@@ -1,11 +1,17 @@
+"use client";
+
 import { Input } from "@/components/ui/input";
+import { useSearch } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 type SearchBarProps = {
   className?: string;
 };
 
 export function SearchBar({ className }: SearchBarProps) {
+  const { searchQuery, handleSetSearchQuery } = useSearch();
+
   return (
     <Input
       className={cn(
@@ -14,6 +20,10 @@ export function SearchBar({ className }: SearchBarProps) {
       )}
       type="search"
       placeholder="Search for item name"
+      value={searchQuery}
+      onChange={(e) => {
+        handleSetSearchQuery(e.target.value);
+      }}
     />
   );
 }
