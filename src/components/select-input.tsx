@@ -10,19 +10,19 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 
-type SelectInputProps = {
+type SelectInputProps<T extends string> = {
   label: string;
-  options: string[];
-  value: string;
-  onChange: (value: string) => void;
+  options: readonly T[];
+  value: T;
+  onChange: (value: T) => void;
 };
 
-export default function SelectInput({
+export default function SelectInput<T extends string>({
   label,
   options,
   value,
   onChange,
-}: SelectInputProps) {
+}: SelectInputProps<T>) {
   const id = useMemo(() => label.toLowerCase().replace(/\s+/g, "-"), [label]);
 
   return (

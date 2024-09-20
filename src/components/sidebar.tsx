@@ -3,19 +3,20 @@
 import { useFilter } from "@/lib/hooks";
 import SelectInput from "./select-input";
 import { SORT_OPTIONS, VIEW_OPTIONS } from "@/lib/constants";
+import { SortOptions, ViewOptions } from "@/lib/types";
 
 export default function SideBar() {
   const { sortBy, viewMode, handleSetSortBy, handleSetViewMode } = useFilter();
 
   return (
     <div className="flex flex-col gap-2 p-[10px] pt-[60px] w-[250px]">
-      <SelectInput
+      <SelectInput<SortOptions>
         label="Sort by"
         options={SORT_OPTIONS}
         value={sortBy}
         onChange={(value) => handleSetSortBy(value)}
       />
-      <SelectInput
+      <SelectInput<ViewOptions>
         label="View"
         options={VIEW_OPTIONS}
         value={viewMode}
