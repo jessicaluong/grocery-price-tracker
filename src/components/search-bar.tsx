@@ -19,7 +19,7 @@ export function SearchBar({ className }: SearchBarProps) {
         className
       )}
       type="search"
-      placeholder="Search for item name"
+      placeholder="Search for item"
       value={searchQuery}
       onChange={(e) => {
         handleSetSearchQuery(e.target.value);

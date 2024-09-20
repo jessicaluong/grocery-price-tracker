@@ -66,7 +66,7 @@ const groceryItems: GroceryItem[] = [
   },
   {
     id: "6",
-    name: "orange juice",
+    name: "lemon juice",
     brand: "simply orange",
     store: "Superstore",
     count: 1,
