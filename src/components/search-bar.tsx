@@ -1,9 +1,6 @@
-"use client";
-
 import { Input } from "@/components/ui/input";
 import { useFilter } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 
 type SearchBarProps = {
   className?: string;
@@ -12,6 +9,8 @@ type SearchBarProps = {
 export function SearchBar({ className }: SearchBarProps) {
   const { searchQuery, handleSetSearchQuery } = useFilter();
 
+  // TODO: add buttons to clear text or search? (consider mobile)
+
   return (
     <Input
       className={cn(
@@ -19,7 +18,7 @@ export function SearchBar({ className }: SearchBarProps) {
         className
       )}
       type="search"
-      placeholder="Search for item"
+      placeholder="Search by item name or brand"
       value={searchQuery}
       onChange={(e) => {
         handleSetSearchQuery(e.target.value);

@@ -22,7 +22,7 @@ export default function GroceryProvider({ children }: GroceryProviderProps) {
       amount: 1,
       unit: "kg",
       price: 4.27,
-      date: "2024-09-12",
+      date: "2024-09-14",
       isSale: true,
     },
     {
@@ -34,7 +34,7 @@ export default function GroceryProvider({ children }: GroceryProviderProps) {
       amount: 100,
       unit: "mL",
       price: 4,
-      date: "2024-09-12",
+      date: "2024-09-15",
       isSale: true,
     },
     {
@@ -168,7 +168,49 @@ export default function GroceryProvider({ children }: GroceryProviderProps) {
       date: "2024-09-13",
       isSale: true,
     },
+    {
+      id: "14",
+      name: "oats",
+      brand: "Quaker",
+      store: "Superstore",
+      count: 1,
+      amount: 1,
+      unit: "kg",
+      price: 5.99,
+      date: "2024-09-16",
+      isSale: true,
+    },
+    {
+      id: "15",
+      name: "oats",
+      brand: "Quaker",
+      store: "Walmart",
+      count: 1,
+      amount: 1,
+      unit: "kg",
+      price: 6.99,
+      date: "2024-09-17",
+      isSale: true,
+    },
+    {
+      id: "16",
+      name: "organic oats",
+      brand: "Quaker",
+      store: "Walmart",
+      count: 1,
+      amount: 1,
+      unit: "kg",
+      price: 25.1,
+      date: "2024-09-12",
+      isSale: false,
+    },
   ]);
+
+  const handleAddItem = () => {};
+
+  const handleRemoveItem = () => {};
+
+  const handleEditItem = () => {};
 
   return (
     <GroceryContext.Provider value={{ groceryItems }}>

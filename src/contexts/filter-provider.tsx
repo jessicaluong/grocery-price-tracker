@@ -3,7 +3,7 @@
 import { DEFAULT_SORT, DEFAULT_VIEW } from "@/lib/constants";
 import { useGrocery } from "@/lib/hooks";
 import { GroceryItem, SortOptions, ViewOptions } from "@/lib/types";
-import { createContext, useState } from "react";
+import { createContext, useMemo, useState } from "react";
 
 type FilterContextType = {
   searchQuery: string;
@@ -43,27 +43,53 @@ export default function FilterProvider({ children }: FilterProviderProps) {
 
   const handleSetSearchQuery = (query: string) => {
     setSearchQuery(query);
-    console.log(`Query changed to: ${query}`);
-    // TODO: escape key should remove query
   };
 
   const handleSetSortBy = (mode: SortOptions) => {
     setSortBy(mode);
-    console.log(`Sort changed to: ${mode}`);
   };
 
   const handleSetViewMode = (mode: ViewOptions) => {
     setViewMode(mode);
-    console.log(`View changed to: ${mode}`);
   };
 
-  const filteredItems = groceryItems.filter((item) => {
-    const itemNameMatch = matchItemName(item.name, searchQuery);
-    const brandNameMatch =
-      item.brand && matchBrandName(item.brand, searchQuery);
+  const sortItems = (
+    items: GroceryItem[],
+    sortOrder: SortOptions
+  ): GroceryItem[] => {
+    return [...items].sort((a, b) => {
+      if (sortOrder === "Lowest Price") {
+        return a.price - b.price;
+      } else if (sortOrder === "Recently Added") {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      }
+      return 0;
+    });
+  };
 
-    return itemNameMatch || brandNameMatch;
-  });
+  const findItems = (items: GroceryItem[], query: string): GroceryItem[] => {
+    return items.filter((item) => {
+      const itemNameMatch = matchItemName(item.name, query);
+      const brandNameMatch = item.brand && matchBrandName(item.brand, query);
+      return itemNameMatch || brandNameMatch;
+    });
+  };
+
+  const groupItems = (items: GroceryItem[], sortOrder: SortOptions) => {
+    // TODO:
+    return items;
+  };
+
+  const filteredItems: GroceryItem[] = useMemo(() => {
+    const foundItems = findItems(groceryItems, searchQuery);
+    const sortedItems = sortItems(foundItems, sortBy);
+
+    if (viewMode === "Group by Item") {
+      return groupItems(sortedItems, sortBy);
+    }
+
+    return sortedItems;
+  }, [groceryItems, searchQuery, sortBy]);
 
   return (
     <FilterContext.Provider
