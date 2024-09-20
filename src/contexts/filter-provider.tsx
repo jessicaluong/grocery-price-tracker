@@ -7,10 +7,10 @@ import { createContext, useState } from "react";
 type FilterContextType = {
   searchQuery: string;
   handleSetSearchQuery: (query: string) => void;
-  sortBy: string;
-  viewMode: string;
-  handleSetSortBy: (mode: string) => void;
-  handleSetViewMode: (mode: string) => void;
+  sortBy: SortOptions;
+  viewMode: ViewOptions;
+  handleSetSortBy: (mode: SortOptions) => void;
+  handleSetViewMode: (mode: ViewOptions) => void;
 };
 
 export const FilterContext = createContext<FilterContextType | null>(null);
