@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearch } from "@/lib/hooks";
+import { useFilter } from "@/lib/hooks";
 import GroceryItemCard from "./grocery-item-card";
 import { GroceryItem } from "@/lib/types";
 
@@ -22,7 +22,7 @@ function matchBrandName(brandName: string, searchQuery: string) {
 }
 
 export default function GroceryList({ groceryItems }: GroceryListProps) {
-  const { searchQuery } = useSearch();
+  const { searchQuery } = useFilter();
 
   const filteredItems = groceryItems.filter((item) => {
     const itemNameMatch = matchItemName(item.name, searchQuery);

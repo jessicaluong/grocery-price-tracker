@@ -1,10 +1,10 @@
-import { SearchContext } from "@/contexts/search-provider";
+import { FilterContext } from "@/contexts/filter-provider";
 import { useContext } from "react";
 
-export function useSearch() {
-  const context = useContext(SearchContext);
+export function useFilter() {
+  const context = useContext(FilterContext);
   if (!context) {
-    throw new Error("useSearch must be used within a SearchProvider");
+    throw new Error("useFilter must be used within a FilterProvider");
   }
   return context;
 }

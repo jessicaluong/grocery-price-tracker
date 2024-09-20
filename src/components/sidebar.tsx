@@ -1,24 +1,25 @@
 "use client";
 
+import { useFilter } from "@/lib/hooks";
 import SelectInput from "./select-input";
-
-const sortOptions = ["lowest", "newest"];
-const viewOptions = ["list", "group"];
+import { SORT_OPTIONS, VIEW_OPTIONS } from "@/lib/constants";
 
 export default function SideBar() {
+  const { sortBy, viewMode, handleSetSortBy, handleSetViewMode } = useFilter();
+
   return (
     <div className="flex flex-col gap-2 p-[10px] pt-[60px] w-[250px]">
       <SelectInput
         label="Sort by"
-        options={sortOptions}
-        defaultValue={sortOptions[0]}
-        onChange={(value) => console.log(`Sort changed to: ${value}`)}
+        options={SORT_OPTIONS}
+        value={sortBy}
+        onChange={(value) => handleSetSortBy(value)}
       />
       <SelectInput
         label="View"
-        options={viewOptions}
-        defaultValue={viewOptions[0]}
-        onChange={(value) => console.log(`Sort changed to: ${value}`)}
+        options={VIEW_OPTIONS}
+        value={viewMode}
+        onChange={(value) => handleSetViewMode(value)}
       />
       {/* <SelectInput label="Category" />
       <SelectInput label="Store" />

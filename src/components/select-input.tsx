@@ -13,14 +13,14 @@ import { Label } from "@/components/ui/label";
 type SelectInputProps = {
   label: string;
   options: string[];
-  defaultValue: string;
+  value: string;
   onChange: (value: string) => void;
 };
 
 export default function SelectInput({
   label,
   options,
-  defaultValue,
+  value,
   onChange,
 }: SelectInputProps) {
   const id = useMemo(() => label.toLowerCase().replace(/\s+/g, "-"), [label]);
@@ -28,14 +28,14 @@ export default function SelectInput({
   return (
     <div className="grid grid-cols-3 items-center gap-4">
       <Label htmlFor={id}>{label}</Label>
-      <Select defaultValue={defaultValue} onValueChange={onChange}>
+      <Select value={value} onValueChange={onChange}>
         <SelectTrigger id={id} className="col-span-2 h-8">
           <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             {options.map((option) => (
-              <SelectItem key={option} value={option} className="capitalize">
+              <SelectItem key={option} value={option}>
                 {option}
               </SelectItem>
             ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { useSearch } from "@/lib/hooks";
+import { useFilter } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
@@ -10,7 +10,7 @@ type SearchBarProps = {
 };
 
 export function SearchBar({ className }: SearchBarProps) {
-  const { searchQuery, handleSetSearchQuery } = useSearch();
+  const { searchQuery, handleSetSearchQuery } = useFilter();
 
   return (
     <Input
