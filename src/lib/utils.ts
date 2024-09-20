@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Unit } from "./types";
+import { unitConversions } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -22,16 +23,6 @@ export function comparePriceFormat(
 ): string {
   const totalAmount = count * amount;
   const pricePerUnit = price / totalAmount;
-
-  const unitConversions = {
-    kg: { factor: 10, displayUnit: "g" },
-    L: { factor: 10, displayUnit: "mL" },
-    g: { factor: 0.01, displayUnit: "g" },
-    mL: { factor: 0.01, displayUnit: "mL" },
-    units: { factor: 1, displayUnit: "unit" },
-    sheets: { factor: 1, displayUnit: "sheet" },
-    washloads: { factor: 1, displayUnit: "washload" },
-  };
 
   const conversion = unitConversions[unit];
   const convertedPrice = pricePerUnit / conversion.factor;

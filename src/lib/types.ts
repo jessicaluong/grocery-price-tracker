@@ -1,6 +1,6 @@
-import { SORT_OPTIONS, VIEW_OPTIONS } from "./constants";
+import { SORT_OPTIONS, VIEW_OPTIONS, unitConversions } from "./constants";
 
-export type Unit = "kg" | "g" | "mL" | "L" | "units" | "sheets" | "washloads";
+export type Unit = keyof typeof unitConversions;
 
 export type GroceryItem = {
   id: string;
