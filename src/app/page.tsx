@@ -1,6 +1,6 @@
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
-import GroceryList from "@/components/grocery-list";
+import GroceryList from "@/components/grocery-list/grocery-list";
 
 export default function Home() {
   return (

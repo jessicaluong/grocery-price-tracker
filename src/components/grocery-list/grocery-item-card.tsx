@@ -9,7 +9,11 @@ type GroceryItemCardProps = {
 
 export default function GroceryItemCard({ item }: GroceryItemCardProps) {
   return (
-    <Card>
+    <Card
+      onClick={() => {
+        console.log("clicked");
+      }}
+    >
       <CardContent className="flex leading-tight">
         <div className="grow mr-4 min-w-0">
           <ItemDetails item={item} />
