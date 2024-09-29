@@ -1,23 +1,49 @@
 import { GroceryItem } from "@/lib/types";
 import React from "react";
+import { cn } from "@/lib/utils";
 
 type ItemDetailsProps = {
   item: GroceryItem;
 };
 
+type ItemBrandProps = {
+  className?: string;
+} & Pick<GroceryItem, "brand">;
+
 export default function ItemDetails({ item }: ItemDetailsProps) {
   return (
-    <>
+    <div>
       <p className="flex items-baseline tracking-tight">
-        <span className="truncate font-semibold capitalize">{item.name}</span>
-        <span className="shrink-0 ml-2 sm:ml-1 text-sm">
-          {item.count !== 1 && `${item.count} x `}
-          {item.amount} {item.unit}
-        </span>
+        <ItemName name={item.name} />
+        <ItemQuantity
+          count={item.count}
+          amount={item.amount}
+          unit={item.unit}
+        />
       </p>
-      <div className="h-7">
-        {item.brand && <p className="capitalize">{item.brand}</p>}
-      </div>
-    </>
+      <ItemBrand brand={item.brand} className="h-7" />
+    </div>
   );
+}
+
+export function ItemName({ name }: Pick<GroceryItem, "name">) {
+  return <span className="truncate font-semibold capitalize">{name}</span>;
+}
+
+export function ItemQuantity({
+  count,
+  amount,
+  unit,
+}: Pick<GroceryItem, "count" | "amount" | "unit">) {
+  return (
+    <span className="shrink-0 ml-2 sm:ml-1 text-sm">
+      {count !== 1 && `${count} x `} {amount} {unit}
+    </span>
+  );
+}
+
+export function ItemBrand({ className, brand }: ItemBrandProps) {
+  if (brand) {
+    return <p className={cn("capitalize", className)}>{brand}</p>;
+  }
 }
