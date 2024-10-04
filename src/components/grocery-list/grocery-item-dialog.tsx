@@ -8,6 +8,7 @@ import {
 import { GroceryItem } from "@/lib/types";
 import { ItemName, ItemQuantity, ItemBrand } from "./item-details";
 import { Price } from "./price-details";
+import { PriceChart } from "./price-chart";
 
 type GroceryItemDialogProps = {
   open: boolean;
@@ -33,8 +34,14 @@ export default function GroceryItemDialog({
               unit={item.unit}
             />
             <ItemBrand brand={item.brand} />
-            <p className="capitalize">{item.store}</p>
-            <Price isSale={item.isSale} price={item.price} />
+            <p className="capitalize leading-10">{item.store}</p>
+            {/* <Price isSale={item.isSale} price={item.price} /> */}
+            <PriceChart />
+            <div className="flex justify-between mt-[10px]">
+              <p>Low $2.99</p>
+              <p>Average $3.50</p>
+              <p>High $5.00</p>
+            </div>
           </DialogDescription>
         </DialogHeader>
       </DialogContent>
