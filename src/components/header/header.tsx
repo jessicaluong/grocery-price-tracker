@@ -1,11 +1,17 @@
+"use client";
+
+import CustomDrawer from "../custom-drawer";
+import CustomPopover from "../custom-popover";
 import { SearchBar } from "./search-bar";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 
 export default function Header() {
   return (
     <header className="flex flex-col gap-2 pb-[10px]">
       <div className="flex gap-1 sm:justify-between w-full">
+        {/* <CustomPopover />
+        <CustomDrawer /> */}
         <Button variant="outline">
           <PlusCircledIcon className="mr-2" /> Add Item
         </Button>
