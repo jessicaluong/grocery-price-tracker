@@ -25,25 +25,25 @@ export default function GroceryItemDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle></DialogTitle>
-          <DialogDescription>
+          <DialogTitle>
             <ItemName name={item.name} />
             <ItemQuantity
               count={item.count}
               amount={item.amount}
               unit={item.unit}
             />
-            <ItemBrand brand={item.brand} />
-            <p className="capitalize leading-10">{item.store}</p>
-            {/* <Price isSale={item.isSale} price={item.price} /> */}
-            <PriceChart />
-            <div className="flex justify-between mt-[10px]">
-              <p>Low $2.99</p>
-              <p>Average $3.50</p>
-              <p>High $5.00</p>
-            </div>
-          </DialogDescription>
+            <ItemBrand brand={item.brand} className="font-semibold" />
+          </DialogTitle>
+          <DialogDescription className="text-center"></DialogDescription>
         </DialogHeader>
+        <p className="capitalize leading-10">{item.store}</p>
+        <Price isSale={item.isSale} price={item.price} />
+        <PriceChart />
+        <div className="flex justify-between mt-[10px]">
+          <p>Low $2.99</p>
+          <p>Average $3.50</p>
+          <p>High $5.00</p>
+        </div>
       </DialogContent>
     </Dialog>
   );

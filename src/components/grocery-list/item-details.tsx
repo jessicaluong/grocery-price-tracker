@@ -13,14 +13,14 @@ type ItemBrandProps = {
 export default function ItemDetails({ item }: ItemDetailsProps) {
   return (
     <div>
-      <p className="flex items-baseline tracking-tight">
+      <div className="flex items-baseline tracking-tight">
         <ItemName name={item.name} />
         <ItemQuantity
           count={item.count}
           amount={item.amount}
           unit={item.unit}
         />
-      </p>
+      </div>
       <ItemBrand brand={item.brand} className="h-7" />
     </div>
   );
@@ -44,6 +44,6 @@ export function ItemQuantity({
 
 export function ItemBrand({ className, brand }: ItemBrandProps) {
   if (brand) {
-    return <p className={cn("capitalize", className)}>{brand}</p>;
+    return <div className={cn("capitalize", className)}>{brand}</div>;
   }
 }
