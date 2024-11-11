@@ -1,14 +1,12 @@
 import { Input } from "@/components/ui/input";
-import { useFilter } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 
 type SearchBarProps = {
   className?: string;
+  onSetSearchQuery: (query: string) => void;
 };
 
-export function SearchBar({ className }: SearchBarProps) {
-  const { searchQuery, handleSetSearchQuery } = useFilter();
-
+export function SearchBar({ className, onSetSearchQuery }: SearchBarProps) {
   // TODO: add buttons to clear text or search? (consider mobile)
 
   return (
@@ -19,9 +17,8 @@ export function SearchBar({ className }: SearchBarProps) {
       )}
       type="search"
       placeholder="Search by item name or brand"
-      value={searchQuery}
       onChange={(e) => {
-        handleSetSearchQuery(e.target.value);
+        onSetSearchQuery(e.target.value);
       }}
     />
   );

@@ -27,7 +27,7 @@ export default function GroceryItemCard({ item }: GroceryItemCardProps) {
           </div>
           <div className="shrink-0 text-right">
             <PriceDetails item={item} />
-            <p className="font-light tracking-tighter">{item.date}</p>
+            {/* <p className="font-light tracking-tighter">{item.date}</p> */}
           </div>
         </CardContent>
       </Card>

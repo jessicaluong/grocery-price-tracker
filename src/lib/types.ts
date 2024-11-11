@@ -1,18 +1,23 @@
 import { SORT_OPTIONS, VIEW_OPTIONS, unitConversions } from "./constants";
+import { GroceryItem as PrismaGroceryItem } from "@prisma/client";
 
 export type Unit = keyof typeof unitConversions;
 
-export type GroceryItem = {
-  id: string;
-  name: string;
-  brand?: string;
-  store: string;
-  count: number;
-  amount: number;
+// export type GroceryItem = {
+//   id: string;
+//   name: string;
+//   brand?: string;
+//   store: string;
+//   count: number;
+//   amount: number;
+//   unit: Unit;
+//   price: number;
+//   date: string;
+//   isSale: boolean;
+// };
+
+export type GroceryItem = Omit<PrismaGroceryItem, "unit"> & {
   unit: Unit;
-  price: number;
-  date: string;
-  isSale: boolean;
 };
 
 export type SortOptions = (typeof SORT_OPTIONS)[number];

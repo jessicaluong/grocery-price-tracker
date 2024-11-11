@@ -31,3 +31,16 @@ export function comparePriceFormat(
     conversion.factor === 1 ? "" : "100"
   } ${conversion.displayUnit}`;
 }
+
+export function matchItemName(itemName: string, searchQuery: string) {
+  const words = itemName.toLowerCase().split(/\s+/);
+  const searchWords = searchQuery.toLowerCase().split(/\s+/);
+
+  return searchWords.every((searchWord) =>
+    words.some((word) => word.startsWith(searchWord))
+  );
+}
+
+export function matchBrandName(brandName: string, searchQuery: string) {
+  return brandName.toLowerCase().startsWith(searchQuery.toLowerCase());
+}

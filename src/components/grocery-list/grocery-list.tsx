@@ -1,11 +1,11 @@
-"use client";
-
-import { useFilter } from "@/lib/hooks";
 import GroceryItemCard from "./grocery-item-card";
+import { GroceryItem } from "@/lib/types";
 
-export default function GroceryList() {
-  const { filteredItems } = useFilter();
+type GroceryListProps = {
+  filteredItems: GroceryItem[];
+};
 
+export default function GroceryList({ filteredItems }: GroceryListProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
       {filteredItems.map((item) => (
