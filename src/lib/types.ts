@@ -3,19 +3,6 @@ import { GroceryItem as PrismaGroceryItem } from "@prisma/client";
 
 export type Unit = keyof typeof unitConversions;
 
-// export type GroceryItem = {
-//   id: string;
-//   name: string;
-//   brand?: string;
-//   store: string;
-//   count: number;
-//   amount: number;
-//   unit: Unit;
-//   price: number;
-//   date: string;
-//   isSale: boolean;
-// };
-
 export type GroceryItem = Omit<PrismaGroceryItem, "unit"> & {
   unit: Unit;
 };
