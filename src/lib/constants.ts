@@ -9,6 +9,6 @@ export const unitConversions = {
 } as const;
 
 export const SORT_OPTIONS = ["Recently Added", "Lowest Price"] as const;
-export const VIEW_OPTIONS = ["List All Dates", "Group by Item"] as const;
+export const VIEW_OPTIONS = ["List All Items", "Group Items"] as const;
 export const DEFAULT_SORT = SORT_OPTIONS[0];
 export const DEFAULT_VIEW = VIEW_OPTIONS[0];
