@@ -4,7 +4,7 @@ import Header from "@/components/header/header";
 import GroceryList from "@/components/grocery-list/grocery-list";
 import { GroceryItem, SortOptions, ViewOptions } from "@/lib/types";
 import { useMemo, useState } from "react";
-import { DEFAULT_SORT, DEFAULT_VIEW } from "@/lib/constants";
+import { DEFAULT_SORT, DEFAULT_VIEW, VIEW_OPTIONS } from "@/lib/constants";
 import { matchBrandName, matchItemName } from "@/lib/utils";
 
 type MainProps = { initialItems: GroceryItem[] };
@@ -61,7 +61,7 @@ export default function Main({ initialItems }: MainProps) {
     const foundItems = findItems(initialItems, searchQuery);
     const sortedItems = sortItems(foundItems, sortBy);
 
-    if (viewMode === "Group by Item") {
+    if (viewMode === VIEW_OPTIONS[1]) {
       return groupItems(sortedItems, sortBy);
     }
 
