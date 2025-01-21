@@ -17,7 +17,7 @@ export default function SortAndViewControls({
   onSetViewMode,
 }: SideBarProps) {
   return (
-    <div className="flex gap-2 justify-between">
+    <div className="flex gap-2">
       <SelectInput<SortOptions>
         label="Sort by"
         options={SORT_OPTIONS}

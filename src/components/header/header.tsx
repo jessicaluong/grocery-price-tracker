@@ -39,7 +39,7 @@ export default function Header({
             J
           </Button>
         </div>
-        <div className="flex flex-col sm:flex-row justify-between gap-2">
+        <div className="flex flex-col gap-2 md:flex-row md:justify-between">
           <SearchBar onSetSearchQuery={onSetSearchQuery} />
           <SortAndViewControls
             sortBy={sortBy}
