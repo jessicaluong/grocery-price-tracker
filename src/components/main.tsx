@@ -1,7 +1,6 @@
 "use client";
 
 import Header from "@/components/header/header";
-import Sidebar from "@/components/sidebar";
 import GroceryList from "@/components/grocery-list/grocery-list";
 import { GroceryItem, SortOptions, ViewOptions } from "@/lib/types";
 import { useMemo, useState } from "react";
@@ -72,16 +71,15 @@ export default function Main({ initialItems }: MainProps) {
   return (
     <main className="flex justify-center w-full p-[10px]">
       <div className="flex w-full max-w-[1200px] sm:border rounded-xl">
-        <div className="hidden sm:block border-r">
-          <Sidebar
+        <div className="hidden sm:block border-r"></div>
+        <div className="flex-1 min-w-0  p-[10px]">
+          <Header
+            onSetSearchQuery={handleSetSearchQuery}
             sortBy={sortBy}
             viewMode={viewMode}
             onSetSortBy={handleSetSortBy}
             onSetViewMode={handleSetViewMode}
           />
-        </div>
-        <div className="flex-1 min-w-0  p-[10px]">
-          <Header onSetSearchQuery={handleSetSearchQuery} />
           <GroceryList filteredItems={filteredItems} />
         </div>
       </div>

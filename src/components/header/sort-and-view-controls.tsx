@@ -1,6 +1,5 @@
 "use client";
-
-import SelectInput from "./select-input";
+import SelectInput from "../select-input";
 import { SORT_OPTIONS, VIEW_OPTIONS } from "@/lib/constants";
 import { SortOptions, ViewOptions } from "@/lib/types";
 
@@ -11,14 +10,14 @@ type SideBarProps = {
   onSetViewMode: (mode: ViewOptions) => void;
 };
 
-export default function SideBar({
+export default function SortAndViewControls({
   sortBy,
   viewMode,
   onSetSortBy,
   onSetViewMode,
 }: SideBarProps) {
   return (
-    <div className="flex flex-col gap-2 p-[10px] pt-[60px] w-[250px]">
+    <div className="flex gap-2 justify-between">
       <SelectInput<SortOptions>
         label="Sort by"
         options={SORT_OPTIONS}
@@ -31,9 +30,6 @@ export default function SideBar({
         value={viewMode}
         onChange={(value) => onSetViewMode(value)}
       />
-      {/* <SelectInput label="Category" />
-      <SelectInput label="Store" />
-      <SelectInput label="Brand" /> */}
     </div>
   );
 }

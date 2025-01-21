@@ -26,10 +26,10 @@ export default function SelectInput<T extends string>({
   const id = useMemo(() => label.toLowerCase().replace(/\s+/g, "-"), [label]);
 
   return (
-    <div className="grid grid-cols-3 items-center gap-4">
+    <div className="grid grid-cols-[auto_1fr] gap-2 items-center">
       <Label htmlFor={id}>{label}</Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger id={id} className="col-span-2 h-8">
+        <SelectTrigger id={id} className="h-8">
           <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
         </SelectTrigger>
         <SelectContent>

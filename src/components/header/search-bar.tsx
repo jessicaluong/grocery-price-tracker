@@ -12,7 +12,7 @@ export function SearchBar({ className, onSetSearchQuery }: SearchBarProps) {
   return (
     <Input
       className={cn(
-        "w-full sm:flex-1 sm:min-w-[200px] sm:max-w-[300px]",
+        "w-full sm:flex-1 sm:min-w-[400px] sm:max-w-[500px]",
         className
       )}
       type="search"
