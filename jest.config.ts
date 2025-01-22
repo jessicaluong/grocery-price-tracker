@@ -40,7 +40,10 @@ const config: Config = {
   },
 
   transform: {
-    "^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
+    "^.+\\.(js|jsx|ts|tsx)$": [
+      "babel-jest",
+      { configFile: "./babel.config.testing.js" },
+    ],
   },
 
   // A list of reporter names that Jest uses when writing coverage reports
