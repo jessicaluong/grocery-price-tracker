@@ -32,8 +32,8 @@ export function comparePriceFormat(
   } ${conversion.displayUnit}`;
 }
 
-export function matchName(itemName: string, searchQuery: string) {
-  const words = itemName.toLowerCase().split(/\s+/);
+export function matchName(name: string, searchQuery: string) {
+  const words = name.toLowerCase().split(/\s+/);
   const searchWords = searchQuery.toLowerCase().split(/\s+/);
 
   return searchWords.every((searchWord) =>
