@@ -5,7 +5,7 @@ import GroceryList from "@/components/grocery-list/grocery-list";
 import { GroceryItem, SortOptions, ViewOptions } from "@/lib/types";
 import { useMemo, useState } from "react";
 import { DEFAULT_SORT, DEFAULT_VIEW, VIEW_OPTIONS } from "@/lib/constants";
-import { matchName } from "@/lib/utils";
+import { findItems, sortItems, groupItems } from "@/services/grocery-service";
 
 type MainProps = { initialItems: GroceryItem[] };
 
@@ -29,33 +29,6 @@ export default function Main({ initialItems }: MainProps) {
   // if (!initialItems || initialItems.length === 0) {
   //   return <div>No grocery items available.</div>;
   // }
-
-  const sortItems = (
-    items: GroceryItem[],
-    sortOrder: SortOptions
-  ): GroceryItem[] => {
-    return [...items].sort((a, b) => {
-      if (sortOrder === "Lowest Price") {
-        return a.price - b.price;
-      } else if (sortOrder === "Recently Added") {
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-      }
-      return 0;
-    });
-  };
-
-  const findItems = (items: GroceryItem[], query: string): GroceryItem[] => {
-    return items.filter((item) => {
-      const itemNameMatch = matchName(item.name, query);
-      const brandNameMatch = item.brand && matchName(item.brand, query);
-      return itemNameMatch || brandNameMatch;
-    });
-  };
-
-  const groupItems = (items: GroceryItem[], sortOrder: SortOptions) => {
-    // TODO: group items that have the same name, quantity and store
-    return items;
-  };
 
   const filteredItems: GroceryItem[] = useMemo(() => {
     const foundItems = findItems(initialItems, searchQuery);

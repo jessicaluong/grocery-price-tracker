@@ -16,7 +16,7 @@ export function SearchBar({ className, onSetSearchQuery }: SearchBarProps) {
         className
       )}
       type="search"
-      placeholder="Search by item name or brand"
+      placeholder="Search by item name and brand"
       onChange={(e) => {
         onSetSearchQuery(e.target.value);
       }}
