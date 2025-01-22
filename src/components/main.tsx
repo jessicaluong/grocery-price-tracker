@@ -5,7 +5,7 @@ import GroceryList from "@/components/grocery-list/grocery-list";
 import { GroceryItem, SortOptions, ViewOptions } from "@/lib/types";
 import { useMemo, useState } from "react";
 import { DEFAULT_SORT, DEFAULT_VIEW, VIEW_OPTIONS } from "@/lib/constants";
-import { matchBrandName, matchItemName } from "@/lib/utils";
+import { matchName } from "@/lib/utils";
 
 type MainProps = { initialItems: GroceryItem[] };
 
@@ -46,8 +46,8 @@ export default function Main({ initialItems }: MainProps) {
 
   const findItems = (items: GroceryItem[], query: string): GroceryItem[] => {
     return items.filter((item) => {
-      const itemNameMatch = matchItemName(item.name, query);
-      const brandNameMatch = item.brand && matchBrandName(item.brand, query);
+      const itemNameMatch = matchName(item.name, query);
+      const brandNameMatch = item.brand && matchName(item.brand, query);
       return itemNameMatch || brandNameMatch;
     });
   };

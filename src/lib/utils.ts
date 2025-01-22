@@ -32,15 +32,11 @@ export function comparePriceFormat(
   } ${conversion.displayUnit}`;
 }
 
-export function matchItemName(itemName: string, searchQuery: string) {
+export function matchName(itemName: string, searchQuery: string) {
   const words = itemName.toLowerCase().split(/\s+/);
   const searchWords = searchQuery.toLowerCase().split(/\s+/);
 
   return searchWords.every((searchWord) =>
     words.some((word) => word.startsWith(searchWord))
   );
-}
-
-export function matchBrandName(brandName: string, searchQuery: string) {
-  return brandName.toLowerCase().startsWith(searchQuery.toLowerCase());
 }
