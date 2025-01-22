@@ -31,11 +31,11 @@ export default function Header({
         {/* <Button variant="outline">
           <PlusCircledIcon className="mr-2" /> Add Item
         </Button> */}
-        <div className="flex justify-between items-center gap-2">
+        <div className="flex justify-end items-center gap-2">
           <Button variant="outline">
             <PlusCircledIcon className="mr-2" /> Add Item
           </Button>
-          <Button size="icon" variant="secondary" className="ml-auto sm:ml-0">
+          <Button size="icon" variant="secondary">
             J
           </Button>
         </div>
