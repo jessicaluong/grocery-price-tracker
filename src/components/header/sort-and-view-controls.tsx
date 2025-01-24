@@ -20,13 +20,13 @@ export default function SortAndViewControls({
     <div className="flex gap-2">
       <SelectInput<SortOptions>
         label="Sort by"
-        options={SORT_OPTIONS}
+        options={Object.values(SORT_OPTIONS)}
         value={sortBy}
         onChange={(value) => onSetSortBy(value)}
       />
       <SelectInput<ViewOptions>
         label="View"
-        options={VIEW_OPTIONS}
+        options={Object.values(VIEW_OPTIONS)}
         value={viewMode}
         onChange={(value) => onSetViewMode(value)}
       />

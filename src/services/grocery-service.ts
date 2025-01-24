@@ -38,6 +38,6 @@ export const findItems = (
 };
 
 export const groupItems = (items: GroceryItem[], sortOrder: SortOptions) => {
-  // TODO: group items that have the same name, quantity and store
+  // TODO: group items that have the same name, quantity, unit, amount, and store
   return items;
 };

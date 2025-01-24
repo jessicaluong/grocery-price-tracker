@@ -34,7 +34,7 @@ export default function Main({ initialItems }: MainProps) {
     const foundItems = findItems(initialItems, searchQuery);
     const sortedItems = sortItems(foundItems, sortBy);
 
-    if (viewMode === VIEW_OPTIONS[1]) {
+    if (viewMode === VIEW_OPTIONS.GROUP) {
       return groupItems(sortedItems, sortBy);
     }
 
