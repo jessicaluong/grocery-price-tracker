@@ -12,6 +12,8 @@ This application aims to help users determine if grocery prices represent good v
 
 ## Technical Stack
 
+![Tech used](https://skillicons.dev/icons?i=next,react,ts,tailwind,jest,prisma)
+
 - **Framework**: Next.js 14 with TypeScript
 - **Frontend**:
   - React 18
