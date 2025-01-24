@@ -1,17 +1,27 @@
 import { matchName } from "@/lib/utils";
 import { GroceryItem, SortOptions } from "@/lib/types";
 
+export const sortByPrice = (a: GroceryItem, b: GroceryItem) =>
+  a.price - b.price;
+
+export const sortByDate = (a: GroceryItem, b: GroceryItem) =>
+  new Date(b.date).getTime() - new Date(a.date).getTime();
+
 export const sortItems = (
   items: GroceryItem[],
   sortOrder: SortOptions
 ): GroceryItem[] => {
+  if (sortOrder !== "Lowest Price" && sortOrder !== "Recently Added") {
+    throw new Error(`Invalid sort order: ${sortOrder}`);
+  }
+
   return [...items].sort((a, b) => {
-    if (sortOrder === "Lowest Price") {
-      return a.price - b.price;
-    } else if (sortOrder === "Recently Added") {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    switch (sortOrder) {
+      case "Lowest Price":
+        return sortByPrice(a, b);
+      case "Recently Added":
+        return sortByDate(a, b);
     }
-    return 0;
   });
 };
 
