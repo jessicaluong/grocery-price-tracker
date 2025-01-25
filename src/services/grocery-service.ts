@@ -11,10 +11,6 @@ export const sortItems = (
   items: GroceryItem[],
   sortOrder: SortOptions
 ): GroceryItem[] => {
-  if (sortOrder !== "Lowest Price" && sortOrder !== "Recently Added") {
-    throw new Error(`Invalid sort order: ${sortOrder}`);
-  }
-
   return [...items].sort((a, b) => {
     switch (sortOrder) {
       case "Lowest Price":
@@ -38,6 +34,6 @@ export const findItems = (
 };
 
 export const groupItems = (items: GroceryItem[], sortOrder: SortOptions) => {
-  // TODO: group items that have the same name, quantity, unit, amount, and store
+  // TODO: group items that have the same name, quantity, unit, amount, and store, count???
   return items;
 };
