@@ -43,18 +43,35 @@ export const groupItems = (
   sortOrder: SortOptions
 ): GroupedGroceryItem[] => {
   // TODO: group items that have the same name, quantity, unit, amount, and store, count???
-  const testItem = {
-    id: "1",
-    name: "oats",
-    brand: "Quaker",
-    store: "Superstore",
-    count: 1,
-    amount: 1,
-    unit: "kg" as Unit,
-    priceRange: {
-      min: 1,
-      max: 2,
+  const testItems = [
+    {
+      id: "1",
+      name: "oats",
+      brand: "Quaker",
+      store: "Superstore",
+      count: 8,
+      amount: 1,
+      unit: "kg" as Unit,
+      priceRange: {
+        min: 1,
+        max: 2,
+      },
+      numberOfItems: 3,
     },
-  };
-  return [testItem];
+    {
+      id: "1",
+      name: "oats",
+      brand: "One Degree",
+      store: "Superstore",
+      count: 8,
+      amount: 1,
+      unit: "kg" as Unit,
+      priceRange: {
+        min: 1,
+        max: 2,
+      },
+      numberOfItems: 1,
+    },
+  ];
+  return testItems;
 };

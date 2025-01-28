@@ -28,6 +28,10 @@ export default function GroceryItemCard({ item, view }: GroceryItemCardProps) {
             <PriceDetails {...priceDetailsProps} />
             <p className="font-light tracking-tighter">
               {view === "LIST" && item.date.toISOString().split("T")[0]}
+              {view === "GROUP" &&
+                `${item.numberOfItems} ${
+                  item.numberOfItems === 1 ? "item" : "items"
+                }`}
             </p>
           </div>
         </CardContent>

@@ -19,7 +19,7 @@ export type GroupedGroceryItem = {
     min: number;
     max: number;
   };
-  // date: Date;
+  numberOfItems: number;
 };
 
 export type SortOptions = (typeof SORT_OPTIONS)[keyof typeof SORT_OPTIONS];
