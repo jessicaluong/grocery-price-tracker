@@ -1,9 +1,9 @@
-import { GroceryItem } from "@/lib/types";
+import { GroceryItem, GroupedGroceryItem } from "@/lib/types";
 import React from "react";
 import { cn } from "@/lib/utils";
 
 type ItemDetailsProps = {
-  item: GroceryItem;
+  item: GroceryItem | GroupedGroceryItem;
 };
 
 type ItemBrandProps = {

@@ -1,16 +1,15 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { GroceryItem } from "@/lib/types";
+import { ItemWithView } from "@/lib/types";
 import PriceDetails from "./price-details";
 import ItemDetails from "./item-details";
 import GroceryItemDialog from "./grocery-item-dialog";
 import { useState } from "react";
 
-type GroceryItemCardProps = {
-  item: GroceryItem;
-};
+type GroceryItemCardProps = ItemWithView;
 
-export default function GroceryItemCard({ item }: GroceryItemCardProps) {
+export default function GroceryItemCard({ item, view }: GroceryItemCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const priceDetailsProps = { view, item } as ItemWithView;
 
   return (
     <>
@@ -26,18 +25,18 @@ export default function GroceryItemCard({ item }: GroceryItemCardProps) {
             <p className="font-light capitalize">{item.store}</p>
           </div>
           <div className="shrink-0 text-right">
-            <PriceDetails item={item} />
+            <PriceDetails {...priceDetailsProps} />
             <p className="font-light tracking-tighter">
-              {item.date.toISOString().split("T")[0]}
+              {view === "LIST" && item.date.toISOString().split("T")[0]}
             </p>
           </div>
         </CardContent>
       </Card>
-      <GroceryItemDialog
+      {/* <GroceryItemDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         item={item}
-      />
+      /> */}
     </>
   );
 }

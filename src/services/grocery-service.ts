@@ -1,5 +1,10 @@
 import { matchName } from "@/lib/utils";
-import { GroceryItem, SortOptions } from "@/lib/types";
+import {
+  GroceryItem,
+  GroupedGroceryItem,
+  SortOptions,
+  Unit,
+} from "@/lib/types";
 
 export const sortByPrice = (a: GroceryItem, b: GroceryItem) =>
   a.price - b.price;
@@ -33,7 +38,23 @@ export const findItems = (
   });
 };
 
-export const groupItems = (items: GroceryItem[], sortOrder: SortOptions) => {
+export const groupItems = (
+  items: GroceryItem[],
+  sortOrder: SortOptions
+): GroupedGroceryItem[] => {
   // TODO: group items that have the same name, quantity, unit, amount, and store, count???
-  return items;
+  const testItem = {
+    id: "1",
+    name: "oats",
+    brand: "Quaker",
+    store: "Superstore",
+    count: 1,
+    amount: 1,
+    unit: "kg" as Unit,
+    priceRange: {
+      min: 1,
+      max: 2,
+    },
+  };
+  return [testItem];
 };

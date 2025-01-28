@@ -2,7 +2,12 @@
 
 import Header from "@/components/header/header";
 import GroceryList from "@/components/grocery-list/grocery-list";
-import { GroceryItem, SortOptions, ViewOptions } from "@/lib/types";
+import {
+  GroceryItem,
+  ItemsWithViewMode,
+  SortOptions,
+  ViewOptions,
+} from "@/lib/types";
 import { useMemo, useState } from "react";
 import { DEFAULT_SORT, DEFAULT_VIEW, VIEW_OPTIONS } from "@/lib/constants";
 import { findItems, sortItems, groupItems } from "@/services/grocery-service";
@@ -30,16 +35,24 @@ export default function Main({ initialItems }: MainProps) {
   //   return <div>No grocery items available.</div>;
   // }
 
-  const filteredItems: GroceryItem[] = useMemo(() => {
+  const filteredItemsWithView: ItemsWithViewMode = useMemo(() => {
     const foundItems = findItems(initialItems, searchQuery);
     const sortedItems = sortItems(foundItems, sortBy);
 
     if (viewMode === VIEW_OPTIONS.GROUP) {
-      return groupItems(sortedItems, sortBy);
+      return {
+        view: "GROUP",
+        items: groupItems(sortedItems, sortBy),
+      };
     }
 
-    return sortedItems;
-  }, [initialItems, searchQuery, sortBy]);
+    // TODO: rearrange view and sorted (e.g., sort the grouped?)
+    // maybe not sort grouped items
+    return {
+      view: "LIST",
+      items: sortedItems,
+    };
+  }, [initialItems, searchQuery, sortBy, viewMode]);
 
   return (
     <main className="flex justify-center w-full p-[10px]">
@@ -53,7 +66,7 @@ export default function Main({ initialItems }: MainProps) {
             onSetSortBy={handleSetSortBy}
             onSetViewMode={handleSetViewMode}
           />
-          <GroceryList filteredItems={filteredItems} />
+          <GroceryList filteredItemsWithView={filteredItemsWithView} />
         </div>
       </div>
     </main>
