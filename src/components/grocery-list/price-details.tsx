@@ -54,8 +54,11 @@ export function Price(props: PriceProps) {
 
   return (
     <p className={baseClassName}>
-      {currencyFormat(props.priceRange.min)}-
-      {currencyFormat(props.priceRange.max)}
+      {props.priceRange.min === props.priceRange.max
+        ? currencyFormat(props.priceRange.min)
+        : `${currencyFormat(props.priceRange.min)}-${currencyFormat(
+            props.priceRange.max
+          )}`}
     </p>
   );
 }
