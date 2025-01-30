@@ -3,8 +3,11 @@ import {
   sortByPrice,
   sortByDate,
   sortItems,
+  groupItems,
+  getGroupKey,
+  formatString,
 } from "@/services/grocery-service";
-import { GroceryItem } from "@/lib/types";
+import { GroceryItem, Unit } from "@/lib/types";
 
 describe("GroceryService", () => {
   describe("sortByPrice", () => {
@@ -127,7 +130,7 @@ describe("GroceryService", () => {
 
     it("should handle empty array", () => {
       const result = sortItems([], "Recently Added");
-      expect(result).toEqual([]);
+      expect(result).toStrictEqual([]);
     });
 
     it("should maintain original array immutability", () => {
@@ -208,6 +211,276 @@ describe("GroceryService", () => {
       const result = findItems(itemsWithDuplicate, "orange tropicana");
       expect(result).toHaveLength(2);
       expect(result).toEqual([itemsWithDuplicate[0], itemsWithDuplicate[3]]);
+    });
+  });
+
+  describe("formatString", () => {
+    it("should remove inner whitespaces", () => {
+      const result = formatString("orange juice");
+      expect(result).toEqual("orangejuice");
+    });
+
+    it("should remove outer whitespaces", () => {
+      const result = formatString("   orange ");
+      expect(result).toEqual("orange");
+    });
+
+    it("should make string lowercase", () => {
+      const result = formatString("ORangE");
+      expect(result).toEqual("orange");
+    });
+
+    it("should handle null", () => {
+      const result = formatString(null);
+      expect(result).toEqual("");
+    });
+  });
+
+  describe("getGroupKey", () => {
+    const baseItem = {
+      id: "1",
+      name: "orange",
+      brand: "Tropicana",
+      store: "Walmart",
+      count: 1,
+      amount: 100,
+      unit: "mL" as const,
+      price: 4,
+      date: new Date("2024-09-15"),
+      isSale: true,
+    };
+
+    it("should create correct key for item", () => {
+      const result = getGroupKey(baseItem);
+      expect(result).toEqual("orange-tropicana-walmart-1-100-ml");
+    });
+
+    it("should handle white spaces", () => {
+      const item = { ...baseItem, name: "orange juice" };
+      const result = getGroupKey(item);
+      expect(result).toEqual("orangejuice-tropicana-walmart-1-100-ml");
+    });
+
+    it("should handle items with no brand", () => {
+      const item = { ...baseItem, brand: null };
+      const result = getGroupKey(item);
+      expect(result).toEqual("orange--walmart-1-100-ml");
+    });
+
+    it("should handle items with brand called null", () => {
+      const item = { ...baseItem, brand: "null" };
+      const result = getGroupKey(item);
+      expect(result).toEqual("orange-null-walmart-1-100-ml");
+    });
+  });
+
+  describe("groupItems", () => {
+    const baseItem = {
+      id: "1",
+      name: "orange juice",
+      brand: "Tropicana",
+      store: "Walmart",
+      count: 1,
+      amount: 100,
+      unit: "mL" as const,
+      price: 4,
+      date: new Date("2024-09-15"),
+      isSale: true,
+    };
+
+    describe("grouping criteria", () => {
+      it("should group identical items together", () => {
+        const items = [
+          { ...baseItem, id: "1" },
+          { ...baseItem, id: "2" },
+        ];
+
+        const result = groupItems(items);
+        expect(result).toHaveLength(1);
+      });
+
+      it("should separate items with different names", () => {
+        const items = [
+          { ...baseItem, id: "1", name: "orange juice" },
+          { ...baseItem, id: "2", name: "apple juice" },
+        ];
+
+        const result = groupItems(items);
+        expect(result).toHaveLength(2);
+      });
+
+      it("should separate items with different brand", () => {
+        const items = [
+          { ...baseItem, id: "1", brand: "Tropicana" },
+          { ...baseItem, id: "2", brand: "Minute Maid" },
+        ];
+
+        const result = groupItems(items);
+        expect(result).toHaveLength(2);
+      });
+
+      it("should separate items with different stores", () => {
+        const items = [
+          { ...baseItem, id: "1", brand: "Walmart" },
+          { ...baseItem, id: "2", brand: "Superstore" },
+        ];
+
+        const result = groupItems(items);
+        expect(result).toHaveLength(2);
+      });
+
+      it("should separate items with different counts", () => {
+        const items = [
+          { ...baseItem, id: "1", count: 8 },
+          { ...baseItem, id: "2", count: 4 },
+        ];
+
+        const result = groupItems(items);
+        expect(result).toHaveLength(2);
+      });
+
+      it("should separate items with different amounts", () => {
+        const items = [
+          { ...baseItem, id: "1", amount: 100 },
+          { ...baseItem, id: "2", amount: 500 },
+        ];
+
+        const result = groupItems(items);
+        expect(result).toHaveLength(2);
+      });
+
+      it("should separate items with different units", () => {
+        const items = [
+          { ...baseItem, id: "1", unit: "mL" as const },
+          { ...baseItem, id: "2", unit: "L" as const },
+        ];
+
+        const result = groupItems(items);
+        expect(result).toHaveLength(2);
+      });
+    });
+
+    describe("properties that should not affect grouping", () => {
+      it("should group items with different dates together", () => {
+        const items = [
+          { ...baseItem, id: "1", date: new Date("2024-01-01") },
+          { ...baseItem, id: "2", date: new Date("2024-02-01") },
+        ];
+
+        const result = groupItems(items);
+        expect(result).toHaveLength(1);
+      });
+
+      it("should group items with different sale status together", () => {
+        const items = [
+          { ...baseItem, id: "1", isSale: true },
+          { ...baseItem, id: "2", isSale: false },
+        ];
+
+        const result = groupItems(items);
+        expect(result).toHaveLength(1);
+      });
+
+      it("should group items with different prices together", () => {
+        const items = [
+          { ...baseItem, id: "1", price: 1.99 },
+          { ...baseItem, id: "2", price: 2.99 },
+        ];
+
+        const result = groupItems(items);
+        expect(result).toHaveLength(1);
+      });
+    });
+
+    describe("price range calculations ", () => {
+      it("should calculate correct price range for grouped items", () => {
+        const items = [
+          { ...baseItem, id: "1", price: 1.5 },
+          { ...baseItem, id: "2", price: 2.99 },
+          { ...baseItem, id: "3", price: 2.5 },
+        ];
+
+        const result = groupItems(items);
+        expect(result[0].priceRange).toEqual({ min: 1.5, max: 2.99 });
+      });
+
+      it("should handle single item price range", () => {
+        const items = [{ ...baseItem, id: "1", price: 1.99 }];
+
+        const result = groupItems(items);
+        expect(result[0].priceRange).toEqual({ min: 1.99, max: 1.99 });
+      });
+
+      it("should handle identical prices in range calculation", () => {
+        const items = [
+          { ...baseItem, id: "1", price: 1.99 },
+          { ...baseItem, id: "2", price: 1.99 },
+        ];
+
+        const result = groupItems(items);
+        expect(result[0].priceRange).toEqual({ min: 1.99, max: 1.99 });
+      });
+    });
+
+    describe("number of items calculations ", () => {
+      it("should count number of items in a group", () => {
+        const items = [
+          { ...baseItem, id: "1" },
+          { ...baseItem, id: "2" },
+          { ...baseItem, id: "3" },
+        ];
+
+        const result = groupItems(items);
+        expect(result[0].numberOfItems).toBe(3);
+      });
+
+      it("should handle single item count", () => {
+        const items = [{ ...baseItem, id: "1" }];
+
+        const result = groupItems(items);
+        expect(result[0].numberOfItems).toBe(1);
+      });
+    });
+
+    describe("edge cases", () => {
+      it("should handle single item", () => {
+        const result = groupItems([baseItem]);
+        expect(result).toHaveLength(1);
+      });
+
+      it("should handle no items", () => {
+        const result = groupItems([]);
+        expect(result).toStrictEqual([]);
+      });
+
+      it("should handle null brands correctly", () => {
+        const items = [
+          { ...baseItem, id: "1", brand: null },
+          { ...baseItem, id: "2", brand: null },
+        ];
+
+        const result = groupItems(items);
+        expect(result).toHaveLength(1);
+        expect(result[0].brand).toBeNull();
+      });
+
+      it("should handle case-insensitive matching", () => {
+        const items = [
+          { ...baseItem, id: "1", name: "Orange Juice" },
+          { ...baseItem, id: "2", name: "orange juice" },
+        ];
+        const result = groupItems(items);
+        expect(result).toHaveLength(1);
+      });
+
+      it("should handle extra spaces matching", () => {
+        const items = [
+          { ...baseItem, id: "1", name: "orange juice" },
+          { ...baseItem, id: "2", name: "  orange    juice  " },
+        ];
+        const result = groupItems(items);
+        expect(result).toHaveLength(1);
+      });
     });
   });
 });

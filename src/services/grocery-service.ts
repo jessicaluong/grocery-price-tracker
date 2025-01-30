@@ -38,40 +38,56 @@ export const findItems = (
   });
 };
 
-export const groupItems = (
-  items: GroceryItem[],
-  sortOrder: SortOptions
-): GroupedGroceryItem[] => {
-  // TODO: group items that have the same name, quantity, unit, amount, and store, count???
-  const testItems = [
-    {
-      id: "1",
-      name: "oats",
-      brand: "Quaker",
-      store: "Superstore",
-      count: 8,
-      amount: 1,
-      unit: "kg" as Unit,
-      priceRange: {
-        min: 1,
-        max: 2,
-      },
-      numberOfItems: 3,
-    },
-    {
-      id: "1",
-      name: "oats",
-      brand: "One Degree",
-      store: "Superstore",
-      count: 8,
-      amount: 1,
-      unit: "kg" as Unit,
-      priceRange: {
-        min: 1,
-        max: 2,
-      },
-      numberOfItems: 1,
-    },
-  ];
-  return testItems;
+export const formatString = (str: string | null): string => {
+  if (!str) return "";
+  return str.replace(/\s/g, "").trim().toLowerCase();
+};
+
+export const getGroupKey = (item: GroceryItem): string => {
+  return `${formatString(item.name)}-${formatString(item.brand)}-${formatString(
+    item.store
+  )}-${item.count}-${item.amount}-${formatString(item.unit)}`;
+};
+
+export const groupItems = (items: GroceryItem[]): GroupedGroceryItem[] => {
+  type GroupAccumulator = {
+    items: GroceryItem[];
+    minPrice: number;
+    maxPrice: number;
+  };
+
+  let groupMap = new Map<string, GroupAccumulator>();
+
+  items.forEach((item) => {
+    const key = getGroupKey(item);
+    if (groupMap.has(key)) {
+      const group = groupMap.get(key)!;
+      group.items.push(item);
+      group.minPrice = Math.min(group.minPrice, item.price);
+      group.maxPrice = Math.max(group.maxPrice, item.price);
+    } else {
+      groupMap.set(key, {
+        items: [item],
+        minPrice: item.price,
+        maxPrice: item.price,
+      });
+    }
+  });
+
+  const groups: GroupedGroceryItem[] = [];
+  groupMap.forEach((group, key) => {
+    groups.push({
+      id: key,
+      name: group.items[0].name,
+      brand: group.items[0].brand,
+      store: group.items[0].store,
+      count: group.items[0].count,
+      amount: group.items[0].amount,
+      unit: group.items[0].unit,
+      priceRange: { min: group.minPrice, max: group.maxPrice },
+      numberOfItems: group.items.length,
+    });
+  });
+
+  return groups;
 };

@@ -42,7 +42,7 @@ export default function Main({ initialItems }: MainProps) {
     if (viewMode === VIEW_OPTIONS.GROUP) {
       return {
         view: "GROUP",
-        items: groupItems(sortedItems, sortBy),
+        items: groupItems(sortedItems),
       };
     }
 
