@@ -1,34 +1,25 @@
 "use client";
 import SelectInput from "../select-input";
 import { SORT_OPTIONS, VIEW_OPTIONS } from "@/lib/constants";
+import { useFilter } from "@/lib/hooks";
 import { SortOptions, ViewOptions } from "@/lib/types";
 
-type SideBarProps = {
-  sortBy: SortOptions;
-  viewMode: ViewOptions;
-  onSetSortBy: (mode: SortOptions) => void;
-  onSetViewMode: (mode: ViewOptions) => void;
-};
+export default function SortAndViewControls() {
+  const { sortBy, handleSetSortBy, viewMode, handleSetViewMode } = useFilter();
 
-export default function SortAndViewControls({
-  sortBy,
-  viewMode,
-  onSetSortBy,
-  onSetViewMode,
-}: SideBarProps) {
   return (
     <div className="flex justify-between sm:gap-2">
       <SelectInput<SortOptions>
         label="Sort"
         options={Object.values(SORT_OPTIONS)}
         value={sortBy}
-        onChange={(value) => onSetSortBy(value)}
+        onChange={(value) => handleSetSortBy(value)}
       />
       <SelectInput<ViewOptions>
         label="View"
         options={Object.values(VIEW_OPTIONS)}
         value={viewMode}
-        onChange={(value) => onSetViewMode(value)}
+        onChange={(value) => handleSetViewMode(value)}
       />
     </div>
   );

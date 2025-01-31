@@ -7,6 +7,7 @@ import { Button } from "../ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { SortOptions, ViewOptions } from "@/lib/types";
 import SortAndViewControls from "./sort-and-view-controls";
+import { useFilter } from "@/lib/hooks";
 
 type HeaderProps = {
   onSetSearchQuery: (query: string) => void;
@@ -16,13 +17,9 @@ type HeaderProps = {
   onSetViewMode: (mode: ViewOptions) => void;
 };
 
-export default function Header({
-  onSetSearchQuery,
-  sortBy,
-  viewMode,
-  onSetSortBy,
-  onSetViewMode,
-}: HeaderProps) {
+export default function Header() {
+  const { sortBy, handleSetSortBy, viewMode, handleSetViewMode } = useFilter();
+
   return (
     <header className="flex flex-col gap-2 pb-[10px]">
       <div className="flex flex-col gap-4 w-full">
@@ -40,13 +37,8 @@ export default function Header({
           </Button>
         </div>
         <div className="flex flex-col gap-2 md:flex-row md:justify-between">
-          <SearchBar onSetSearchQuery={onSetSearchQuery} />
-          <SortAndViewControls
-            sortBy={sortBy}
-            viewMode={viewMode}
-            onSetSortBy={onSetSortBy}
-            onSetViewMode={onSetViewMode}
-          />
+          <SearchBar />
+          <SortAndViewControls />
         </div>
       </div>
     </header>

@@ -1,13 +1,9 @@
+import { useFilter } from "@/lib/hooks";
 import GroceryItemCard from "./grocery-item-card";
-import { ItemsWithViewMode, ItemWithView } from "@/lib/types";
+import { ItemWithView } from "@/lib/types";
 
-type GroceryListProps = {
-  filteredItemsWithView: ItemsWithViewMode;
-};
-
-export default function GroceryList({
-  filteredItemsWithView,
-}: GroceryListProps) {
+export default function GroceryList() {
+  const { filteredItemsWithView } = useFilter();
   const { view, items } = filteredItemsWithView;
 
   return (

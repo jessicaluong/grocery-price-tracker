@@ -1,8 +1,13 @@
 "use client";
 
-import { DEFAULT_SORT, DEFAULT_VIEW } from "@/lib/constants";
-import { useGrocery } from "@/lib/hooks";
-import { GroceryItem, SortOptions, ViewOptions } from "@/lib/types";
+import { DEFAULT_SORT, DEFAULT_VIEW, VIEW_OPTIONS } from "@/lib/constants";
+import {
+  GroceryItem,
+  ItemsWithViewMode,
+  SortOptions,
+  ViewOptions,
+} from "@/lib/types";
+import { findItems, groupItems, sortItems } from "@/services/grocery-service";
 import { createContext, useMemo, useState } from "react";
 
 type FilterContextType = {
@@ -12,31 +17,20 @@ type FilterContextType = {
   handleSetSearchQuery: (query: string) => void;
   handleSetSortBy: (mode: SortOptions) => void;
   handleSetViewMode: (mode: ViewOptions) => void;
-  filteredItems: GroceryItem[];
+  filteredItemsWithView: ItemsWithViewMode;
 };
 
 export const FilterContext = createContext<FilterContextType | null>(null);
 
-function matchItemName(itemName: string, searchQuery: string) {
-  const words = itemName.toLowerCase().split(/\s+/);
-  const searchWords = searchQuery.toLowerCase().split(/\s+/);
-
-  return searchWords.every((searchWord) =>
-    words.some((word) => word.startsWith(searchWord))
-  );
-}
-
-function matchBrandName(brandName: string, searchQuery: string) {
-  return brandName.toLowerCase().startsWith(searchQuery.toLowerCase());
-}
-
 type FilterProviderProps = {
   children: React.ReactNode;
+  initialItems: GroceryItem[];
 };
 
-export default function FilterProvider({ children }: FilterProviderProps) {
-  const { groceryItems } = useGrocery();
-
+export default function FilterProvider({
+  children,
+  initialItems,
+}: FilterProviderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOptions>(DEFAULT_SORT);
   const [viewMode, setViewMode] = useState<ViewOptions>(DEFAULT_VIEW);
@@ -53,43 +47,24 @@ export default function FilterProvider({ children }: FilterProviderProps) {
     setViewMode(mode);
   };
 
-  const sortItems = (
-    items: GroceryItem[],
-    sortOrder: SortOptions
-  ): GroceryItem[] => {
-    return [...items].sort((a, b) => {
-      if (sortOrder === "Lowest Price") {
-        return a.price - b.price;
-      } else if (sortOrder === "Recently Added") {
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-      }
-      return 0;
-    });
-  };
-
-  const findItems = (items: GroceryItem[], query: string): GroceryItem[] => {
-    return items.filter((item) => {
-      const itemNameMatch = matchItemName(item.name, query);
-      const brandNameMatch = item.brand && matchBrandName(item.brand, query);
-      return itemNameMatch || brandNameMatch;
-    });
-  };
-
-  const groupItems = (items: GroceryItem[], sortOrder: SortOptions) => {
-    // TODO:
-    return items;
-  };
-
-  const filteredItems: GroceryItem[] = useMemo(() => {
-    const foundItems = findItems(groceryItems, searchQuery);
+  const filteredItemsWithView: ItemsWithViewMode = useMemo(() => {
+    const foundItems = findItems(initialItems, searchQuery);
     const sortedItems = sortItems(foundItems, sortBy);
 
-    if (viewMode === "Group by Item") {
-      return groupItems(sortedItems, sortBy);
+    if (viewMode === VIEW_OPTIONS.GROUP) {
+      return {
+        view: "GROUP",
+        items: groupItems(sortedItems),
+      };
     }
 
-    return sortedItems;
-  }, [groceryItems, searchQuery, sortBy]);
+    // TODO: rearrange view and sorted (e.g., sort the grouped?)
+    // maybe not sort grouped items
+    return {
+      view: "LIST",
+      items: sortedItems,
+    };
+  }, [initialItems, searchQuery, sortBy, viewMode]);
 
   return (
     <FilterContext.Provider
@@ -100,7 +75,7 @@ export default function FilterProvider({ children }: FilterProviderProps) {
         handleSetSearchQuery,
         handleSetSortBy,
         handleSetViewMode,
-        filteredItems,
+        filteredItemsWithView,
       }}
     >
       {children}
