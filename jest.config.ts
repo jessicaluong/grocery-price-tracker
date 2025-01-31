@@ -46,6 +46,10 @@ const config: Config = {
     ],
   },
 
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+
+  testEnvironment: "jsdom",
+
   // A list of reporter names that Jest uses when writing coverage reports
   // coverageReporters: [
   //   "json",
