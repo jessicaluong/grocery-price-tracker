@@ -28,20 +28,22 @@ export default function SelectInput<T extends string>({
   return (
     <div className="grid grid-cols-[auto_1fr] gap-2 items-center">
       <Label htmlFor={id}>{label}</Label>
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger id={id} className="h-8">
-          <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            {options.map((option) => (
-              <SelectItem key={option} value={option}>
-                {option}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+      <div className="w-32 sm:w-40">
+        <Select value={value} onValueChange={onChange}>
+          <SelectTrigger id={id} className="h-8 w-full">
+            <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {options.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }
