@@ -5,21 +5,9 @@ import CustomPopover from "../custom-popover";
 import { SearchBar } from "./search-bar";
 import { Button } from "../ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
-import { SortOptions, ViewOptions } from "@/lib/types";
 import SortAndViewControls from "./sort-and-view-controls";
-import { useFilter } from "@/lib/hooks";
-
-type HeaderProps = {
-  onSetSearchQuery: (query: string) => void;
-  sortBy: SortOptions;
-  viewMode: ViewOptions;
-  onSetSortBy: (mode: SortOptions) => void;
-  onSetViewMode: (mode: ViewOptions) => void;
-};
 
 export default function Header() {
-  const { sortBy, handleSetSortBy, viewMode, handleSetViewMode } = useFilter();
-
   return (
     <header className="flex flex-col gap-2 pb-[10px]">
       <div className="flex flex-col gap-4 w-full">
