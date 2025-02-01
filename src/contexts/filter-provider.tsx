@@ -7,7 +7,7 @@ import {
   SortOptions,
   ViewOptions,
 } from "@/lib/types";
-import { findItems, groupItems, sortItems } from "@/services/grocery-service";
+import { findItems, groupItems, sortItems } from "@/contexts/filter-utils";
 import { createContext, useMemo, useState } from "react";
 
 type FilterContextType = {

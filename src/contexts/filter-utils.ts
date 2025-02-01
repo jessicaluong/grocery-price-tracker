@@ -1,10 +1,5 @@
 import { matchName } from "@/lib/utils";
-import {
-  GroceryItem,
-  GroupedGroceryItem,
-  SortOptions,
-  Unit,
-} from "@/lib/types";
+import { GroceryItem, GroupedGroceryItem, SortOptions } from "@/lib/types";
 
 export const sortByPrice = (a: GroceryItem, b: GroceryItem) =>
   a.price - b.price;

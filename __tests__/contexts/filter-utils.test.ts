@@ -6,10 +6,10 @@ import {
   groupItems,
   getGroupKey,
   formatString,
-} from "@/services/grocery-service";
-import { GroceryItem, Unit } from "@/lib/types";
+} from "@/contexts/filter-utils";
+import { GroceryItem } from "@/lib/types";
 
-describe("GroceryService", () => {
+describe("FilterUtils", () => {
   describe("sortByPrice", () => {
     it("should sort items in ascending price order (cheapest first)", () => {
       const items = [
