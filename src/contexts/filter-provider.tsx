@@ -1,13 +1,13 @@
 "use client";
 
-import { DEFAULT_SORT, DEFAULT_VIEW, VIEW_OPTIONS } from "@/lib/constants";
+import { DEFAULT_SORT, DEFAULT_VIEW } from "@/lib/constants";
 import {
   GroceryItem,
   ItemsWithViewMode,
   SortOptions,
   ViewOptions,
 } from "@/lib/types";
-import { findItems, groupItems, sortItems } from "@/contexts/filter-utils";
+import { getFilteredItemsWithView } from "@/contexts/filter-utils";
 import { createContext, useMemo, useState } from "react";
 
 type FilterContextType = {
@@ -47,24 +47,10 @@ export default function FilterProvider({
     setViewMode(mode);
   };
 
-  const filteredItemsWithView: ItemsWithViewMode = useMemo(() => {
-    const foundItems = findItems(initialItems, searchQuery);
-    const sortedItems = sortItems(foundItems, sortBy);
-
-    if (viewMode === VIEW_OPTIONS.GROUP) {
-      return {
-        view: "GROUP",
-        items: groupItems(sortedItems),
-      };
-    }
-
-    // TODO: rearrange view and sorted (e.g., sort the grouped?)
-    // maybe not sort grouped items
-    return {
-      view: "LIST",
-      items: sortedItems,
-    };
-  }, [initialItems, searchQuery, sortBy, viewMode]);
+  const filteredItemsWithView: ItemsWithViewMode = useMemo(
+    () => getFilteredItemsWithView(initialItems, searchQuery, sortBy, viewMode),
+    [initialItems, searchQuery, sortBy, viewMode]
+  );
 
   return (
     <FilterContext.Provider

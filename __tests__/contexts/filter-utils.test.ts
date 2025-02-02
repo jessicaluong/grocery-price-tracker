@@ -6,6 +6,7 @@ import {
   groupItems,
   getGroupKey,
   formatString,
+  getFilteredItemsWithView,
 } from "@/contexts/filter-utils";
 import { GroceryItem } from "@/lib/types";
 
@@ -480,6 +481,217 @@ describe("FilterUtils", () => {
         ];
         const result = groupItems(items);
         expect(result).toHaveLength(1);
+      });
+    });
+  });
+
+  describe("getFilteredItemsWithView", () => {
+    const baseItem = {
+      id: "1",
+      name: "orange juice",
+      brand: "Tropicana",
+      store: "Walmart",
+      count: 1,
+      amount: 100,
+      unit: "mL" as const,
+      price: 4,
+      date: new Date("2024-09-15"),
+      isSale: true,
+    };
+
+    it("should return correct view type for list view", () => {
+      const result = getFilteredItemsWithView(
+        [baseItem],
+        "",
+        "Recently Added",
+        "List All Items"
+      );
+      expect(result.view).toBe("LIST");
+    });
+
+    it("should return correct view type for group view", () => {
+      const result = getFilteredItemsWithView(
+        [baseItem],
+        "",
+        "Recently Added",
+        "Group Items"
+      );
+      expect(result.view).toBe("GROUP");
+    });
+
+    describe("group ordering with sort modes", () => {
+      it("should order grouped items by min price in each group when sort by Lowest Price", () => {
+        const items = [
+          { ...baseItem, id: "1", price: 4.99 },
+          { ...baseItem, id: "2", price: 2.99 },
+          { ...baseItem, id: "3", name: "apple juice", price: 3.5 },
+          { ...baseItem, id: "4", name: "apple juice", price: 3.99 },
+          { ...baseItem, id: "5", name: "grape juice", price: 0.99 },
+          { ...baseItem, id: "6", name: "grape juice", price: 1.95 },
+        ];
+        const result = getFilteredItemsWithView(
+          items,
+          "",
+          "Lowest Price",
+          "Group Items"
+        );
+        expect(result.view).toBe("GROUP");
+        expect(result.items).toHaveLength(3);
+        expect(result.items[0].name).toBe("grape juice");
+        expect(result.items[1].name).toBe("orange juice");
+        expect(result.items[2].name).toBe("apple juice");
+      });
+
+      it("should order grouped items by newest item in each group when sort by Recently Added", () => {
+        const items = [
+          { ...baseItem, id: "1", date: new Date("2024-01-01") },
+          {
+            ...baseItem,
+            id: "2",
+            name: "apple juice",
+            date: new Date("2024-03-01"),
+          },
+          {
+            ...baseItem,
+            id: "3",
+            name: "grape juice",
+            date: new Date("2024-02-01"),
+          },
+          {
+            ...baseItem,
+            id: "4",
+            name: "strawberry juice",
+            date: new Date("2024-04-01"),
+          },
+        ];
+        const result = getFilteredItemsWithView(
+          items,
+          "",
+          "Recently Added",
+          "Group Items"
+        );
+
+        expect(result.view).toBe("GROUP");
+        expect(result.items).toHaveLength(4);
+        expect(result.items[0].name).toBe("strawberry juice");
+        expect(result.items[1].name).toBe("apple juice");
+        expect(result.items[2].name).toBe("grape juice");
+        expect(result.items[3].name).toBe("orange juice");
+      });
+    });
+
+    describe("search, sort and group", () => {
+      const items = [
+        {
+          ...baseItem,
+          name: "orange juice",
+          price: 3.99,
+          date: new Date("2024-03-01"),
+        },
+        {
+          ...baseItem,
+          name: "orange soda",
+          price: 2.99,
+          date: new Date("2024-01-01"),
+        },
+        {
+          ...baseItem,
+          name: "apple juice",
+          price: 1.99,
+          date: new Date("2024-02-01"),
+        },
+      ];
+
+      it("should filter and sort by price in list view", () => {
+        const result = getFilteredItemsWithView(
+          items,
+          "orange",
+          "Lowest Price",
+          "List All Items"
+        );
+
+        expect(result.view).toBe("LIST");
+        expect(result.items).toHaveLength(2); // Only orange items
+        expect(result.items[0].name).toBe("orange soda"); // Cheaper orange item first
+        expect(result.items[1].name).toBe("orange juice");
+      });
+
+      it("should filter and sort by date in list view", () => {
+        const result = getFilteredItemsWithView(
+          items,
+          "orange",
+          "Recently Added",
+          "List All Items"
+        );
+
+        expect(result.view).toBe("LIST");
+        expect(result.items).toHaveLength(2); // Only orange items
+        expect(result.items[0].name).toBe("orange juice"); // Most recent orange item first
+        expect(result.items[1].name).toBe("orange soda");
+      });
+
+      it("should filter and sort by price in group view", () => {
+        const result = getFilteredItemsWithView(
+          items,
+          "orange",
+          "Lowest Price",
+          "Group Items"
+        );
+
+        expect(result.view).toBe("GROUP");
+        if (result.view === "GROUP") {
+          expect(result.items).toHaveLength(2); // Only orange items
+          expect(result.items[0].name).toBe("orange soda"); // Cheaper orange item first
+          expect(result.items[1].name).toBe("orange juice");
+        }
+      });
+
+      it("should filter and sort by date in group view", () => {
+        const result = getFilteredItemsWithView(
+          items,
+          "orange",
+          "Recently Added",
+          "Group Items"
+        );
+
+        expect(result.view).toBe("GROUP");
+        if (result.view === "GROUP") {
+          expect(result.items).toHaveLength(2); // Only orange items
+          expect(result.items[0].name).toBe("orange juice"); // Most recent orange item first
+          expect(result.items[1].name).toBe("orange soda");
+        }
+      });
+    });
+
+    describe("edge cases", () => {
+      it("should handle empty initial items", () => {
+        const result = getFilteredItemsWithView(
+          [],
+          "apple",
+          "Recently Added",
+          "List All Items"
+        );
+        expect(result.items).toHaveLength(0);
+      });
+
+      it("should return all items when no search query", () => {
+        const result = getFilteredItemsWithView(
+          [baseItem],
+          "",
+          "Recently Added",
+          "List All Items"
+        );
+        expect(result.items).toHaveLength(1);
+      });
+
+      it("should handle no search results", () => {
+        const result = getFilteredItemsWithView(
+          [baseItem],
+          "nonexistent",
+          "Recently Added",
+          "List All Items"
+        );
+        expect(result.items).toHaveLength(0);
       });
     });
   });

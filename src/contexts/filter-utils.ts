@@ -1,5 +1,12 @@
 import { matchName } from "@/lib/utils";
-import { GroceryItem, GroupedGroceryItem, SortOptions } from "@/lib/types";
+import {
+  GroceryItem,
+  GroupedGroceryItem,
+  ItemsWithViewMode,
+  SortOptions,
+  ViewOptions,
+} from "@/lib/types";
+import { VIEW_OPTIONS } from "@/lib/constants";
 
 export const sortByPrice = (a: GroceryItem, b: GroceryItem) =>
   a.price - b.price;
@@ -85,4 +92,26 @@ export const groupItems = (items: GroceryItem[]): GroupedGroceryItem[] => {
   });
 
   return groups;
+};
+
+export const getFilteredItemsWithView = (
+  initialItems: GroceryItem[],
+  searchQuery: string,
+  sortBy: SortOptions,
+  viewMode: ViewOptions
+): ItemsWithViewMode => {
+  const foundItems = findItems(initialItems, searchQuery);
+  const sortedItems = sortItems(foundItems, sortBy);
+
+  if (viewMode === VIEW_OPTIONS.GROUP) {
+    return {
+      view: "GROUP",
+      items: groupItems(sortedItems),
+    };
+  }
+
+  return {
+    view: "LIST",
+    items: sortedItems,
+  };
 };
