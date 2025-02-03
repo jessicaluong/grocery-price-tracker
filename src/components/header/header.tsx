@@ -13,11 +13,8 @@ export default function Header() {
       <div className="flex flex-col gap-4 w-full">
         {/* <CustomPopover />
         <CustomDrawer /> */}
-        {/* <Button variant="outline">
-          <PlusCircledIcon className="mr-2" /> Add Item
-        </Button> */}
         <div className="flex justify-end items-center gap-2">
-          <Button variant="outline">
+          <Button variant="outline" className="rounded-3xl">
             <PlusCircledIcon className="mr-2" /> Add Item
           </Button>
           <Button size="icon" variant="secondary">
