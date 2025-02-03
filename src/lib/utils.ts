@@ -21,14 +21,18 @@ export function comparePriceFormat(
   amount: number,
   unit: Unit
 ): string {
+  if (count === 0 || amount === 0) {
+    return "N/A";
+  }
+
   const totalAmount = count * amount;
   const pricePerUnit = price / totalAmount;
 
   const conversion = unitConversions[unit];
   const convertedPrice = pricePerUnit / conversion.factor;
 
-  return `${currencyFormat(convertedPrice)} / ${
-    conversion.factor === 1 ? "" : "100"
+  return `${currencyFormat(convertedPrice)} /${
+    conversion.factor === 1 ? "" : " 100"
   } ${conversion.displayUnit}`;
 }
 
