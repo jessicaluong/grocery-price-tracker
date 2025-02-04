@@ -8,7 +8,7 @@ A full-stack Next.js application being developed to help shoppers track and anal
 
 This application aims to help users determine if grocery prices represent good value by providing historical price context and trends. The price trend graph is currently in progress, but will look something like this:
 
-<img width="400" alt="dark_mode" src="https://github.com/user-attachments/assets/141d4cb6-c92b-4146-9426-7c693301b663">
+<img width="387" alt="graph" src="https://github.com/user-attachments/assets/59676966-5f10-46fc-a81c-bd605057a737" />
 
 ## Technical Stack
 
