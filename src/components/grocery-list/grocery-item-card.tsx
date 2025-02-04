@@ -1,15 +1,16 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ItemWithView } from "@/lib/types";
-import PriceDetails from "./price-details";
-import ItemDetails from "./item-details";
 import GroceryItemDialog from "./grocery-item-dialog";
 import { useState } from "react";
+import { ItemQuantity } from "./item-quantity";
+import { comparePriceFormat, currencyFormat } from "@/lib/utils";
+import { SaleIndicator } from "./sale-indicator";
 
 type GroceryItemCardProps = ItemWithView;
 
 export default function GroceryItemCard({ item, view }: GroceryItemCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const priceDetailsProps = { view, item } as ItemWithView;
+  const itemWithView = { view, item } as ItemWithView;
 
   return (
     <>
@@ -21,11 +22,47 @@ export default function GroceryItemCard({ item, view }: GroceryItemCardProps) {
       >
         <CardContent className="flex leading-tight">
           <div className="grow mr-4 min-w-0">
-            <ItemDetails item={item} />
+            <div>
+              <div className="flex items-baseline tracking-tight">
+                <span className="truncate font-semibold capitalize">
+                  {item.name}
+                </span>
+                <ItemQuantity
+                  count={item.count}
+                  amount={item.amount}
+                  unit={item.unit}
+                />
+              </div>
+              <div className="capitalize h-7">{item.brand && item.brand}</div>
+            </div>
             <p className="font-light capitalize">{item.store}</p>
           </div>
           <div className="shrink-0 text-right">
-            <PriceDetails {...priceDetailsProps} />
+            {view === "LIST" && (
+              <>
+                <p className="font-semibold tracking-tight flex items-center justify-end">
+                  {item.isSale && <SaleIndicator />}
+                  {currencyFormat(item.price)}
+                </p>
+                <p className="text-sm text-muted-foreground tracking-tighter h-7">
+                  {comparePriceFormat(
+                    item.count,
+                    item.price,
+                    item.amount,
+                    item.unit
+                  )}
+                </p>
+              </>
+            )}
+            {view === "GROUP" && (
+              <p className="font-semibold tracking-tight flex items-center justify-end">
+                {item.priceRange.min === item.priceRange.max
+                  ? currencyFormat(item.priceRange.min)
+                  : `${currencyFormat(item.priceRange.min)}-${currencyFormat(
+                      item.priceRange.max
+                    )}`}
+              </p>
+            )}
             <p className="font-light tracking-tighter">
               {view === "LIST" && item.date.toISOString().split("T")[0]}
               {view === "GROUP" &&
@@ -36,11 +73,11 @@ export default function GroceryItemCard({ item, view }: GroceryItemCardProps) {
           </div>
         </CardContent>
       </Card>
-      {/* <GroceryItemDialog
+      <GroceryItemDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        item={item}
-      /> */}
+        itemWithView={itemWithView}
+      />
     </>
   );
 }

@@ -9,8 +9,8 @@ export default function GroceryList() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
       {items.map((item) => {
-        const cardProps = { view, item } as ItemWithView;
-        return <GroceryItemCard key={item.id} {...cardProps} />;
+        const itemWithView = { view, item } as ItemWithView;
+        return <GroceryItemCard key={item.id} {...itemWithView} />;
       })}
     </div>
   );
