@@ -38,17 +38,15 @@ export default function GroceryItemDialog({
               />
             </div>
             {item.brand && <div className="capitalize h-7">{item.brand}</div>}
-            <div className="flex items-center justify-center">
-              <span className="font-light capitalize">
-                {view === "LIST" && (
-                  <span className="font-light tracking-tight">
-                    {item.isSale && <SaleIndicator />}
-                    {currencyFormat(item.price)}{" "}
-                    <span className="text-sm">@</span>{" "}
-                  </span>
-                )}
-                {item.store}
-              </span>
+            <div className="font-light capitalize">
+              {view === "LIST" && (
+                <>
+                  {item.isSale && <SaleIndicator />}
+                  {currencyFormat(item.price)}{" "}
+                  <span className="text-sm">@</span>{" "}
+                </>
+              )}
+              {item.store}
             </div>
           </DialogTitle>
           <DialogDescription className="text-center"></DialogDescription>
