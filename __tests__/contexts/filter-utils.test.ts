@@ -38,7 +38,7 @@ describe("FilterUtils", () => {
       const items = [
         { id: "1", date: new Date("2024-09-14") },
         { id: "2", date: new Date("2024-09-15") },
-      ] as GroceryItem[];
+      ];
 
       const result = sortByDate(items[0], items[1]);
       expect(result).toBeGreaterThan(0);
@@ -48,7 +48,7 @@ describe("FilterUtils", () => {
       const items = [
         { id: "1", date: new Date("2024-10-14") },
         { id: "2", date: new Date("2024-09-15") },
-      ] as GroceryItem[];
+      ];
 
       const result = sortByDate(items[0], items[1]);
       expect(result).toBeLessThan(0);
@@ -58,7 +58,7 @@ describe("FilterUtils", () => {
       const items = [
         { id: "1", date: new Date("2024-10-14") },
         { id: "2", date: new Date("2020-09-15") },
-      ] as GroceryItem[];
+      ];
 
       const result = sortByDate(items[0], items[1]);
       expect(result).toBeLessThan(0);
@@ -68,7 +68,7 @@ describe("FilterUtils", () => {
       const items = [
         { id: "1", date: new Date("2024-09-14") },
         { id: "2", date: new Date("2024-09-14") },
-      ] as GroceryItem[];
+      ];
 
       const result = sortByDate(items[0], items[1]);
       expect(result).toBe(0);

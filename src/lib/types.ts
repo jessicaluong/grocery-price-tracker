@@ -7,6 +7,12 @@ export type GroceryItem = Omit<PrismaGroceryItem, "unit"> & {
   unit: Unit;
 };
 
+export type PricePoint = {
+  date: Date;
+  price: number;
+  isSale: boolean;
+};
+
 export type GroupedGroceryItem = {
   id: string;
   name: string;
@@ -15,11 +21,12 @@ export type GroupedGroceryItem = {
   count: number;
   amount: number;
   unit: Unit;
+  numberOfItems: number;
   priceRange: {
     min: number;
     max: number;
   };
-  numberOfItems: number;
+  priceHistory: PricePoint[];
 };
 
 export type SortOptions = (typeof SORT_OPTIONS)[keyof typeof SORT_OPTIONS];
