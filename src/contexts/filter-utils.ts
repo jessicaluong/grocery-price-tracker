@@ -1,7 +1,7 @@
 import { matchName } from "@/lib/utils";
 import {
   GroceryItem,
-  GroupedGroceryItem,
+  GroceryGroup,
   ItemsWithViewMode,
   PricePoint,
   SortOptions,
@@ -52,7 +52,7 @@ export const getGroupKey = (item: GroceryItem): string => {
   )}-${item.count}-${item.amount}-${formatString(item.unit)}`;
 };
 
-export const groupItems = (items: GroceryItem[]): GroupedGroceryItem[] => {
+export const groupItems = (items: GroceryItem[]): GroceryGroup[] => {
   type Group = {
     items: GroceryItem[];
     minPrice: number;
@@ -94,7 +94,7 @@ export const groupItems = (items: GroceryItem[]): GroupedGroceryItem[] => {
       : groupMap.set(key, createInitialGroup(item));
   });
 
-  const groups: GroupedGroceryItem[] = [];
+  const groups: GroceryGroup[] = [];
 
   groupMap.forEach((group, key) => {
     const firstItem = group.items[0];

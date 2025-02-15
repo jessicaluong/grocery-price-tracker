@@ -6,8 +6,18 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum Unit {
+  g
+  kg
+  mL
+  L
+  units
+  sheets
+  washloads
 }
 
 model GroceryItem {
@@ -17,10 +27,45 @@ model GroceryItem {
   store  String
   count  Int
   amount Float
-  unit   String
+  unit   Unit
   price  Float
   date   DateTime
   isSale Boolean  @default(false)
+}
 
-  @@map("grocery_items")
+model Group {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name   String
+  brand  String?
+  store  String
+  count  Int
+  amount Float
+  unit   Unit
+
+  minPrice Float
+  maxPrice Float
+
+  items Item[]
+
+  @@unique([name, brand, store, count, amount, unit])
+  @@index([name])
+  @@index([brand])
+}
+
+model Item {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  date   DateTime
+  price  Float
+  isSale Boolean  @default(false)
+
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId String
+
+  @@index([groupId])
 }

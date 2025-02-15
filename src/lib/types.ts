@@ -3,9 +3,7 @@ import { GroceryItem as PrismaGroceryItem } from "@prisma/client";
 
 export type Unit = keyof typeof unitConversions;
 
-export type GroceryItem = Omit<PrismaGroceryItem, "unit"> & {
-  unit: Unit;
-};
+export type GroceryItem = PrismaGroceryItem;
 
 export type PricePoint = {
   date: Date;
@@ -13,7 +11,7 @@ export type PricePoint = {
   isSale: boolean;
 };
 
-export type GroupedGroceryItem = {
+export type GroceryGroup = {
   id: string;
   name: string;
   brand: string | null;
@@ -35,8 +33,8 @@ export type ViewOptions = (typeof VIEW_OPTIONS)[keyof typeof VIEW_OPTIONS];
 
 export type ItemWithView =
   | { view: "LIST"; item: GroceryItem }
-  | { view: "GROUP"; item: GroupedGroceryItem };
+  | { view: "GROUP"; item: GroceryGroup };
 
 export type ItemsWithViewMode =
   | { view: "LIST"; items: GroceryItem[] }
-  | { view: "GROUP"; items: GroupedGroceryItem[] };
+  | { view: "GROUP"; items: GroceryGroup[] };
