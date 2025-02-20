@@ -9,7 +9,7 @@ export const unitConversions = {
 } as const;
 
 export const SORT_OPTIONS = {
-  NEWEST: "Recently Added",
+  NEWEST: "Newest Date",
   CHEAPEST: "Lowest Price",
 } as const;
 export const VIEW_OPTIONS = {

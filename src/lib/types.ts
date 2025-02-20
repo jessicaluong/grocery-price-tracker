@@ -1,29 +1,57 @@
-import { SORT_OPTIONS, VIEW_OPTIONS, unitConversions } from "./constants";
-import { GroceryItem as PrismaGroceryItem } from "@prisma/client";
+import { SORT_OPTIONS, VIEW_OPTIONS } from "./constants";
+import {
+  Item as PrismaItem,
+  Group as PrismaGroup,
+  Unit as PrismaUnit,
+} from "@prisma/client";
 
-export type Unit = keyof typeof unitConversions;
+export type Unit = PrismaUnit;
 
-export type GroceryItem = PrismaGroceryItem;
+type DbItem = Omit<PrismaItem, "createdAt" | "updatedAt">;
+type DbGroup = Omit<PrismaGroup, "createdAt" | "updatedAt">;
 
-export type PricePoint = {
-  date: Date;
-  price: number;
-  isSale: boolean;
-};
+/**
+ * Core Item type
+ * Properties:
+ * - id: string
+ * - name: string
+ * - brand: string | null
+ * - store: string
+ * - count: number
+ * - unit: Unit
+ * - date: Date
+ * - price: number
+ * - isSale: boolean
+ * - groupId: string
+ */
+export type GroceryItem = DbItem &
+  Omit<DbGroup, "minPrice" | "maxPrice" | "id">;
 
-export type GroceryGroup = {
-  id: string;
-  name: string;
-  brand: string | null;
-  store: string;
-  count: number;
-  amount: number;
-  unit: Unit;
+/**
+ * Price point for historical price tracking
+ * Properties:
+ * - date: Date
+ * - price: number
+ * - isSale: boolean
+ */
+export type PricePoint = Pick<DbItem, "date" | "price" | "isSale">;
+
+/**
+ * Core Group type
+ * Properties:
+ * - id: string
+ * - name: string
+ * - brand: string | null
+ * - store: string
+ * - count: number
+ * - unit: Unit
+ * - maxPrice: number
+ * - minPrice: number
+ * - numberOfItems: number
+ * - priceHistory: PricePoint[]
+ */
+export type GroceryGroup = DbGroup & {
   numberOfItems: number;
-  priceRange: {
-    min: number;
-    max: number;
-  };
   priceHistory: PricePoint[];
 };
 

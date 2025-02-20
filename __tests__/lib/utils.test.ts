@@ -1,4 +1,9 @@
-import { comparePriceFormat, currencyFormat, matchName } from "@/lib/utils";
+import {
+  comparePriceFormat,
+  currencyFormat,
+  formatString,
+  matchName,
+} from "@/lib/utils";
 
 describe("utils", () => {
   describe("currencyFormat", () => {
@@ -167,5 +172,27 @@ describe("utils", () => {
       const match = matchName("", "orange");
       expect(match).toBe(false);
     });
+  });
+});
+
+describe("formatString", () => {
+  it("should remove inner whitespaces", () => {
+    const result = formatString("orange juice");
+    expect(result).toEqual("orangejuice");
+  });
+
+  it("should remove outer whitespaces", () => {
+    const result = formatString("   orange ");
+    expect(result).toEqual("orange");
+  });
+
+  it("should make string lowercase", () => {
+    const result = formatString("ORangE");
+    expect(result).toEqual("orange");
+  });
+
+  it("should handle null", () => {
+    const result = formatString(null);
+    expect(result).toEqual("");
   });
 });

@@ -20,36 +20,32 @@ enum Unit {
   washloads
 }
 
-model GroceryItem {
-  id     String   @id @default(cuid())
-  name   String
-  brand  String?
-  store  String
-  count  Int
-  amount Float
-  unit   Unit
-  price  Float
-  date   DateTime
-  isSale Boolean  @default(false)
-}
+// model User {
+//   id             String   @id @default(cuid())
+//   createdAt      DateTime @default(now())
+//   updatedAt      DateTime @updatedAt
+//   email          String   @unique
+//   hashedPassword String 
+//   groups         Group[]
+// }
 
 model Group {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  name      String
+  brand     String?
+  store     String
+  count     Int
+  amount    Float
+  unit      Unit
+  minPrice  Int
+  maxPrice  Int
+  items     Item[]
+  // user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // userId    String
 
-  name   String
-  brand  String?
-  store  String
-  count  Int
-  amount Float
-  unit   Unit
-
-  minPrice Float
-  maxPrice Float
-
-  items Item[]
-
+  // @@unique([userId, name, brand, store, count, amount, unit])
   @@unique([name, brand, store, count, amount, unit])
   @@index([name])
   @@index([brand])
@@ -59,13 +55,11 @@ model Item {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  date   DateTime
-  price  Float
-  isSale Boolean  @default(false)
-
-  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  groupId String
+  date      DateTime
+  price     Float
+  isSale    Boolean  @default(false)
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId   String
 
   @@index([groupId])
 }

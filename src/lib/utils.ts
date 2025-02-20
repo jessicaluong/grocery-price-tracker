@@ -44,3 +44,8 @@ export function matchName(name: string, searchQuery: string) {
     words.some((word) => word.startsWith(searchWord))
   );
 }
+
+export const formatString = (str: string | null): string => {
+  if (!str) return "";
+  return str.replace(/\s/g, "").trim().toLowerCase();
+};

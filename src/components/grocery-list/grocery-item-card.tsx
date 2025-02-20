@@ -56,10 +56,10 @@ export default function GroceryItemCard({ item, view }: GroceryItemCardProps) {
             )}
             {view === "GROUP" && (
               <p className="font-semibold tracking-tight flex items-center justify-end">
-                {item.priceRange.min === item.priceRange.max
-                  ? currencyFormat(item.priceRange.min)
-                  : `${currencyFormat(item.priceRange.min)}-${currencyFormat(
-                      item.priceRange.max
+                {item.minPrice === item.maxPrice
+                  ? currencyFormat(item.minPrice)
+                  : `${currencyFormat(item.minPrice)}-${currencyFormat(
+                      item.maxPrice
                     )}`}
               </p>
             )}
