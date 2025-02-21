@@ -39,8 +39,6 @@ model Group {
   count     Int
   amount    Float
   unit      Unit
-  minPrice  Int
-  maxPrice  Int
   items     Item[]
   // user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   // userId    String

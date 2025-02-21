@@ -24,8 +24,7 @@ type DbGroup = Omit<PrismaGroup, "createdAt" | "updatedAt">;
  * - isSale: boolean
  * - groupId: string
  */
-export type GroceryItem = DbItem &
-  Omit<DbGroup, "minPrice" | "maxPrice" | "id">;
+export type GroceryItem = DbItem & Omit<DbGroup, "id">;
 
 /**
  * Price point for historical price tracking
@@ -51,6 +50,8 @@ export type PricePoint = Pick<DbItem, "date" | "price" | "isSale">;
  * - priceHistory: PricePoint[]
  */
 export type GroceryGroup = DbGroup & {
+  minPrice: number;
+  maxPrice: number;
   numberOfItems: number;
   priceHistory: PricePoint[];
 };

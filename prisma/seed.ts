@@ -1,188 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-const groceryItems: Prisma.GroceryItemCreateInput[] = [
-  {
-    name: "oats",
-    brand: "Quaker",
-    store: "Superstore",
-    count: 1,
-    amount: 1,
-    unit: "kg",
-    price: 4.27,
-    date: new Date("2024-09-14"),
-    isSale: true,
-  },
-  {
-    name: "orange juice",
-    brand: "Tropicana",
-    store: "Walmart",
-    count: 1,
-    amount: 100,
-    unit: "mL",
-    price: 4,
-    date: new Date("2024-09-15"),
-    isSale: true,
-  },
-  {
-    name: "organic oats",
-    brand: "Quaker",
-    store: "T&T",
-    count: 1,
-    amount: 1,
-    unit: "kg",
-    price: 25.1,
-    date: new Date("2024-09-12"),
-    isSale: false,
-  },
-  {
-    name: "milk",
-    brand: "Natrel",
-    store: "Costco",
-    count: 1,
-    amount: 3.5,
-    unit: "L",
-    price: 6.99,
-    date: new Date("2024-09-12"),
-    isSale: false,
-  },
-  {
-    name: "oats",
-    brand: "Quaker",
-    store: "Superstore",
-    count: 1,
-    amount: 1.5,
-    unit: "kg",
-    price: 12.99,
-    date: new Date("2024-09-12"),
-    isSale: true,
-  },
-  {
-    name: "lemon juice",
-    brand: "simply orange",
-    store: "Superstore",
-    count: 1,
-    amount: 1,
-    unit: "L",
-    price: 5.99,
-    date: new Date("2024-09-12"),
-    isSale: false,
-  },
-  {
-    name: "orange juice",
-    brand: "simply orange",
-    store: "Superstore",
-    count: 1,
-    amount: 250,
-    unit: "mL",
-    price: 2.5,
-    date: new Date("2024-09-12"),
-    isSale: false,
-  },
-  {
-    name: "toothbrushes",
-    brand: "Oral-B",
-    store: "Costco",
-    count: 1,
-    amount: 8,
-    unit: "units",
-    price: 12.99,
-    date: new Date("2024-09-12"),
-    isSale: true,
-  },
-  {
-    name: "paper towel",
-    brand: "Bounty",
-    store: "Costco",
-    count: 12,
-    amount: 86,
-    unit: "sheets",
-    price: 22.49,
-    date: new Date("2024-09-12"),
-    isSale: true,
-  },
-  {
-    name: "vitamin D3",
-    brand: "Webbers",
-    store: "Costco",
-    count: 1,
-    amount: 300,
-    unit: "units",
-    price: 22.49,
-    date: new Date("2024-09-12"),
-    isSale: false,
-  },
-  {
-    name: "laundry detergent",
-    brand: "Tide",
-    store: "Costco",
-    count: 1,
-    amount: 89,
-    unit: "washloads",
-    price: 22.49,
-    date: new Date("2024-09-12"),
-    isSale: false,
-  },
-  {
-    name: "toothpaste",
-    brand: "Crest",
-    store: "Costco",
-    count: 5,
-    amount: 135,
-    unit: "mL",
-    price: 14.49,
-    date: new Date("2024-09-12"),
-    isSale: true,
-  },
-  {
-    name: "bok choy",
-    store: "PriceSmart",
-    count: 1,
-    amount: 1.5,
-    unit: "kg",
-    price: 5,
-    date: new Date("2024-09-13"),
-    isSale: true,
-  },
-  {
-    name: "oats",
-    brand: "Quaker",
-    store: "Superstore",
-    count: 1,
-    amount: 1,
-    unit: "kg",
-    price: 5.99,
-    date: new Date("2024-09-16"),
-    isSale: true,
-  },
-  {
-    name: "oats",
-    brand: "Quaker",
-    store: "Walmart",
-    count: 1,
-    amount: 1,
-    unit: "kg",
-    price: 6.99,
-    date: new Date("2024-09-17"),
-    isSale: true,
-  },
-  {
-    name: "organic oats",
-    brand: "Quaker",
-    store: "Walmart",
-    count: 1,
-    amount: 1,
-    unit: "kg",
-    price: 25.1,
-    date: new Date("2024-09-12"),
-    isSale: false,
-  },
-];
-
-type GroupCreateInput = Omit<
-  Prisma.GroupCreateInput,
-  "minPrice" | "maxPrice" | "items"
->;
+type GroupCreateInput = Omit<Prisma.GroupCreateInput, "items">;
 type ItemCreateInput = Omit<Prisma.ItemCreateInput, "group" | "groupId">;
 
 type CreateGroupWithItemsInput = GroupCreateInput & {
@@ -377,9 +196,6 @@ async function createGroupWithItems({
   unit,
   prices,
 }: CreateGroupWithItemsInput) {
-  const minPrice = Math.min(...prices.map((p) => p.price));
-  const maxPrice = Math.max(...prices.map((p) => p.price));
-
   const group = await prisma.group.create({
     data: {
       name,
@@ -388,8 +204,6 @@ async function createGroupWithItems({
       count,
       amount,
       unit,
-      minPrice,
-      maxPrice,
       items: {
         create: prices.map(({ price, isSale, date }) => ({
           price,
@@ -403,12 +217,6 @@ async function createGroupWithItems({
 }
 
 async function main() {
-  await prisma.groceryItem.deleteMany({});
-  await prisma.groceryItem.createMany({
-    data: groceryItems,
-  });
-
-  await prisma.item.deleteMany({});
   await prisma.group.deleteMany({});
 
   for (const groupData of groupsWithItems) {
