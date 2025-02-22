@@ -1,5 +1,3 @@
-"use client";
-
 import Header from "@/components/header/header";
 import GroceryList from "@/components/grocery-list/grocery-list";
 

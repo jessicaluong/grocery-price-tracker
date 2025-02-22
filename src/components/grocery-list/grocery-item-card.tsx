@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { ItemWithView } from "@/lib/types";
 import GroceryItemDialog from "./grocery-item-dialog";

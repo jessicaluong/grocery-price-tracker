@@ -1,3 +1,5 @@
+"use client";
+
 import { useFilter } from "@/lib/hooks";
 import GroceryItemCard from "./grocery-item-card";
 import { ItemWithView } from "@/lib/types";
