@@ -92,7 +92,6 @@ export const groupItems = (items: GroceryItem[]): GroceryGroup[] => {
       count: group.item.count,
       amount: group.item.amount,
       unit: group.item.unit,
-      numberOfItems: group.pricePoints.length,
       minPrice: group.minPrice,
       maxPrice: group.maxPrice,
       priceHistory: group.pricePoints.sort((a, b) => sortByDate(a, b)),

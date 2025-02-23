@@ -252,29 +252,6 @@ describe("FilterUtils", () => {
       });
     });
 
-    describe("number of items calculations ", () => {
-      it("should count number of items in a group", () => {
-        const items = [
-          { ...baseItem, id: "1", groupId: "1" },
-          { ...baseItem, id: "2", groupId: "2" },
-          { ...baseItem, id: "3", groupId: "1" },
-          { ...baseItem, id: "4", groupId: "2" },
-          { ...baseItem, id: "5", groupId: "2" },
-        ];
-
-        const result = groupItems(items);
-        expect(result[0].numberOfItems).toBe(2);
-        expect(result[1].numberOfItems).toBe(3);
-      });
-
-      it("should handle single item count", () => {
-        const items = [{ ...baseItem, id: "1" }];
-
-        const result = groupItems(items);
-        expect(result[0].numberOfItems).toBe(1);
-      });
-    });
-
     describe("edge cases", () => {
       it("should handle single item", () => {
         const result = groupItems([baseItem]);
