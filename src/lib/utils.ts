@@ -15,21 +15,33 @@ export function currencyFormat(value: number) {
   }).format(value);
 }
 
+export function getConvertedPrice(
+  count: number,
+  price: number,
+  amount: number,
+  unit: Unit
+) {
+  const totalAmount = count * amount;
+  const pricePerUnit = price / totalAmount;
+
+  const conversion = unitConversions[unit];
+  const convertedPrice = pricePerUnit / conversion.factor;
+
+  return convertedPrice;
+}
+
 export function comparePriceFormat(
   count: number,
   price: number,
   amount: number,
   unit: Unit
 ): string {
+  const conversion = unitConversions[unit];
+  const convertedPrice = getConvertedPrice(count, price, amount, unit);
+
   if (count === 0 || amount === 0) {
     return "N/A";
   }
-
-  const totalAmount = count * amount;
-  const pricePerUnit = price / totalAmount;
-
-  const conversion = unitConversions[unit];
-  const convertedPrice = pricePerUnit / conversion.factor;
 
   return `${currencyFormat(convertedPrice)} /${
     conversion.factor === 1 ? "" : " 100"

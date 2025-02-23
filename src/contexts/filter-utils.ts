@@ -1,4 +1,4 @@
-import { matchName } from "@/lib/utils";
+import { getConvertedPrice, matchName } from "@/lib/utils";
 import {
   GroceryItem,
   GroceryGroup,
@@ -6,25 +6,37 @@ import {
   SortOptions,
   ViewOptions,
   PricePoint,
+  Unit,
 } from "@/lib/types";
 import { VIEW_OPTIONS } from "@/lib/constants";
 
-export const sortByPrice = <T extends { price: number }>(a: T, b: T): number =>
-  a.price - b.price;
+export const compareNumbersAscending = (a: number, b: number): number => a - b;
 
-export const sortByDate = <T extends { date: Date }>(a: T, b: T): number =>
-  new Date(b.date).getTime() - new Date(a.date).getTime();
+export const compareDatesDescending = <T extends { date: Date }>(
+  a: T,
+  b: T
+): number => new Date(b.date).getTime() - new Date(a.date).getTime();
 
-export const sortItems = <T extends { price: number; date: Date }>(
+export const sortItems = <
+  T extends {
+    count: number;
+    amount: number;
+    unit: Unit;
+    price: number;
+    date: Date;
+  }
+>(
   items: T[],
   sortOrder: SortOptions
 ): T[] => {
   return [...items].sort((a, b) => {
     switch (sortOrder) {
       case "Lowest Price":
-        return sortByPrice(a, b);
+        const priceA = getConvertedPrice(a.count, a.price, a.amount, a.unit);
+        const priceB = getConvertedPrice(b.count, b.price, b.amount, b.unit);
+        return compareNumbersAscending(priceA, priceB);
       case "Newest Date":
-        return sortByDate(a, b);
+        return compareDatesDescending(a, b);
     }
   });
 };
@@ -94,7 +106,9 @@ export const groupItems = (items: GroceryItem[]): GroceryGroup[] => {
       unit: group.item.unit,
       minPrice: group.minPrice,
       maxPrice: group.maxPrice,
-      priceHistory: group.pricePoints.sort((a, b) => sortByDate(a, b)),
+      priceHistory: group.pricePoints.sort((a, b) =>
+        compareDatesDescending(a, b)
+      ),
     });
   });
 

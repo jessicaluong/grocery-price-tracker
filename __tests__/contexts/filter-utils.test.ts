@@ -1,7 +1,7 @@
 import {
   findItems,
-  sortByPrice,
-  sortByDate,
+  compareNumbersAscending,
+  compareDatesDescending,
   sortItems,
   groupItems,
   getFilteredItemsWithView,
@@ -9,56 +9,56 @@ import {
 import { GroceryItem } from "@/lib/types";
 
 describe("FilterUtils", () => {
-  describe("sortByPrice", () => {
-    it("should sort items in ascending price order (cheapest first)", () => {
-      const items = [
-        { id: "1", price: 2.0 },
-        { id: "2", price: 1.5 },
-      ] as GroceryItem[];
-
-      const result = sortByPrice(items[0], items[1]);
+  describe("compareNumbersAscending", () => {
+    it("should sort numbers in ascending order (lowest first)", () => {
+      const result = compareNumbersAscending(2.0, 1.5);
       expect(result).toBe(0.5);
     });
 
-    it("should handle equal prices", () => {
-      const items = [
-        { id: "1", price: 2.0 },
-        { id: "2", price: 2.0 },
-      ] as GroceryItem[];
-
-      const result = sortByPrice(items[0], items[1]);
+    it("should handle equal values", () => {
+      const result = compareNumbersAscending(2.0, 2.0);
       expect(result).toBe(0);
+    });
+
+    it("should handle negative numbers", () => {
+      const result = compareNumbersAscending(-1.0, -2.0);
+      expect(result).toBe(1);
+    });
+
+    it("should handle zero", () => {
+      const result = compareNumbersAscending(0, 1.0);
+      expect(result).toBe(-1);
     });
   });
 
-  describe("sortByDate", () => {
-    it("should sort items in descending date order (most recent first) - different days", () => {
+  describe("compareDatesDescending", () => {
+    it("should order items in descending date order (most recent first) - different days", () => {
       const items = [
         { id: "1", date: new Date("2024-09-14") },
         { id: "2", date: new Date("2024-09-15") },
       ];
 
-      const result = sortByDate(items[0], items[1]);
+      const result = compareDatesDescending(items[0], items[1]);
       expect(result).toBeGreaterThan(0);
     });
 
-    it("should sort items in descending date order (most recent first) - different months", () => {
+    it("should order items in descending date order (most recent first) - different months", () => {
       const items = [
         { id: "1", date: new Date("2024-10-14") },
         { id: "2", date: new Date("2024-09-15") },
       ];
 
-      const result = sortByDate(items[0], items[1]);
+      const result = compareDatesDescending(items[0], items[1]);
       expect(result).toBeLessThan(0);
     });
 
-    it("should sort items in descending date order (most recent first) - different years", () => {
+    it("should order items in descending date order (most recent first) - different years", () => {
       const items = [
         { id: "1", date: new Date("2024-10-14") },
         { id: "2", date: new Date("2020-09-15") },
       ];
 
-      const result = sortByDate(items[0], items[1]);
+      const result = compareDatesDescending(items[0], items[1]);
       expect(result).toBeLessThan(0);
     });
 
@@ -68,35 +68,33 @@ describe("FilterUtils", () => {
         { id: "2", date: new Date("2024-09-14") },
       ];
 
-      const result = sortByDate(items[0], items[1]);
+      const result = compareDatesDescending(items[0], items[1]);
       expect(result).toBe(0);
     });
   });
 
   describe("sortItems", () => {
-    const items = [
-      { id: "1", price: 4.27, date: new Date("2024-09-14") },
-      { id: "2", price: 4, date: new Date("2024-09-15") },
-      { id: "3", price: 25.1, date: new Date("2024-09-12") },
-    ] as GroceryItem[];
-
-    it("should sort multiple items by price correctly", () => {
+    it("should sort items by converted price correctly", () => {
       const items = [
-        { id: "1", price: 3.0 },
-        { id: "2", price: 1.5 },
-        { id: "3", price: 2.0 },
-        { id: "4", price: 2.99 },
-        { id: "5", price: 2.1 },
+        {
+          count: 1,
+          amount: 100,
+          unit: "mL",
+          price: 4.0,
+          date: new Date(),
+        },
+        {
+          count: 1,
+          amount: 1,
+          unit: "L",
+          price: 5.0,
+          date: new Date(),
+        },
       ] as GroceryItem[];
 
+      // The item with price $4.00/100mL should come after $5.00/L since $4.00/100mL = $40.00/L
       const result = sortItems(items, "Lowest Price");
-      expect(result).toEqual([
-        items[1],
-        items[2],
-        items[4],
-        items[3],
-        items[0],
-      ]);
+      expect(result).toEqual([items[1], items[0]]);
     });
 
     it("should sort multiple items by date correctly", () => {
@@ -134,8 +132,20 @@ describe("FilterUtils", () => {
 
     it("should maintain original array immutability", () => {
       const original = [
-        { id: "1", price: 2.0 },
-        { id: "2", price: 1.5 },
+        {
+          count: 1,
+          amount: 100,
+          unit: "mL",
+          price: 4.0,
+          date: new Date(),
+        },
+        {
+          count: 1,
+          amount: 1,
+          unit: "L",
+          price: 5.0,
+          date: new Date(),
+        },
       ] as GroceryItem[];
       const originalCopy = [...original];
 
