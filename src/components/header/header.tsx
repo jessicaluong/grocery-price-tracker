@@ -1,11 +1,9 @@
-"use client";
-
 import CustomDrawer from "../custom-drawer";
 import CustomPopover from "../custom-popover";
 import { SearchBar } from "./search-bar";
 import { Button } from "../ui/button";
-import { PlusCircledIcon } from "@radix-ui/react-icons";
 import SortAndViewControls from "./sort-and-view-controls";
+import AddItemDialog from "./add-item-dialog";
 
 export default function Header() {
   return (
@@ -14,9 +12,7 @@ export default function Header() {
         {/* <CustomPopover />
         <CustomDrawer /> */}
         <div className="flex justify-end items-center gap-2">
-          <Button variant="outline" className="rounded-3xl">
-            <PlusCircledIcon className="mr-2" /> Add Item
-          </Button>
+          <AddItemDialog />
           <Button size="icon" variant="secondary">
             J
           </Button>
