@@ -77,6 +77,31 @@ export async function getItems() {
   }));
 }
 
+export async function getPriceHistoryByGroupId(id: string) {
+  const items = await prisma.group.findUnique({
+    where: { id },
+    select: {
+      items: {
+        select: { id: true, date: true, price: true, isSale: true },
+        orderBy: { date: "asc" },
+      },
+    },
+  });
+
+  const priceHistory = items?.items ?? [];
+  return {
+    priceHistory,
+    minPrice:
+      priceHistory.length > 0
+        ? Math.min(...priceHistory.map((pricePoint) => pricePoint.price))
+        : 0,
+    maxPrice:
+      priceHistory.length > 0
+        ? Math.max(...priceHistory.map((pricePoint) => pricePoint.price))
+        : 0,
+  };
+}
+
 // Test function for server action
 export async function addItem() {
   const sampleItem = {

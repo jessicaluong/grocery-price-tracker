@@ -5,11 +5,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ItemWithView } from "@/lib/types";
-import { PriceChart } from "./price-chart";
+import { ItemWithView, PriceHistoryData } from "@/lib/types";
 import { currencyFormat } from "@/lib/utils";
-import { SaleIndicator } from "./sale-indicator";
 import { ItemQuantity } from "./item-quantity";
+import { useQuery } from "@tanstack/react-query";
 
 type GroceryItemDialogProps = {
   open: boolean;
@@ -22,6 +21,13 @@ export default function GroceryItemDialog({
   onOpenChange,
   itemWithView: { item, view },
 }: GroceryItemDialogProps) {
+  const id = view === "LIST" ? item.groupId : item.id;
+  const { data, isLoading, error } = useQuery<PriceHistoryData>({
+    queryKey: ["priceHistory", id],
+    queryFn: () => fetch(`/api/price-history/${id}`).then((res) => res.json()),
+    enabled: open && !!id,
+  });
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -39,24 +45,18 @@ export default function GroceryItemDialog({
             </div>
             {item.brand && <div className="capitalize h-7">{item.brand}</div>}
             <div className="font-light capitalize">
-              {view === "LIST" && (
-                <>
-                  {item.isSale && <SaleIndicator />}
-                  {currencyFormat(item.price)}{" "}
-                  <span className="text-sm">@</span>{" "}
-                </>
-              )}
+              {data &&
+                (data.maxPrice === data.minPrice
+                  ? currencyFormat(data.minPrice)
+                  : `${currencyFormat(data.minPrice)}-${currencyFormat(
+                      data.maxPrice
+                    )}`)}
+              <span className="text-sm"> @ </span>
               {item.store}
             </div>
           </DialogTitle>
           <DialogDescription className="text-center"></DialogDescription>
         </DialogHeader>
-        <PriceChart />
-        <div className="flex justify-between mt-[10px]">
-          <p>Low $2.99</p>
-          <p>Average $3.50</p>
-          <p>High $5.00</p>
-        </div>
       </DialogContent>
     </Dialog>
   );

@@ -46,15 +46,41 @@ export type PricePoint = Pick<DbItem, "date" | "price" | "isSale">;
  * - unit: Unit
  * - maxPrice: number
  * - minPrice: number
- * - numberOfItems: number
  * - priceHistory: PricePoint[]
  */
 export type GroceryGroup = DbGroup & {
   minPrice: number;
   maxPrice: number;
-  numberOfItems: number;
   priceHistory: PricePoint[];
 };
+
+export type PriceHistoryPoint = {
+  id: string;
+  date: string;
+  price: number;
+  isSale: boolean;
+};
+
+export type PriceHistoryData = {
+  priceHistory: PriceHistoryPoint[];
+  minPrice: number;
+  maxPrice: number;
+};
+
+export type GroupMap = Map<
+  string,
+  {
+    name: string;
+    brand: string | null;
+    store: string;
+    count: number;
+    amount: number;
+    unit: Unit;
+    minPrice: number;
+    maxPrice: number;
+    pricePoints: PricePoint[];
+  }
+>;
 
 export type SortOptions = (typeof SORT_OPTIONS)[keyof typeof SORT_OPTIONS];
 
