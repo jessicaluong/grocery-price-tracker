@@ -2,6 +2,8 @@ import {
   comparePriceFormat,
   currencyFormat,
   formatString,
+  getDisplayFromParam,
+  getParamFromDisplay,
   matchName,
 } from "@/lib/utils";
 
@@ -173,26 +175,114 @@ describe("utils", () => {
       expect(match).toBe(false);
     });
   });
-});
 
-describe("formatString", () => {
-  it("should remove inner whitespaces", () => {
-    const result = formatString("orange juice");
-    expect(result).toEqual("orangejuice");
+  describe("formatString", () => {
+    it("should remove inner whitespaces", () => {
+      const result = formatString("orange juice");
+      expect(result).toEqual("orangejuice");
+    });
+
+    it("should remove outer whitespaces", () => {
+      const result = formatString("   orange ");
+      expect(result).toEqual("orange");
+    });
+
+    it("should make string lowercase", () => {
+      const result = formatString("ORangE");
+      expect(result).toEqual("orange");
+    });
+
+    it("should handle null", () => {
+      const result = formatString(null);
+      expect(result).toEqual("");
+    });
   });
 
-  it("should remove outer whitespaces", () => {
-    const result = formatString("   orange ");
-    expect(result).toEqual("orange");
+  describe("getDisplayFromParam", () => {
+    it("should get correct display for sort by newest", () => {
+      const display = getDisplayFromParam("sort", "newest");
+      expect(display).toBe("Newest Date");
+    });
+
+    it("should get correct display for sort by cheapest", () => {
+      const display = getDisplayFromParam("sort", "cheapest");
+      expect(display).toBe("Lowest Price");
+    });
+
+    it("should get correct display for view by list", () => {
+      const display = getDisplayFromParam("view", "list");
+      expect(display).toBe("List All Items");
+    });
+
+    it("should get correct display for view by group", () => {
+      const display = getDisplayFromParam("view", "group");
+      expect(display).toBe("Group Items");
+    });
+
+    it("should return default sort display value for invalid sort parameter", () => {
+      const display = getDisplayFromParam("sort", "invalid");
+      expect(display).toBe("Newest Date");
+    });
+
+    it("should return default view display value for invalid view parameter", () => {
+      const display = getDisplayFromParam("view", "invalid");
+      expect(display).toBe("List All Items");
+    });
+
+    it("should handle empty parameter strings", () => {
+      const displaySort = getDisplayFromParam("sort", "");
+      const displayView = getDisplayFromParam("view", "");
+      expect(displaySort).toBe("Newest Date");
+      expect(displayView).toBe("List All Items");
+    });
+
+    it("should handle case-sensitive parameter matching", () => {
+      const display = getDisplayFromParam("sort", "CHEAPEST");
+      expect(display).toBe("Lowest Price");
+    });
   });
 
-  it("should make string lowercase", () => {
-    const result = formatString("ORangE");
-    expect(result).toEqual("orange");
-  });
+  describe("getParamFromDisplay", () => {
+    it("should get correct parameter for sort by newest", () => {
+      const display = getParamFromDisplay("sort", "Newest Date");
+      expect(display).toBe("newest");
+    });
 
-  it("should handle null", () => {
-    const result = formatString(null);
-    expect(result).toEqual("");
+    it("should get correct parameter for sort by cheapest", () => {
+      const display = getParamFromDisplay("sort", "Lowest Price");
+      expect(display).toBe("cheapest");
+    });
+
+    it("should get correct parameter for view by list", () => {
+      const display = getParamFromDisplay("view", "List All Items");
+      expect(display).toBe("list");
+    });
+
+    it("should get correct parameter for view by group", () => {
+      const display = getParamFromDisplay("view", "Group Items");
+      expect(display).toBe("group");
+    });
+
+    it("should return default sort parameter for invalid sort display value", () => {
+      const display = getParamFromDisplay("sort", "invalid");
+      expect(display).toBe("newest");
+    });
+
+    it("should return default view parameter for invalid view display value", () => {
+      const display = getParamFromDisplay("view", "invalid");
+      expect(display).toBe("list");
+    });
+
+    it("should handle empty display strings", () => {
+      const displaySort = getParamFromDisplay("sort", "");
+      const displayView = getParamFromDisplay("view", "");
+      expect(displaySort).toBe("newest");
+      expect(displayView).toBe("list");
+    });
+
+    it("should handle case-sensitive display matching", () => {
+      const display = getParamFromDisplay("sort", "LOWEST PRICE");
+      expect(display).toBe("cheapest");
+    });
   });
 });

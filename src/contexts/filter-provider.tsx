@@ -4,19 +4,19 @@ import { DEFAULT_SORT, DEFAULT_VIEW } from "@/lib/constants";
 import {
   GroceryItem,
   ItemsWithViewMode,
-  SortOptions,
-  ViewOptions,
+  SortDisplayValues,
+  ViewDisplayValues,
 } from "@/lib/types";
 import { getFilteredItemsWithView } from "@/contexts/filter-utils";
 import { createContext, useMemo, useState } from "react";
 
 type FilterContextType = {
   searchQuery: string;
-  sortBy: SortOptions;
-  viewMode: ViewOptions;
+  sortBy: SortDisplayValues;
+  viewMode: ViewDisplayValues;
   handleSetSearchQuery: (query: string) => void;
-  handleSetSortBy: (mode: SortOptions) => void;
-  handleSetViewMode: (mode: ViewOptions) => void;
+  handleSetSortBy: (mode: SortDisplayValues) => void;
+  handleSetViewMode: (mode: ViewDisplayValues) => void;
   filteredItemsWithView: ItemsWithViewMode;
 };
 
@@ -32,20 +32,24 @@ export default function FilterProvider({
   initialItems,
 }: FilterProviderProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<SortOptions>(DEFAULT_SORT);
-  const [viewMode, setViewMode] = useState<ViewOptions>(DEFAULT_VIEW);
+  const [sortBy, setSortBy] = useState<SortDisplayValues>(DEFAULT_SORT.display);
+  const [viewMode, setViewMode] = useState<ViewDisplayValues>(
+    DEFAULT_VIEW.display
+  );
 
   const handleSetSearchQuery = (query: string) => {
     setSearchQuery(query);
   };
 
-  const handleSetSortBy = (mode: SortOptions) => {
+  const handleSetSortBy = (mode: SortDisplayValues) => {
     setSortBy(mode);
   };
 
-  const handleSetViewMode = (mode: ViewOptions) => {
+  const handleSetViewMode = (mode: ViewDisplayValues) => {
     setViewMode(mode);
   };
+
+  // const groupMap = useMemo(() => getGroupMap(initialItems), [initialItems]);
 
   const filteredItemsWithView: ItemsWithViewMode = useMemo(
     () => getFilteredItemsWithView(initialItems, searchQuery, sortBy, viewMode),

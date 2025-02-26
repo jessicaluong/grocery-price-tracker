@@ -1,14 +1,25 @@
+"use client";
+
 import { Input } from "@/components/ui/input";
-import { useFilter } from "@/lib/hooks";
+import { useUrlParams } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 type SearchBarProps = {
   className?: string;
 };
 
 export function SearchBar({ className }: SearchBarProps) {
-  const { handleSetSearchQuery } = useFilter();
-  // TODO: add buttons to clear text or search? (consider mobile)
+  const { getParam, updateParam } = useUrlParams();
+  const [inputValue, setInputValue] = useState(getParam("query", ""));
+
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      updateParam("search", "query", inputValue);
+    }, 500);
+
+    return () => clearTimeout(debounceTimer);
+  }, [inputValue, updateParam]);
 
   return (
     <Input
@@ -18,9 +29,8 @@ export function SearchBar({ className }: SearchBarProps) {
       )}
       type="search"
       placeholder="Search by item name and brand"
-      onChange={(e) => {
-        handleSetSearchQuery(e.target.value);
-      }}
+      value={inputValue}
+      onChange={(e) => setInputValue(e.target.value)}
     />
   );
 }

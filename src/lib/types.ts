@@ -82,9 +82,15 @@ export type GroupMap = Map<
   }
 >;
 
-export type SortOptions = (typeof SORT_OPTIONS)[keyof typeof SORT_OPTIONS];
+export type SortDisplayValues =
+  (typeof SORT_OPTIONS)[keyof typeof SORT_OPTIONS]["display"];
+export type ViewDisplayValues =
+  (typeof VIEW_OPTIONS)[keyof typeof VIEW_OPTIONS]["display"];
 
-export type ViewOptions = (typeof VIEW_OPTIONS)[keyof typeof VIEW_OPTIONS];
+export type SortParamValues =
+  (typeof SORT_OPTIONS)[keyof typeof SORT_OPTIONS]["param"];
+export type ViewParamValues =
+  (typeof VIEW_OPTIONS)[keyof typeof VIEW_OPTIONS]["param"];
 
 export type ItemWithView =
   | { view: "LIST"; item: GroceryItem }

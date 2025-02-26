@@ -3,10 +3,11 @@ import {
   GroceryItem,
   GroceryGroup,
   ItemsWithViewMode,
-  SortOptions,
-  ViewOptions,
+  SortDisplayValues,
+  ViewDisplayValues,
   PricePoint,
   Unit,
+  GroupMap,
 } from "@/lib/types";
 import { VIEW_OPTIONS } from "@/lib/constants";
 
@@ -27,7 +28,7 @@ export const sortItems = <
   }
 >(
   items: T[],
-  sortOrder: SortOptions
+  sortOrder: SortDisplayValues
 ): T[] => {
   return [...items].sort((a, b) => {
     switch (sortOrder) {
@@ -53,7 +54,61 @@ export const findItems = (
   });
 };
 
+export const getGroupMap = (items: GroceryItem[]) => {
+  type Group = {
+    name: string;
+    brand: string | null;
+    store: string;
+    count: number;
+    amount: number;
+    unit: Unit;
+    minPrice: number;
+    maxPrice: number;
+    pricePoints: PricePoint[];
+  };
+
+  let groupMap = new Map<string, Group>();
+
+  const createInitialGroup = (item: GroceryItem): Group => {
+    const pricePoint = {
+      date: item.date,
+      price: item.price,
+      isSale: item.isSale,
+    };
+    return {
+      name: item.name,
+      brand: item.brand,
+      store: item.store,
+      count: item.count,
+      amount: item.amount,
+      unit: item.unit,
+      minPrice: item.price,
+      maxPrice: item.price,
+      pricePoints: [pricePoint],
+    };
+  };
+
+  const updateExistingGroup = (group: Group, item: GroceryItem): void => {
+    group.minPrice = Math.min(group.minPrice, item.price);
+    group.maxPrice = Math.max(group.maxPrice, item.price);
+    group.pricePoints.push({
+      date: item.date,
+      price: item.price,
+      isSale: item.isSale,
+    });
+  };
+
+  items.forEach((item) => {
+    groupMap.has(item.groupId)
+      ? updateExistingGroup(groupMap.get(item.groupId)!, item)
+      : groupMap.set(item.groupId, createInitialGroup(item));
+  });
+
+  return groupMap;
+};
+
 export const groupItems = (items: GroceryItem[]): GroceryGroup[] => {
+  // access group map here
   type Group = {
     item: GroceryItem; // One representative item for group name, brand, store, count, amount, unit
     minPrice: number;
@@ -115,16 +170,20 @@ export const groupItems = (items: GroceryItem[]): GroceryGroup[] => {
   return groups;
 };
 
+const findGroups = () => {};
+
+const sortGroups = () => {};
+
 export const getFilteredItemsWithView = (
   items: GroceryItem[],
   searchQuery: string,
-  sortBy: SortOptions,
-  viewMode: ViewOptions
+  sortBy: SortDisplayValues,
+  viewMode: ViewDisplayValues
 ): ItemsWithViewMode => {
   const foundItems = findItems(items, searchQuery);
   const sortedItems = sortItems(foundItems, sortBy);
 
-  if (viewMode === VIEW_OPTIONS.GROUP) {
+  if (viewMode === VIEW_OPTIONS.GROUP.display) {
     return {
       view: "GROUP",
       items: groupItems(sortedItems),

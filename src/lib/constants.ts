@@ -9,12 +9,14 @@ export const unitConversions = {
 } as const;
 
 export const SORT_OPTIONS = {
-  NEWEST: "Newest Date",
-  CHEAPEST: "Lowest Price",
+  NEWEST: { display: "Newest Date", param: "newest" },
+  CHEAPEST: { display: "Lowest Price", param: "cheapest" },
 } as const;
+
 export const VIEW_OPTIONS = {
-  LIST: "List All Items",
-  GROUP: "Group Items",
+  LIST: { display: "List All Items", param: "list" },
+  GROUP: { display: "Group Items", param: "group" },
 } as const;
+
 export const DEFAULT_SORT = SORT_OPTIONS.NEWEST;
 export const DEFAULT_VIEW = VIEW_OPTIONS.LIST;

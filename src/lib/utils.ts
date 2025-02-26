@@ -1,7 +1,13 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Unit } from "./types";
-import { unitConversions } from "./constants";
+import {
+  DEFAULT_SORT,
+  DEFAULT_VIEW,
+  SORT_OPTIONS,
+  unitConversions,
+  VIEW_OPTIONS,
+} from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -61,3 +67,24 @@ export const formatString = (str: string | null): string => {
   if (!str) return "";
   return str.replace(/\s/g, "").trim().toLowerCase();
 };
+
+export function getDisplayFromParam(type: "sort" | "view", param: string) {
+  const options = type === "sort" ? SORT_OPTIONS : VIEW_OPTIONS;
+  const entry = Object.values(options).find(
+    (option) => option.param.toLowerCase() === param.toLowerCase()
+  );
+  return (
+    entry?.display ||
+    (type === "sort" ? DEFAULT_SORT.display : DEFAULT_VIEW.display)
+  );
+}
+
+export function getParamFromDisplay(type: "sort" | "view", display: string) {
+  const options = type === "sort" ? SORT_OPTIONS : VIEW_OPTIONS;
+  const entry = Object.values(options).find(
+    (option) => option.display.toLowerCase() === display.toLowerCase()
+  );
+  return (
+    entry?.param || (type === "sort" ? DEFAULT_SORT.param : DEFAULT_VIEW.param)
+  );
+}
