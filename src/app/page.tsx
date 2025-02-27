@@ -1,4 +1,3 @@
-import { getGroups, getItems } from "@/data-access/item-repository";
 import { DEFAULT_SORT, DEFAULT_VIEW } from "@/lib/constants";
 import Header from "@/components/header/header";
 import GroceryList from "@/components/grocery-list/grocery-list";
@@ -16,8 +15,6 @@ export default async function Page({ searchParams }: PageProps) {
   const viewMode = (searchParams.view || DEFAULT_VIEW.param) as ViewParamValues;
   const sortBy = (searchParams.sort || DEFAULT_SORT.param) as SortParamValues;
   const searchQuery = searchParams.query || "";
-
-  console.log(viewMode, sortBy, searchQuery);
 
   return (
     <main className="flex justify-center w-full p-[10px]">
