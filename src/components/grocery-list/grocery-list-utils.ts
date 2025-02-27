@@ -3,11 +3,11 @@ import {
   GroceryItem,
   GroceryGroup,
   ItemsWithViewMode,
-  SortDisplayValues,
-  ViewDisplayValues,
   PricePoint,
   Unit,
   GroupMap,
+  SortParamValues,
+  ViewParamValues,
 } from "@/lib/types";
 import { VIEW_OPTIONS } from "@/lib/constants";
 
@@ -28,15 +28,15 @@ export const sortItems = <
   }
 >(
   items: T[],
-  sortOrder: SortDisplayValues
+  sortOrder: SortParamValues
 ): T[] => {
   return [...items].sort((a, b) => {
     switch (sortOrder) {
-      case "Lowest Price":
+      case "cheapest":
         const priceA = getConvertedPrice(a.count, a.price, a.amount, a.unit);
         const priceB = getConvertedPrice(b.count, b.price, b.amount, b.unit);
         return compareNumbersAscending(priceA, priceB);
-      case "Newest Date":
+      case "newest":
         return compareDatesDescending(a, b);
     }
   });
@@ -177,13 +177,13 @@ const sortGroups = () => {};
 export const getFilteredItemsWithView = (
   items: GroceryItem[],
   searchQuery: string,
-  sortBy: SortDisplayValues,
-  viewMode: ViewDisplayValues
+  sortBy: SortParamValues,
+  viewMode: ViewParamValues
 ): ItemsWithViewMode => {
   const foundItems = findItems(items, searchQuery);
   const sortedItems = sortItems(foundItems, sortBy);
 
-  if (viewMode === VIEW_OPTIONS.GROUP.display) {
+  if (viewMode === VIEW_OPTIONS.GROUP.param) {
     return {
       view: "GROUP",
       items: groupItems(sortedItems),

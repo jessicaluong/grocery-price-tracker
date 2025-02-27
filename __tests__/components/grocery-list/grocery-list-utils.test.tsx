@@ -5,10 +5,10 @@ import {
   sortItems,
   groupItems,
   getFilteredItemsWithView,
-} from "@/contexts/filter-utils";
+} from "@/components/grocery-list/grocery-list-utils";
 import { GroceryItem } from "@/lib/types";
 
-describe("FilterUtils", () => {
+describe("GroceryListUtils", () => {
   describe("compareNumbersAscending", () => {
     it("should sort numbers in ascending order (lowest first)", () => {
       const result = compareNumbersAscending(2.0, 1.5);
@@ -93,7 +93,7 @@ describe("FilterUtils", () => {
       ] as GroceryItem[];
 
       // The item with price $4.00/100mL should come after $5.00/L since $4.00/100mL = $40.00/L
-      const result = sortItems(items, "Lowest Price");
+      const result = sortItems(items, "cheapest");
       expect(result).toEqual([items[1], items[0]]);
     });
 
@@ -106,7 +106,7 @@ describe("FilterUtils", () => {
         { id: "5", date: new Date("2022-07-23") },
       ] as GroceryItem[];
 
-      const result = sortItems(items, "Newest Date");
+      const result = sortItems(items, "newest");
       expect(result).toEqual([
         items[2],
         items[0],
@@ -121,12 +121,12 @@ describe("FilterUtils", () => {
         { id: "1", date: new Date("2024-01-01") },
       ] as GroceryItem[];
 
-      const result = sortItems(items, "Newest Date");
+      const result = sortItems(items, "newest");
       expect(result).toEqual([items[0]]);
     });
 
     it("should handle empty array", () => {
-      const result = sortItems([], "Newest Date");
+      const result = sortItems([], "newest");
       expect(result).toStrictEqual([]);
     });
 
@@ -149,7 +149,7 @@ describe("FilterUtils", () => {
       ] as GroceryItem[];
       const originalCopy = [...original];
 
-      sortItems(original, "Lowest Price");
+      sortItems(original, "cheapest");
       expect(original).toEqual(originalCopy);
     });
   });
@@ -291,12 +291,7 @@ describe("FilterUtils", () => {
     };
 
     it("should return correct view type for list view", () => {
-      const result = getFilteredItemsWithView(
-        [baseItem],
-        "",
-        "Newest Date",
-        "List All Items"
-      );
+      const result = getFilteredItemsWithView([baseItem], "", "newest", "list");
       expect(result.view).toBe("LIST");
     });
 
@@ -304,8 +299,8 @@ describe("FilterUtils", () => {
       const result = getFilteredItemsWithView(
         [baseItem],
         "",
-        "Newest Date",
-        "Group Items"
+        "newest",
+        "group"
       );
       expect(result.view).toBe("GROUP");
     });
@@ -340,12 +335,7 @@ describe("FilterUtils", () => {
             groupId: "3",
           },
         ];
-        const result = getFilteredItemsWithView(
-          items,
-          "",
-          "Lowest Price",
-          "Group Items"
-        );
+        const result = getFilteredItemsWithView(items, "", "cheapest", "group");
         expect(result.view).toBe("GROUP");
         expect(result.items).toHaveLength(3);
         expect(result.items[0].id).toBe("3");
@@ -375,12 +365,7 @@ describe("FilterUtils", () => {
             groupId: "4",
           },
         ];
-        const result = getFilteredItemsWithView(
-          items,
-          "",
-          "Newest Date",
-          "Group Items"
-        );
+        const result = getFilteredItemsWithView(items, "", "newest", "group");
 
         expect(result.view).toBe("GROUP");
         expect(result.items).toHaveLength(4);
@@ -391,25 +376,28 @@ describe("FilterUtils", () => {
       });
     });
 
-    xdescribe("search, sort and group", () => {
+    describe("search, sort and group", () => {
       const items = [
         {
           ...baseItem,
           name: "orange juice",
           price: 3.99,
           date: new Date("2024-03-01"),
+          groupId: "1",
         },
         {
           ...baseItem,
           name: "orange soda",
           price: 2.99,
           date: new Date("2024-01-01"),
+          groupId: "2",
         },
         {
           ...baseItem,
           name: "apple juice",
           price: 1.99,
           date: new Date("2024-02-01"),
+          groupId: "3",
         },
       ];
 
@@ -417,8 +405,8 @@ describe("FilterUtils", () => {
         const result = getFilteredItemsWithView(
           items,
           "orange",
-          "Lowest Price",
-          "List All Items"
+          "cheapest",
+          "list"
         );
 
         expect(result.view).toBe("LIST");
@@ -431,8 +419,8 @@ describe("FilterUtils", () => {
         const result = getFilteredItemsWithView(
           items,
           "orange",
-          "Newest Date",
-          "List All Items"
+          "newest",
+          "list"
         );
 
         expect(result.view).toBe("LIST");
@@ -445,8 +433,8 @@ describe("FilterUtils", () => {
         const result = getFilteredItemsWithView(
           items,
           "orange",
-          "Lowest Price",
-          "Group Items"
+          "cheapest",
+          "group"
         );
 
         expect(result.view).toBe("GROUP");
@@ -461,8 +449,8 @@ describe("FilterUtils", () => {
         const result = getFilteredItemsWithView(
           items,
           "orange",
-          "Newest Date",
-          "Group Items"
+          "newest",
+          "group"
         );
 
         expect(result.view).toBe("GROUP");
@@ -476,12 +464,7 @@ describe("FilterUtils", () => {
 
     describe("edge cases", () => {
       it("should handle empty initial items", () => {
-        const result = getFilteredItemsWithView(
-          [],
-          "apple",
-          "Newest Date",
-          "List All Items"
-        );
+        const result = getFilteredItemsWithView([], "apple", "newest", "list");
         expect(result.items).toHaveLength(0);
       });
 
@@ -489,8 +472,8 @@ describe("FilterUtils", () => {
         const result = getFilteredItemsWithView(
           [baseItem],
           "",
-          "Newest Date",
-          "List All Items"
+          "newest",
+          "list"
         );
         expect(result.items).toHaveLength(1);
       });
@@ -499,8 +482,8 @@ describe("FilterUtils", () => {
         const result = getFilteredItemsWithView(
           [baseItem],
           "nonexistent",
-          "Newest Date",
-          "List All Items"
+          "newest",
+          "list"
         );
         expect(result.items).toHaveLength(0);
       });
