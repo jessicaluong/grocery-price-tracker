@@ -21,6 +21,16 @@ export function currencyFormat(value: number) {
   }).format(value);
 }
 
+export function formatDate(dateValue: string | Date): string {
+  const date = new Date(dateValue as string | number | Date);
+  const formattedDate = date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+  return formattedDate;
+}
+
 export function getConvertedPrice(
   count: number,
   price: number,

@@ -8,6 +8,7 @@ import { ItemQuantity } from "./item-quantity";
 import {
   comparePriceFormat,
   currencyFormat,
+  formatDate,
   getConvertedPrice,
 } from "@/lib/utils";
 import { SaleIndicator } from "./sale-indicator";
@@ -90,8 +91,8 @@ export default function GroceryItemCard({
                 </p>
               </>
             )}
-            <p className="font-light tracking-tighter">
-              {view === "LIST" && item.date.toISOString().split("T")[0]}
+            <p className="font-light tracking-tight">
+              {view === "LIST" && formatDate(item.date)}
               {view === "GROUP" &&
                 `${item.priceHistory.length} ${
                   item.priceHistory.length === 1 ? "item" : "items"

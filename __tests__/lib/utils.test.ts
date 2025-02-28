@@ -5,6 +5,7 @@ import {
   getDisplayFromParam,
   getParamFromDisplay,
   matchName,
+  formatDate,
 } from "@/lib/utils";
 
 describe("utils", () => {
@@ -12,6 +13,19 @@ describe("utils", () => {
     it("should format currency with USD symbol and two decimal places", () => {
       const result = currencyFormat(10.5);
       expect(result).toBe("$10.50");
+    });
+  });
+
+  describe("formatDate", () => {
+    it("should format Date objects correctly", () => {
+      const date = new Date(2024, 0, 1);
+      expect(formatDate(date)).toBe("Jan 1, 2024");
+    });
+
+    it("should handle date strings", () => {
+      const dateString = "2024-02-15T00:00:00.000Z";
+      const result = formatDate(dateString as unknown as Date);
+      expect(result).toBe("Feb 15, 2024");
     });
   });
 
