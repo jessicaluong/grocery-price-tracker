@@ -1,5 +1,3 @@
-import CustomDrawer from "../custom-drawer";
-import CustomPopover from "../custom-popover";
 import { SearchBar } from "./search-bar";
 import { Button } from "../ui/button";
 import SortAndViewControls from "./sort-and-view-controls";
@@ -9,8 +7,6 @@ export default function Header() {
   return (
     <header className="flex flex-col gap-2 pb-[10px]">
       <div className="flex flex-col gap-4 w-full">
-        {/* <CustomPopover />
-        <CustomDrawer /> */}
         <div className="flex justify-end items-center gap-2">
           <AddItemDialog />
           <Button size="icon" variant="secondary">
