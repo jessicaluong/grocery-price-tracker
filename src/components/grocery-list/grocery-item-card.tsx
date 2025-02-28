@@ -14,9 +14,13 @@ import { SaleIndicator } from "./sale-indicator";
 
 type GroceryItemCardProps = ItemWithView;
 
-export default function GroceryItemCard({ item, view }: GroceryItemCardProps) {
+export default function GroceryItemCard({
+  view,
+  item,
+  groupMap,
+}: GroceryItemCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const itemWithView = { view, item } as ItemWithView;
+  const itemWithView = { view, item, groupMap } as ItemWithView;
 
   return (
     <>

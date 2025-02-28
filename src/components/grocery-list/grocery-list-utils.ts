@@ -3,8 +3,6 @@ import {
   GroceryItem,
   GroceryGroup,
   ItemsWithViewMode,
-  PricePoint,
-  Unit,
   GroupMap,
   SortParamValues,
   ViewParamValues,
@@ -18,18 +16,15 @@ export const compareDatesDescending = <T extends { date: Date }>(
   b: T
 ): number => new Date(b.date).getTime() - new Date(a.date).getTime();
 
-export const sortItems = <
-  T extends {
-    count: number;
-    amount: number;
-    unit: Unit;
-    price: number;
-    date: Date;
-  }
->(
-  items: T[],
+export const compareDatesAscending = <T extends { date: Date }>(
+  a: T,
+  b: T
+): number => new Date(a.date).getTime() - new Date(b.date).getTime();
+
+export const sortItems = (
+  items: GroceryItem[],
   sortOrder: SortParamValues
-): T[] => {
+): GroceryItem[] => {
   return [...items].sort((a, b) => {
     switch (sortOrder) {
       case "cheapest":
@@ -54,28 +49,17 @@ export const findItems = (
   });
 };
 
-export const getGroupMap = (items: GroceryItem[]) => {
-  type Group = {
-    name: string;
-    brand: string | null;
-    store: string;
-    count: number;
-    amount: number;
-    unit: Unit;
-    minPrice: number;
-    maxPrice: number;
-    pricePoints: PricePoint[];
-  };
+export const createGroupMap = (items: GroceryItem[]): GroupMap => {
+  let groupMap: GroupMap = new Map();
 
-  let groupMap = new Map<string, Group>();
-
-  const createInitialGroup = (item: GroceryItem): Group => {
+  const createInitialGroup = (item: GroceryItem): void => {
     const pricePoint = {
+      id: item.id,
       date: item.date,
       price: item.price,
       isSale: item.isSale,
     };
-    return {
+    const group = {
       name: item.name,
       brand: item.brand,
       store: item.store,
@@ -86,12 +70,16 @@ export const getGroupMap = (items: GroceryItem[]) => {
       maxPrice: item.price,
       pricePoints: [pricePoint],
     };
+
+    groupMap.set(item.groupId, group);
   };
 
-  const updateExistingGroup = (group: Group, item: GroceryItem): void => {
+  const updateExistingGroup = (item: GroceryItem): void => {
+    const group = groupMap.get(item.groupId)!;
     group.minPrice = Math.min(group.minPrice, item.price);
     group.maxPrice = Math.max(group.maxPrice, item.price);
     group.pricePoints.push({
+      id: item.id,
       date: item.date,
       price: item.price,
       isSale: item.isSale,
@@ -100,79 +88,71 @@ export const getGroupMap = (items: GroceryItem[]) => {
 
   items.forEach((item) => {
     groupMap.has(item.groupId)
-      ? updateExistingGroup(groupMap.get(item.groupId)!, item)
-      : groupMap.set(item.groupId, createInitialGroup(item));
+      ? updateExistingGroup(item)
+      : createInitialGroup(item);
+  });
+
+  groupMap.forEach((group) => {
+    group.pricePoints.sort(compareDatesAscending);
   });
 
   return groupMap;
 };
 
-export const groupItems = (items: GroceryItem[]): GroceryGroup[] => {
-  // access group map here
-  type Group = {
-    item: GroceryItem; // One representative item for group name, brand, store, count, amount, unit
-    minPrice: number;
-    maxPrice: number;
-    pricePoints: PricePoint[];
-  };
+export const findGroups = (groupMap: GroupMap, query: string): GroupMap => {
+  if (!query) return groupMap;
 
-  let groupMap = new Map<string, Group>();
+  const filteredMap: GroupMap = new Map();
 
-  const createInitialGroup = (item: GroceryItem): Group => {
-    const pricePoint = {
-      date: item.date,
-      price: item.price,
-      isSale: item.isSale,
-    };
-    return {
-      item: item,
-      minPrice: item.price,
-      maxPrice: item.price,
-      pricePoints: [pricePoint],
-    };
-  };
-
-  const updateExistingGroup = (group: Group, item: GroceryItem): void => {
-    group.minPrice = Math.min(group.minPrice, item.price);
-    group.maxPrice = Math.max(group.maxPrice, item.price);
-    group.pricePoints.push({
-      date: item.date,
-      price: item.price,
-      isSale: item.isSale,
-    });
-  };
-
-  items.forEach((item) => {
-    groupMap.has(item.groupId)
-      ? updateExistingGroup(groupMap.get(item.groupId)!, item)
-      : groupMap.set(item.groupId, createInitialGroup(item));
+  groupMap.forEach((groupData, groupId) => {
+    const combinedText = `${groupData.name} ${groupData.brand || ""}`;
+    if (matchName(combinedText, query)) {
+      filteredMap.set(groupId, groupData);
+    }
   });
 
+  return filteredMap;
+};
+
+export const sortGroups = (
+  groups: GroceryGroup[],
+  sortOrder: SortParamValues
+): GroceryGroup[] => {
+  return [...groups].sort((a, b) => {
+    switch (sortOrder) {
+      case "cheapest":
+        const priceA = getConvertedPrice(a.count, a.minPrice, a.amount, a.unit);
+        const priceB = getConvertedPrice(b.count, b.minPrice, b.amount, b.unit);
+        return compareNumbersAscending(priceA, priceB);
+      case "newest":
+        return compareDatesDescending(
+          a.priceHistory[a.priceHistory.length - 1],
+          b.priceHistory[b.priceHistory.length - 1]
+        );
+    }
+  });
+};
+
+export const groupMapToArray = (groupMap: GroupMap): GroceryGroup[] => {
   const groups: GroceryGroup[] = [];
 
-  groupMap.forEach((group) => {
+  groupMap.forEach((groupData, groupId) => {
     groups.push({
-      id: group.item.groupId,
-      name: group.item.name,
-      brand: group.item.brand,
-      store: group.item.store,
-      count: group.item.count,
-      amount: group.item.amount,
-      unit: group.item.unit,
-      minPrice: group.minPrice,
-      maxPrice: group.maxPrice,
-      priceHistory: group.pricePoints.sort((a, b) =>
-        compareDatesDescending(a, b)
-      ),
+      id: groupId,
+      name: groupData.name,
+      brand: groupData.brand,
+      store: groupData.store,
+      count: groupData.count,
+      amount: groupData.amount,
+      unit: groupData.unit,
+      minPrice: groupData.minPrice,
+      maxPrice: groupData.maxPrice,
+      priceHistory: groupData.pricePoints,
     });
   });
 
   return groups;
 };
-
-const findGroups = () => {};
-
-const sortGroups = () => {};
 
 export const getFilteredItemsWithView = (
   items: GroceryItem[],
@@ -180,18 +160,24 @@ export const getFilteredItemsWithView = (
   sortBy: SortParamValues,
   viewMode: ViewParamValues
 ): ItemsWithViewMode => {
-  const foundItems = findItems(items, searchQuery);
-  const sortedItems = sortItems(foundItems, sortBy);
+  const groupMap = createGroupMap(items);
 
   if (viewMode === VIEW_OPTIONS.GROUP.param) {
+    const foundGroups = findGroups(groupMap, searchQuery);
+    const sortedGroups = sortGroups(groupMapToArray(foundGroups), sortBy);
     return {
       view: "GROUP",
-      items: groupItems(sortedItems),
+      items: sortedGroups,
+      groupMap: groupMap,
     };
   }
+
+  const foundItems = findItems(items, searchQuery);
+  const sortedItems = sortItems(foundItems, sortBy);
 
   return {
     view: "LIST",
     items: sortedItems,
+    groupMap: groupMap,
   };
 };

@@ -3,10 +3,13 @@ import {
   compareNumbersAscending,
   compareDatesDescending,
   sortItems,
-  groupItems,
   getFilteredItemsWithView,
+  createGroupMap,
+  findGroups,
+  sortGroups,
+  groupMapToArray,
 } from "@/components/grocery-list/grocery-list-utils";
-import { GroceryItem } from "@/lib/types";
+import { GroceryGroup, GroceryItem, GroupMap, PricePoint } from "@/lib/types";
 
 describe("GroceryListUtils", () => {
   describe("compareNumbersAscending", () => {
@@ -84,15 +87,14 @@ describe("GroceryListUtils", () => {
           date: new Date(),
         },
         {
-          count: 1,
-          amount: 1,
-          unit: "L",
+          count: 2,
+          amount: 200,
+          unit: "mL",
           price: 5.0,
           date: new Date(),
         },
       ] as GroceryItem[];
 
-      // The item with price $4.00/100mL should come after $5.00/L since $4.00/100mL = $40.00/L
       const result = sortItems(items, "cheapest");
       expect(result).toEqual([items[1], items[0]]);
     });
@@ -223,11 +225,46 @@ describe("GroceryListUtils", () => {
     });
   });
 
-  describe("groupItems", () => {
+  describe("createGroupMap", () => {
     const baseItem = {
       id: "1",
       groupId: "1",
+      name: "orange juice",
+      brand: "Tropicana",
+      store: "Walmart",
+      count: 1,
+      amount: 100,
+      unit: "mL" as const,
+      price: 4,
+      date: new Date("2024-09-15"),
+      isSale: true,
     } as GroceryItem;
+
+    describe("group items with same groupId", () => {
+      it("should group items with the same groupId", () => {
+        const items = [
+          { ...baseItem, id: "1", groupId: "1" },
+          { ...baseItem, id: "2", groupId: "2" },
+          { ...baseItem, id: "3", groupId: "1" },
+        ];
+
+        const result = createGroupMap(items);
+        expect(result).toBeInstanceOf(Map);
+        expect(result.size).toBe(2);
+
+        expect(result.has("1")).toBe(true);
+        const group1 = result.get("1");
+        expect(group1?.pricePoints.length).toBe(2);
+
+        expect(result.has("2")).toBe(true);
+        const group2 = result.get("2");
+        expect(group2?.pricePoints.length).toBe(1);
+
+        expect(group1?.name).toBe(baseItem.name);
+        expect(group1?.brand).toBe(baseItem.brand);
+        expect(group1?.store).toBe(baseItem.store);
+      });
+    });
 
     describe("price range calculations ", () => {
       it("should calculate correct price range for grouped items", () => {
@@ -237,17 +274,19 @@ describe("GroceryListUtils", () => {
           { ...baseItem, id: "3", price: 2.5 },
         ];
 
-        const result = groupItems(items);
-        expect(result[0].minPrice).toEqual(1.5);
-        expect(result[0].maxPrice).toEqual(2.99);
+        const result = createGroupMap(items);
+        const group1 = result.get("1");
+        expect(group1?.minPrice).toBe(1.5);
+        expect(group1?.maxPrice).toEqual(2.99);
       });
 
       it("should handle single item price range", () => {
         const items = [{ ...baseItem, id: "1", price: 1.99 }];
 
-        const result = groupItems(items);
-        expect(result[0].minPrice).toEqual(1.99);
-        expect(result[0].maxPrice).toEqual(1.99);
+        const result = createGroupMap(items);
+        const group1 = result.get("1");
+        expect(group1?.minPrice).toBe(1.99);
+        expect(group1?.maxPrice).toEqual(1.99);
       });
 
       it("should handle identical prices in range calculation", () => {
@@ -256,22 +295,414 @@ describe("GroceryListUtils", () => {
           { ...baseItem, id: "2", price: 1.99 },
         ];
 
-        const result = groupItems(items);
-        expect(result[0].minPrice).toEqual(1.99);
-        expect(result[0].maxPrice).toEqual(1.99);
+        const result = createGroupMap(items);
+        const group1 = result.get("1");
+        expect(group1?.minPrice).toBe(1.99);
+        expect(group1?.maxPrice).toEqual(1.99);
+      });
+    });
+
+    describe("date sorting within price points", () => {
+      it("should sort price points by date with oldest first", () => {
+        const items = [
+          {
+            ...baseItem,
+            id: "1",
+            date: new Date("2024-01-15"),
+          },
+          {
+            ...baseItem,
+            id: "2",
+            date: new Date("2024-09-15"),
+          },
+          {
+            ...baseItem,
+            id: "3",
+            date: new Date("2024-03-20"),
+          },
+        ];
+
+        const result = createGroupMap(items);
+
+        expect(result.has("1")).toBe(true);
+        const group = result.get("1");
+        expect(group).toBeDefined();
+        expect(group?.pricePoints.length).toBe(3);
+
+        const sortedPricePoints = group?.pricePoints as PricePoint[];
+
+        expect(sortedPricePoints[0].date).toEqual(new Date("2024-01-15"));
+        expect(sortedPricePoints[0].id).toBe("1");
+
+        expect(sortedPricePoints[1].date).toEqual(new Date("2024-03-20"));
+        expect(sortedPricePoints[1].id).toBe("3");
+
+        expect(sortedPricePoints[2].date).toEqual(new Date("2024-09-15"));
+        expect(sortedPricePoints[2].id).toBe("2");
+      });
+
+      it("should handle items with identical dates", () => {
+        const items = [
+          {
+            ...baseItem,
+            id: "1",
+            date: new Date("2024-09-15"),
+            price: 3.99,
+          },
+          {
+            ...baseItem,
+            id: "2",
+            date: new Date("2024-09-15"),
+            price: 4.29,
+          },
+        ];
+
+        const result = createGroupMap(items);
+        const group = result.get("1");
+        expect(group?.pricePoints.length).toBe(2);
+
+        expect(group?.pricePoints[0].date).toEqual(new Date("2024-09-15"));
+        expect(group?.pricePoints[1].date).toEqual(new Date("2024-09-15"));
       });
     });
 
     describe("edge cases", () => {
       it("should handle single item", () => {
-        const result = groupItems([baseItem]);
-        expect(result).toHaveLength(1);
+        const result = createGroupMap([baseItem]);
+        expect(result.size).toBe(1);
+        expect(result.has(baseItem.groupId)).toBe(true);
+
+        const group = result.get(baseItem.groupId);
+        expect(group).toBeDefined();
+        expect(group?.pricePoints.length).toBe(1);
+        expect(group?.minPrice).toBe(baseItem.price);
+        expect(group?.maxPrice).toBe(baseItem.price);
       });
 
       it("should handle no items", () => {
-        const result = groupItems([]);
-        expect(result).toStrictEqual([]);
+        const result = createGroupMap([]);
+        expect(result.size).toBe(0);
+        expect(result).toBeInstanceOf(Map);
       });
+    });
+  });
+
+  describe("findGroups", () => {
+    const groupMap: GroupMap = new Map();
+
+    const groups = [
+      {
+        name: "orange juice",
+        brand: "Tropicana",
+        store: "Walmart",
+        count: 1,
+        amount: 100,
+        unit: "mL" as const,
+        minPrice: 3.99,
+        maxPrice: 4.29,
+        pricePoints: [
+          { id: "1", date: new Date("2024-09-15"), price: 4.29, isSale: false },
+          { id: "2", date: new Date("2024-08-15"), price: 3.99, isSale: true },
+        ],
+      },
+      {
+        name: "oats",
+        brand: "Quaker",
+        store: "Costco",
+        count: 1,
+        amount: 1,
+        unit: "L" as const,
+        minPrice: 2.99,
+        maxPrice: 3.49,
+        pricePoints: [
+          { id: "3", date: new Date("2024-09-10"), price: 3.49, isSale: false },
+          { id: "4", date: new Date("2024-08-20"), price: 2.99, isSale: true },
+        ],
+      },
+      {
+        name: "orange soda",
+        brand: "Fanta",
+        store: "Whole Foods",
+        count: 1,
+        amount: 2,
+        unit: "L" as const,
+        minPrice: 5.99,
+        maxPrice: 5.99,
+        pricePoints: [
+          { id: "5", date: new Date("2024-09-05"), price: 5.99, isSale: false },
+        ],
+      },
+    ];
+
+    groupMap.set("1", groups[0]);
+    groupMap.set("2", groups[1]);
+    groupMap.set("3", groups[2]);
+
+    it("should find groups by name", () => {
+      const result = findGroups(groupMap, "juice");
+      expect(result.size).toBe(1);
+      expect(result.has("1")).toBe(true);
+      expect(result.has("2")).toBe(false);
+      expect(result.has("3")).toBe(false);
+    });
+
+    it("should find groups by brand", () => {
+      const result = findGroups(groupMap, "tropicana");
+      expect(result.size).toBe(1);
+      expect(result.has("1")).toBe(true);
+      expect(result.has("2")).toBe(false);
+      expect(result.has("3")).toBe(false);
+    });
+
+    it("should find groups by name and brand", () => {
+      const result = findGroups(groupMap, "orange juice tropicana");
+      expect(result.size).toBe(1);
+      expect(result.has("1")).toBe(true);
+      expect(result.has("2")).toBe(false);
+      expect(result.has("3")).toBe(false);
+    });
+
+    it("should return all groups for empty search query", () => {
+      const result = findGroups(groupMap, "");
+      expect(result.size).toBe(3);
+      expect(result.has("1")).toBe(true);
+      expect(result.has("2")).toBe(true);
+      expect(result.has("3")).toBe(true);
+    });
+
+    it("should return empty map for non-matching query", () => {
+      const result = findGroups(groupMap, "banana");
+      expect(result.size).toBe(0);
+      expect(result).toBeInstanceOf(Map);
+    });
+
+    it("should match groups with missing brand", () => {
+      groupMap.set("4", {
+        name: "bok choy",
+        brand: null,
+        store: "Superstore",
+        count: 1,
+        amount: 300,
+        unit: "g" as const,
+        minPrice: 0.99,
+        maxPrice: 1.29,
+        pricePoints: [
+          { id: "1", date: new Date("2024-09-15"), price: 0.99, isSale: false },
+          { id: "2", date: new Date("2024-08-15"), price: 1.29, isSale: true },
+        ],
+      });
+      const result = findGroups(groupMap, "choy");
+      expect(result.size).toBe(1);
+      expect(result.has("1")).toBe(false);
+      expect(result.has("2")).toBe(false);
+      expect(result.has("3")).toBe(false);
+      expect(result.has("4")).toBe(true);
+    });
+
+    it("should find multiple groups", () => {
+      const result = findGroups(groupMap, "orange");
+      expect(result.size).toBe(2);
+      expect(result.has("1")).toBe(true);
+      expect(result.has("2")).toBe(false);
+      expect(result.has("3")).toBe(true);
+    });
+
+    it("should return empty map if grocery list is empty", () => {
+      const emptyMap: GroupMap = new Map();
+
+      const result = findGroups(emptyMap, "orange");
+      expect(result.size).toBe(0);
+    });
+
+    it("should include duplicates when name and brand match", () => {
+      groupMap.set("4", {
+        name: "orange juice",
+        brand: "Tropicana",
+        store: "Superstore",
+        count: 1,
+        amount: 100,
+        unit: "mL" as const,
+        minPrice: 3.99,
+        maxPrice: 4.29,
+        pricePoints: [
+          { id: "1", date: new Date("2024-09-15"), price: 4.29, isSale: false },
+          { id: "2", date: new Date("2024-08-15"), price: 3.99, isSale: true },
+        ],
+      });
+
+      const result = findGroups(groupMap, "orange tropicana");
+      expect(result.size).toBe(2);
+      expect(result.has("1")).toBe(true);
+      expect(result.has("2")).toBe(false);
+      expect(result.has("3")).toBe(false);
+      expect(result.has("4")).toBe(true);
+    });
+  });
+
+  describe("sortGroups", () => {
+    it("should sort groups by converted price correctly", () => {
+      const groups = [
+        {
+          id: "1",
+          count: 1,
+          amount: 100,
+          unit: "mL",
+          minPrice: 4.0,
+        },
+        {
+          id: "2",
+          count: 1,
+          amount: 200,
+          unit: "mL",
+          minPrice: 5.0,
+        },
+      ] as GroceryGroup[];
+
+      const result = sortGroups(groups, "cheapest");
+      expect(result).toEqual([groups[1], groups[0]]);
+    });
+
+    it("should sort multiple items by date correctly", () => {
+      const items = [
+        { id: "1", date: new Date("2024-01-01") },
+        { id: "2", date: new Date("1999-02-01") },
+        { id: "3", date: new Date("2024-01-10") },
+        { id: "4", date: new Date("2023-01-01") },
+        { id: "5", date: new Date("2022-07-23") },
+      ] as GroceryItem[];
+
+      const groups = [
+        {
+          id: "1",
+          priceHistory: [
+            { date: new Date("2023-01-10") },
+            { date: new Date("2024-02-14") },
+            { date: new Date("2024-01-20") },
+          ],
+        },
+        {
+          id: "2",
+          priceHistory: [{ date: new Date("2024-09-15") }],
+        },
+        {
+          id: "3",
+          priceHistory: [
+            { date: new Date("2025-01-15") },
+            { date: new Date("2025-02-15") },
+          ],
+        },
+        {
+          id: "4",
+          priceHistory: [
+            { date: new Date("2023-01-12") },
+            { date: new Date("2023-04-15") },
+            { date: new Date("2024-05-15") },
+            { date: new Date("2024-06-18") },
+          ],
+        },
+      ] as GroceryGroup[];
+
+      const result = sortGroups(groups, "newest");
+      expect(result).toEqual([groups[2], groups[1], groups[3], groups[0]]);
+    });
+
+    it("should handle single group", () => {
+      const groups = [
+        {
+          id: "1",
+          priceHistory: [
+            { date: new Date("2023-01-10") },
+            { date: new Date("2024-02-14") },
+          ],
+        },
+      ] as GroceryGroup[];
+
+      const result = sortGroups(groups, "newest");
+      expect(result).toEqual([groups[0]]);
+    });
+
+    it("should handle empty array", () => {
+      const result = sortGroups([], "newest");
+      expect(result).toStrictEqual([]);
+    });
+
+    it("should maintain original array immutability", () => {
+      const original = [
+        {
+          count: 1,
+          amount: 100,
+          unit: "mL",
+          minPrice: 4.0,
+        },
+        {
+          count: 1,
+          amount: 1,
+          unit: "L",
+          minPrice: 5.0,
+        },
+      ] as GroceryGroup[];
+      const originalCopy = [...original];
+
+      sortGroups(original, "cheapest");
+      expect(original).toEqual(originalCopy);
+    });
+  });
+
+  describe("groupMapToArray", () => {
+    it("should convert a GroupMap to an array of GroceryGroups", () => {
+      const groupMap: GroupMap = new Map();
+
+      groupMap.set("group1", {
+        name: "orange juice",
+        brand: "Tropicana",
+        store: "Walmart",
+        count: 1,
+        amount: 100,
+        unit: "mL",
+        minPrice: 3.99,
+        maxPrice: 4.29,
+        pricePoints: [
+          { id: "1", date: new Date("2024-09-15"), price: 4.29, isSale: false },
+          { id: "2", date: new Date("2024-08-15"), price: 3.99, isSale: true },
+        ],
+      });
+
+      groupMap.set("group2", {
+        name: "apple",
+        brand: null,
+        store: "Costco",
+        count: 5,
+        amount: 1,
+        unit: "kg",
+        minPrice: 2.99,
+        maxPrice: 3.49,
+        pricePoints: [
+          { id: "3", date: new Date("2024-09-10"), price: 3.49, isSale: false },
+        ],
+      });
+
+      const result = groupMapToArray(groupMap);
+
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBe(2);
+
+      expect(result[0].id).toBe("group1");
+      expect(result[1].id).toBe("group2");
+
+      expect(result[0].name).toBe("orange juice");
+      expect(result[0].brand).toBe("Tropicana");
+      expect(result[1].name).toBe("apple");
+      expect(result[1].brand).toBeNull();
+
+      expect(result[0].priceHistory.length).toBe(2);
+      expect(result[1].priceHistory.length).toBe(1);
+    });
+
+    it("should handle empty Map", () => {
+      const groupMap: GroupMap = new Map();
+      const result = groupMapToArray(groupMap);
+
+      expect(result).toEqual([]);
     });
   });
 
@@ -303,6 +734,27 @@ describe("GroceryListUtils", () => {
         "group"
       );
       expect(result.view).toBe("GROUP");
+    });
+
+    it("should include groupMap in the response for list view", () => {
+      const result = getFilteredItemsWithView([baseItem], "", "newest", "list");
+      expect(result.groupMap).toBeDefined();
+      expect(result.groupMap).toBeInstanceOf(Map);
+      expect(result.groupMap.size).toBe(1);
+      expect(result.groupMap.has("1")).toBe(true);
+    });
+
+    it("should include groupMap in the response for group view", () => {
+      const result = getFilteredItemsWithView(
+        [baseItem],
+        "",
+        "newest",
+        "group"
+      );
+      expect(result.groupMap).toBeDefined();
+      expect(result.groupMap).toBeInstanceOf(Map);
+      expect(result.groupMap.size).toBe(1);
+      expect(result.groupMap.has("1")).toBe(true);
     });
 
     describe("group ordering with sort modes", () => {

@@ -16,7 +16,7 @@ export default async function GroceryList({
   searchQuery,
 }: GroceryListProps) {
   const initialItems = await getItems();
-  const { view, items } = getFilteredItemsWithView(
+  const { view, items, groupMap } = getFilteredItemsWithView(
     initialItems,
     searchQuery,
     sortBy,
@@ -26,7 +26,7 @@ export default async function GroceryList({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
       {items.map((item) => {
-        const itemWithView = { view, item } as ItemWithView;
+        const itemWithView = { view, item, groupMap } as ItemWithView;
         return <GroceryItemCard key={item.id} {...itemWithView} />;
         // return <GroceryItemDialog key={item.id} {...itemWithView} />;
       })}

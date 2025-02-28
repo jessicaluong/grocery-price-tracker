@@ -5,10 +5,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ItemWithView, PriceHistoryData } from "@/lib/types";
+import { ItemWithView } from "@/lib/types";
 import { currencyFormat } from "@/lib/utils";
 import { ItemQuantity } from "./item-quantity";
-import { useQuery } from "@tanstack/react-query";
 
 type GroceryItemDialogProps = {
   open: boolean;
@@ -19,14 +18,10 @@ type GroceryItemDialogProps = {
 export default function GroceryItemDialog({
   open,
   onOpenChange,
-  itemWithView: { item, view },
+  itemWithView: { view, item, groupMap },
 }: GroceryItemDialogProps) {
-  const id = view === "LIST" ? item.groupId : item.id;
-  const { data, isLoading, error } = useQuery<PriceHistoryData>({
-    queryKey: ["priceHistory", id],
-    queryFn: () => fetch(`/api/price-history/${id}`).then((res) => res.json()),
-    enabled: open && !!id,
-  });
+  const group =
+    view === "LIST" ? groupMap.get(item.groupId) : groupMap.get(item.id);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -45,11 +40,11 @@ export default function GroceryItemDialog({
             </div>
             {item.brand && <div className="capitalize h-7">{item.brand}</div>}
             <div className="font-light capitalize">
-              {data &&
-                (data.maxPrice === data.minPrice
-                  ? currencyFormat(data.minPrice)
-                  : `${currencyFormat(data.minPrice)}-${currencyFormat(
-                      data.maxPrice
+              {group &&
+                (group.maxPrice === group.minPrice
+                  ? currencyFormat(group.minPrice)
+                  : `${currencyFormat(group.minPrice)}-${currencyFormat(
+                      group.maxPrice
                     )}`)}
               <span className="text-sm"> @ </span>
               {item.store}

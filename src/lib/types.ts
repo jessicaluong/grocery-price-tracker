@@ -29,11 +29,12 @@ export type GroceryItem = DbItem & Omit<DbGroup, "id">;
 /**
  * Price point for historical price tracking
  * Properties:
+ * - id: string
  * - date: Date
  * - price: number
  * - isSale: boolean
  */
-export type PricePoint = Pick<DbItem, "date" | "price" | "isSale">;
+export type PricePoint = Pick<DbItem, "id" | "date" | "price" | "isSale">;
 
 /**
  * Core Group type
@@ -52,19 +53,6 @@ export type GroceryGroup = DbGroup & {
   minPrice: number;
   maxPrice: number;
   priceHistory: PricePoint[];
-};
-
-export type PriceHistoryPoint = {
-  id: string;
-  date: string;
-  price: number;
-  isSale: boolean;
-};
-
-export type PriceHistoryData = {
-  priceHistory: PriceHistoryPoint[];
-  minPrice: number;
-  maxPrice: number;
 };
 
 export type GroupMap = Map<
@@ -93,9 +81,9 @@ export type ViewParamValues =
   (typeof VIEW_OPTIONS)[keyof typeof VIEW_OPTIONS]["param"];
 
 export type ItemWithView =
-  | { view: "LIST"; item: GroceryItem }
-  | { view: "GROUP"; item: GroceryGroup };
+  | { view: "LIST"; item: GroceryItem; groupMap: GroupMap }
+  | { view: "GROUP"; item: GroceryGroup; groupMap: GroupMap };
 
 export type ItemsWithViewMode =
-  | { view: "LIST"; items: GroceryItem[] }
-  | { view: "GROUP"; items: GroceryGroup[] };
+  | { view: "LIST"; items: GroceryItem[]; groupMap: GroupMap }
+  | { view: "GROUP"; items: GroceryGroup[]; groupMap: GroupMap };
