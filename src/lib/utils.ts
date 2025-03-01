@@ -23,12 +23,21 @@ export function currencyFormat(value: number) {
 
 export function formatDate(dateValue: string | Date): string {
   const date = new Date(dateValue as string | number | Date);
-  const formattedDate = date.toLocaleDateString("en-US", {
+
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth();
+  const day = date.getUTCDate();
+
+  const formatter = new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
+    timeZone: "UTC",
   });
-  return formattedDate;
+
+  const utcDate = new Date(Date.UTC(year, month, day));
+
+  return formatter.format(utcDate);
 }
 
 export function getConvertedPrice(
