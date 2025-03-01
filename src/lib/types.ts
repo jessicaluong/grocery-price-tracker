@@ -6,6 +6,7 @@ import {
 } from "@prisma/client";
 
 export type Unit = PrismaUnit;
+export { PrismaUnit as UnitEnum };
 
 type DbItem = Omit<PrismaItem, "createdAt" | "updatedAt">;
 type DbGroup = Omit<PrismaGroup, "createdAt" | "updatedAt">;
@@ -18,6 +19,7 @@ type DbGroup = Omit<PrismaGroup, "createdAt" | "updatedAt">;
  * - brand: string | null
  * - store: string
  * - count: number
+ * - amount: number
  * - unit: Unit
  * - date: Date
  * - price: number
@@ -44,6 +46,7 @@ export type PricePoint = Pick<DbItem, "id" | "date" | "price" | "isSale">;
  * - brand: string | null
  * - store: string
  * - count: number
+ * - amount: number
  * - unit: Unit
  * - maxPrice: number
  * - minPrice: number
