@@ -7,7 +7,7 @@ jest.mock("@/lib/hooks", () => ({
   useUrlParams: jest.fn(),
 }));
 
-jest.mock("@/components/header/select-input", () => {
+jest.mock("@/components/header/sort-and-view-select-input", () => {
   return function MockSelectInput({
     label,
     options,

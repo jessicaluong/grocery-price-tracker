@@ -1,6 +1,6 @@
 "use client";
 
-import SelectInput from "./select-input";
+import SelectInput from "./sort-and-view-select-input";
 import { SORT_OPTIONS, VIEW_OPTIONS } from "@/lib/constants";
 import { SortDisplayValues, ViewDisplayValues } from "@/lib/types";
 import { useUrlParams } from "@/lib/hooks";

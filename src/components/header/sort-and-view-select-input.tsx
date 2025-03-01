@@ -1,15 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import SelectContentOptions from "./select-content-options";
 
 type SelectInputProps<T extends string> = {
   label: string;
@@ -18,7 +12,7 @@ type SelectInputProps<T extends string> = {
   onChange: (value: T) => void;
 };
 
-export default function SelectInput<T extends string>({
+export default function SortAndViewSelectInput<T extends string>({
   label,
   options,
   value,
@@ -34,15 +28,7 @@ export default function SelectInput<T extends string>({
           <SelectTrigger id={id} className="h-8 w-full">
             <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
           </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              {options.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
+          <SelectContentOptions options={options} />
         </Select>
       </div>
     </div>
