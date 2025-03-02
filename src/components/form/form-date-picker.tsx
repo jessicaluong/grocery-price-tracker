@@ -71,15 +71,13 @@ export function FormDatePicker<TFieldValues extends FieldValues>({
               </PopoverContent>
             </Popover>
           </div>
-          {description && (
-            <div className="grid grid-cols-4 gap-4">
-              <div className="col-span-1" />
-              <div className="col-span-3">
-                <FormDescription>{description}</FormDescription>
-                <FormMessage />
-              </div>
+          <div className="grid grid-cols-4 gap-4">
+            <div className="col-span-1" />
+            <div className="col-span-3">
+              <FormDescription>{description}</FormDescription>
+              <FormMessage />
             </div>
-          )}
+          </div>
         </FormItem>
       )}
     />
