@@ -3,21 +3,21 @@
 import { useMemo } from "react";
 import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import SelectContentOptions from "./select-content-options";
+import FormSelectContent from "../form/form-select-content";
 
-type SelectInputProps<T extends string> = {
+type SortAndViewSelectProps<T extends string> = {
   label: string;
   options: readonly T[];
   value: T;
   onChange: (value: T) => void;
 };
 
-export default function SortAndViewSelectInput<T extends string>({
+export default function SortAndViewSelect<T extends string>({
   label,
   options,
   value,
   onChange,
-}: SelectInputProps<T>) {
+}: SortAndViewSelectProps<T>) {
   const id = useMemo(() => label.toLowerCase().replace(/\s+/g, "-"), [label]);
 
   return (
@@ -28,7 +28,7 @@ export default function SortAndViewSelectInput<T extends string>({
           <SelectTrigger id={id} className="h-8 w-full">
             <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
           </SelectTrigger>
-          <SelectContentOptions options={options} />
+          <FormSelectContent options={options} />
         </Select>
       </div>
     </div>

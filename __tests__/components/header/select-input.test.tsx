@@ -1,4 +1,4 @@
-import SortAndViewSelectInput from "@/components/header/sort-and-view-select-input";
+import SortAndViewSelect from "@/components/header/sort-and-view-select";
 import { render, screen } from "@testing-library/react";
 
 describe("SortAndViewSelectInput", () => {
@@ -7,7 +7,7 @@ describe("SortAndViewSelectInput", () => {
 
   it("renders with label and initial value", async () => {
     render(
-      <SortAndViewSelectInput
+      <SortAndViewSelect
         label="Test Label"
         options={options}
         value={options[0]}

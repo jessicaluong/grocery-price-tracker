@@ -1,12 +1,12 @@
 import { SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
 
-type SelectContentOptions<T extends string> = {
+type FormSelectContentProps<T extends string> = {
   options: readonly T[];
 };
 
-export default function SelectContentOptions<T extends string>({
+export default function FormSelectContent<T extends string>({
   options,
-}: SelectContentOptions<T>) {
+}: FormSelectContentProps<T>) {
   return (
     <SelectContent>
       <SelectGroup>

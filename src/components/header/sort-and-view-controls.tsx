@@ -1,6 +1,6 @@
 "use client";
 
-import SelectInput from "./sort-and-view-select-input";
+import SortAndViewSelect from "./sort-and-view-select";
 import { SORT_OPTIONS, VIEW_OPTIONS } from "@/lib/constants";
 import { SortDisplayValues, ViewDisplayValues } from "@/lib/types";
 import { useUrlParams } from "@/lib/hooks";
@@ -13,13 +13,13 @@ export default function SortAndViewControls() {
 
   return (
     <div className="flex justify-between sm:gap-2">
-      <SelectInput<SortDisplayValues>
+      <SortAndViewSelect<SortDisplayValues>
         label="Sort"
         options={Object.values(SORT_OPTIONS).map((option) => option.display)}
         value={sortDisplay}
         onChange={(value) => updateParam("sort", "sort", value)}
       />
-      <SelectInput<ViewDisplayValues>
+      <SortAndViewSelect<ViewDisplayValues>
         label="View"
         options={Object.values(VIEW_OPTIONS).map((option) => option.display)}
         value={viewDisplay}
