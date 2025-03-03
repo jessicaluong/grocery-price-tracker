@@ -15,6 +15,7 @@ type FormInputProps<TFieldValues extends FieldValues> = {
   label: string;
   placeholder: string;
   description?: string;
+  type?: string;
 };
 
 export default function FormInput<TFieldValues extends FieldValues>({
@@ -23,28 +24,47 @@ export default function FormInput<TFieldValues extends FieldValues>({
   label,
   placeholder,
   description,
+  type = "text",
 }: FormInputProps<TFieldValues>) {
   return (
     <FormField
       control={form.control}
       name={name}
-      render={({ field }) => (
-        <FormItem>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <FormLabel className="text-right">{label}</FormLabel>
-            <FormControl className="col-span-3">
-              <Input placeholder={placeholder} {...field} />
-            </FormControl>
-          </div>
-          <div className="grid grid-cols-4 gap-4">
-            <div className="col-span-1" />
-            <div className="col-span-3">
-              <FormDescription>{description}</FormDescription>
-              <FormMessage />
+      render={({ field }) => {
+        const displayValue =
+          field.value === undefined || field.value === null
+            ? ""
+            : String(field.value);
+
+        return (
+          <FormItem>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <FormLabel className="text-right">{label}</FormLabel>
+              <FormControl className="col-span-3">
+                <Input
+                  placeholder={placeholder}
+                  type={type}
+                  {...field}
+                  value={displayValue}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    field.onChange(
+                      type === "number" && val === "" ? undefined : val
+                    );
+                  }}
+                />
+              </FormControl>
             </div>
-          </div>
-        </FormItem>
-      )}
+            <div className="grid grid-cols-4 gap-4">
+              <div className="col-span-1" />
+              <div className="col-span-3">
+                <FormDescription>{description}</FormDescription>
+                <FormMessage />
+              </div>
+            </div>
+          </FormItem>
+        );
+      }}
     />
   );
 }
