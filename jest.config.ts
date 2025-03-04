@@ -46,7 +46,7 @@ const config: Config = {
     ],
   },
 
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+  setupFilesAfterEnv: ["<rootDir>/setup-jest.js", "@testing-library/jest-dom"],
 
   testEnvironment: "jsdom",
 

@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,37 +11,30 @@ import {
 } from "@/components/ui/dialog";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import AddItemForm from "./add-item-form";
+import { useState } from "react";
 
 export default function AddItemDialog() {
-  // const handleSubmit = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const result = await addItemAction();
-  //     if (result.success) {
-  //       onOpenChange(false);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error adding item:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="rounded-3xl">
-          <PlusCircledIcon className="mr-2" /> Add Item
+          <PlusCircledIcon className="mr-2" /> Add item
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add Item</DialogTitle>
+          <DialogTitle>Add item</DialogTitle>
           <DialogDescription>
-            This will add a sample orange juice item.
+            This will add a new grocery item.
           </DialogDescription>
         </DialogHeader>
-        <AddItemForm />
+        <AddItemForm onSuccess={handleClose} />
       </DialogContent>
     </Dialog>
   );

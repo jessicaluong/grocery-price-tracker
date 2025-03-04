@@ -13,7 +13,7 @@ type FormInputProps<TFieldValues extends FieldValues> = {
   form: UseFormReturn<TFieldValues>;
   name: FieldPath<TFieldValues>;
   label: string;
-  placeholder: string;
+  placeholder?: string;
   description?: string;
   type?: string;
 };
