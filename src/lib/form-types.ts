@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UnitEnum } from "./types";
+import { Unit, UnitEnum } from "./types";
 
 const unitSchema = z.enum(Object.values(UnitEnum) as [string, ...string[]]);
 
@@ -55,3 +55,15 @@ export type AddItemServerErrors = {
   date?: string[];
   price?: string[];
 } | null;
+
+export type AddItemInput = {
+  name: string;
+  brand: string | null;
+  store: string;
+  count: number;
+  amount: number;
+  unit: Unit;
+  price: number;
+  date: Date;
+  isSale: boolean;
+};
