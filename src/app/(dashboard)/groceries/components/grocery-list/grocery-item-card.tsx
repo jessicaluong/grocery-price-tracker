@@ -35,18 +35,16 @@ export default function GroceryItemCard({
           <div className="grow mr-4 min-w-0">
             <div>
               <div className="flex items-baseline tracking-tight">
-                <span className="truncate font-semibold capitalize">
-                  {item.name}
-                </span>
+                <span className="truncate font-semibold">{item.name}</span>
                 <ItemQuantity
                   count={item.count}
                   amount={item.amount}
                   unit={item.unit}
                 />
               </div>
-              <div className="capitalize h-7">{item.brand && item.brand}</div>
+              <div className="h-7">{item.brand && item.brand}</div>
             </div>
-            <p className="font-light capitalize">{item.store}</p>
+            <p className="font-light">{item.store}</p>
           </div>
           <div className="shrink-0 text-right">
             {view === "LIST" && (

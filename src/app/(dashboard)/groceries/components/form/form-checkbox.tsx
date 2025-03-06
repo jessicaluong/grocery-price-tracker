@@ -6,7 +6,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { FieldPath, FieldValues, UseFormReturn } from "react-hook-form";
-import { Checkbox } from "../ui/checkbox";
+import { Checkbox } from "../../../../../components/ui/checkbox";
 
 type FormCheckboxProps<TFieldValues extends FieldValues> = {
   form: UseFormReturn<TFieldValues>;

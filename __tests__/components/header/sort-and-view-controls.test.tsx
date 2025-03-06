@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import SortAndViewControls from "@/components/header/sort-and-view-controls";
+import SortAndViewControls from "@/app/(dashboard)/groceries/components/header/sort-and-view-controls";
 import { useUrlParams } from "@/lib/hooks";
 import { SORT_OPTIONS, VIEW_OPTIONS } from "@/lib/constants";
 
@@ -7,38 +7,41 @@ jest.mock("@/lib/hooks", () => ({
   useUrlParams: jest.fn(),
 }));
 
-jest.mock("@/components/header/sort-and-view-select", () => {
-  return function MockSortAndViewSelect({
-    label,
-    options,
-    value,
-    onChange,
-  }: {
-    label: string;
-    options: readonly string[];
-    value: string;
-    onChange: (value: string) => void;
-  }) {
-    return (
-      <div data-testid={`select-${label.toLowerCase()}`}>
-        <span>
-          {label} {value}
-        </span>
-        <select
-          data-testid={`${label.toLowerCase()}-select`}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        >
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
-  };
-});
+jest.mock(
+  "@/app/(dashboard)/groceries/components/header/sort-and-view-select",
+  () => {
+    return function MockSortAndViewSelect({
+      label,
+      options,
+      value,
+      onChange,
+    }: {
+      label: string;
+      options: readonly string[];
+      value: string;
+      onChange: (value: string) => void;
+    }) {
+      return (
+        <div data-testid={`select-${label.toLowerCase()}`}>
+          <span>
+            {label} {value}
+          </span>
+          <select
+            data-testid={`${label.toLowerCase()}-select`}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+          >
+            {options.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+      );
+    };
+  }
+);
 
 describe("SortAndViewControls", () => {
   const mockUpdateParam = jest.fn();

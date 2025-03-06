@@ -1,5 +1,5 @@
 import { SearchBar } from "./search-bar";
-import { Button } from "../ui/button";
+import { Button } from "../../../../../components/ui/button";
 import SortAndViewControls from "./sort-and-view-controls";
 import AddItemDialog from "./add-item-dialog";
 

@@ -8,7 +8,7 @@ import {
   findGroups,
   sortGroups,
   groupMapToArray,
-} from "@/components/grocery-list/grocery-list-utils";
+} from "@/app/(dashboard)/groceries/components/grocery-list/grocery-list-utils";
 import { GroceryGroup, GroceryItem, GroupMap, PricePoint } from "@/lib/types";
 
 describe("GroceryListUtils", () => {

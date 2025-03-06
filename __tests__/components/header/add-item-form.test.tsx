@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { addItemAction } from "@/actions/actions";
-import AddItemForm from "@/components/header/add-item-form";
+import AddItemForm from "@/app/(dashboard)/groceries/components/header/add-item-form";
 import React from "react";
 
 jest.mock("@/actions/actions", () => ({
