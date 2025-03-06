@@ -8,6 +8,8 @@ import {
 import { ItemWithView } from "@/lib/types";
 import { currencyFormat } from "@/lib/utils";
 import { ItemQuantity } from "./item-quantity";
+import GroceryGroupTable from "./grocery-group-table/grocery-group-table";
+import { columns } from "./grocery-group-table/grocery-group-table-column";
 
 type GroceryItemDialogProps = {
   open: boolean;
@@ -52,6 +54,9 @@ export default function GroceryItemDialog({
           </DialogTitle>
           <DialogDescription className="text-center"></DialogDescription>
         </DialogHeader>
+        {group && (
+          <GroceryGroupTable columns={columns} data={group?.pricePoints} />
+        )}
       </DialogContent>
     </Dialog>
   );
