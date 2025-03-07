@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/form";
 import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FieldPath, FieldValues, UseFormReturn } from "react-hook-form";
-import FormSelectContent from "./form-select-content";
+import FormSelectContent from "../../../../../components/form/form-select-content";
 
 type FormSelectProps<
   TFieldValues extends FieldValues,

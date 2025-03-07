@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import FormSelectContent from "../form/form-select-content";
+import FormSelectContent from "../../../../../components/form/form-select-content";
 
 type SortAndViewSelectProps<T extends string> = {
   label: string;
