@@ -1,4 +1,4 @@
-import { addItemAction } from "@/actions/actions";
+import { addItemAction } from "@/actions/grocery-actions";
 import { addItem } from "@/data-access/item-repository";
 import { Unit } from "@/lib/types";
 

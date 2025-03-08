@@ -1,6 +1,6 @@
 "use client";
 
-import { addItemAction } from "@/actions/actions";
+import { addItemAction } from "@/actions/grocery-actions";
 import { DialogFooter } from "../../../../../components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
