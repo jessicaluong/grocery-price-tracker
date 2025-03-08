@@ -1,7 +1,19 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import prisma from "../src/lib/db";
+import { Prisma } from "@prisma/client";
+import * as bcrypt from "bcrypt";
 
-type GroupCreateInput = Omit<Prisma.GroupCreateInput, "items">;
+async function createUser(email: string, password: string) {
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  return prisma.user.create({
+    data: {
+      email: email,
+      hashedPassword,
+    },
+  });
+}
+
+type GroupCreateInput = Omit<Prisma.GroupCreateInput, "items" | "user">;
 type ItemCreateInput = Omit<Prisma.ItemCreateInput, "group" | "groupId">;
 
 type CreateGroupWithItemsInput = GroupCreateInput & {
@@ -187,15 +199,10 @@ const groupsWithItems: CreateGroupWithItemsInput[] = [
   },
 ];
 
-async function createGroupWithItems({
-  name,
-  brand,
-  store,
-  count,
-  amount,
-  unit,
-  prices,
-}: CreateGroupWithItemsInput) {
+async function createGroupWithItems(
+  userId: string,
+  { name, brand, store, count, amount, unit, prices }: CreateGroupWithItemsInput
+) {
   const group = await prisma.group.create({
     data: {
       name,
@@ -204,6 +211,7 @@ async function createGroupWithItems({
       count,
       amount,
       unit,
+      userId,
       items: {
         create: prices.map(({ price, isSale, date }) => ({
           price,
@@ -217,10 +225,17 @@ async function createGroupWithItems({
 }
 
 async function main() {
+  await prisma.item.deleteMany({});
   await prisma.group.deleteMany({});
+  await prisma.session.deleteMany({});
+  await prisma.account.deleteMany({});
+  await prisma.verificationRequest.deleteMany({});
+  await prisma.user.deleteMany({});
+
+  const user = createUser("test@gmail.com", "password123");
 
   for (const groupData of groupsWithItems) {
-    await createGroupWithItems(groupData);
+    await createGroupWithItems((await user).id, groupData);
   }
   console.log(`Created ${groupsWithItems.length} groups with their items`);
 }
