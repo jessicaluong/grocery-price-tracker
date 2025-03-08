@@ -90,3 +90,5 @@ export type ItemWithView =
 export type ItemsWithViewMode =
   | { view: "LIST"; items: GroceryItem[]; groupMap: GroupMap }
   | { view: "GROUP"; items: GroceryGroup[]; groupMap: GroupMap };
+
+export type ServerErrors = Record<string, string | string[]> | null;

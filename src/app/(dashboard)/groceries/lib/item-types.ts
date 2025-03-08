@@ -44,18 +44,6 @@ export const addItemSchema = z.object({
 
 export type TAddItemSchema = z.infer<typeof addItemSchema>;
 
-export type AddItemServerErrors = {
-  form?: string;
-  name?: string[];
-  brand?: string[];
-  store?: string[];
-  count?: string[];
-  amount?: string[];
-  unit?: string[];
-  date?: string[];
-  price?: string[];
-} | null;
-
 export type AddItemInput = {
   name: string;
   brand: string | null;

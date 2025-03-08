@@ -4,7 +4,7 @@ import { addItemAction } from "@/actions/grocery-actions";
 import { DialogFooter } from "../../../../../components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { UnitEnum } from "@/lib/types";
+import { ServerErrors, UnitEnum } from "@/lib/types";
 import FormInput from "../item-form/item-form-input";
 import { FormSelect } from "../item-form/item-form-select";
 import FormCheckbox from "../item-form/item-form-checkbox";
@@ -12,9 +12,8 @@ import { FormDatePicker } from "../item-form/item-form-date-picker";
 import FormButton from "../../../../../components/form/form-button";
 import {
   addItemSchema,
-  AddItemServerErrors,
   TAddItemSchema,
-} from "@/app/(dashboard)/groceries/lib/form-types";
+} from "@/app/(dashboard)/groceries/lib/item-types";
 import { useState } from "react";
 import ErrorCallout from "../../../../../components/form/error-callout";
 import { Form } from "../../../../../components/ui/form";
@@ -37,7 +36,7 @@ export default function AddItemForm({ onSuccess }: AddItemFormProps) {
     },
   });
 
-  const [serverErrors, setServerErrors] = useState<AddItemServerErrors>(null);
+  const [serverErrors, setServerErrors] = useState<ServerErrors>(null);
   const { isSubmitting } = form.formState;
 
   async function onSubmit(values: TAddItemSchema) {
