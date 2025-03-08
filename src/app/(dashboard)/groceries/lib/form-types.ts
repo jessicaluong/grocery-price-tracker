@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Unit, UnitEnum } from "./types";
+import { Unit, UnitEnum } from "../../../../lib/types";
 
 const unitSchema = z.enum(Object.values(UnitEnum) as [string, ...string[]]);
 

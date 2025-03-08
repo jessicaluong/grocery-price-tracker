@@ -14,7 +14,7 @@ import {
   addItemSchema,
   AddItemServerErrors,
   TAddItemSchema,
-} from "@/lib/form-types";
+} from "@/app/(dashboard)/groceries/lib/form-types";
 import { useState } from "react";
 import ErrorCallout from "../../../../../components/form/error-callout";
 import { Form } from "../../../../../components/ui/form";

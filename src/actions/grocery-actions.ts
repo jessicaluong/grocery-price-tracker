@@ -1,7 +1,7 @@
 "use server";
 
 import { addItem } from "@/data-access/item-repository";
-import { addItemSchema } from "@/lib/form-types";
+import { addItemSchema } from "@/app/(dashboard)/groceries/lib/form-types";
 import { Unit } from "@/lib/types";
 
 export async function addItemAction(values: unknown) {
