@@ -1,7 +1,15 @@
 import prisma from "@/lib/db";
-import { AddItemInput } from "@/lib/form-types";
+import { AddItemInput } from "@/app/(dashboard)/groceries/lib/item-types";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
 
 export async function getGroups() {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect("/login");
+  }
+
   const groups = await prisma.group.findMany({
     select: {
       id: true,
@@ -40,8 +48,22 @@ export async function getGroups() {
   }));
 }
 
-export async function getItems() {
+export async function getItems(userId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect("/login");
+  }
+
+  if (session.user?.id !== userId) {
+    return [];
+  }
+
   const items = await prisma.item.findMany({
+    where: {
+      group: {
+        userId,
+      },
+    },
     orderBy: { date: "desc" },
     select: {
       id: true,
@@ -78,6 +100,20 @@ export async function getItems() {
 }
 
 export async function getPriceHistoryByGroupId(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect("/login");
+  }
+
+  const group = await prisma.group.findUnique({
+    where: { id: id },
+    select: { userId: true },
+  });
+
+  if (!group || group.userId !== session.user?.id) {
+    throw new Error("Unauthorized access to price history");
+  }
+
   const items = await prisma.group.findUnique({
     where: { id },
     select: {
@@ -102,7 +138,16 @@ export async function getPriceHistoryByGroupId(id: string) {
   };
 }
 
-export async function addItem(item: AddItemInput) {
+export async function addItem(item: AddItemInput & { userId: string }) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect("/login");
+  }
+
+  if (session && session.user?.id !== item.userId) {
+    throw new Error("Unauthorized access to items");
+  }
+
   const normalizedBrand = item.brand === "" ? null : item.brand;
 
   const existingGroup = await prisma.group.findFirst({
@@ -113,6 +158,7 @@ export async function addItem(item: AddItemInput) {
       count: item.count,
       amount: item.amount,
       unit: item.unit,
+      userId: item.userId,
     },
   });
 
@@ -134,6 +180,7 @@ export async function addItem(item: AddItemInput) {
         count: item.count,
         amount: item.amount,
         unit: item.unit,
+        userId: item.userId,
         items: {
           create: {
             date: item.date,
