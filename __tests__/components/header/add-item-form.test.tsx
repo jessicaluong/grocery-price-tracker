@@ -223,14 +223,12 @@ describe("AddItemForm", () => {
 
     await user.click(screen.getByRole("button", { name: "Submit" }));
 
-    // Check for loading state
     expect(screen.getByText("Adding...")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Adding..." })).toBeDisabled();
 
     // Resolve the promise to complete the submission
     resolveAction!({ success: true });
 
-    // Wait for the loading state to be removed
     await waitFor(() => {
       expect(screen.queryByText("Adding...")).not.toBeInTheDocument();
     });
@@ -261,9 +259,6 @@ describe("AddItemForm", () => {
   });
 
   it("handles unexpected errors during submission", async () => {
-    const consoleErrorSpy = jest
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
     (addItemAction as jest.Mock).mockRejectedValue(new Error("Network error"));
 
     render(<AddItemForm onSuccess={mockOnSuccess} />);
@@ -280,10 +275,9 @@ describe("AddItemForm", () => {
     await waitFor(() => {
       expect(
         screen.getByText((content) =>
-          content.includes("An unexpected error occurred")
+          content.includes("An error occurred while adding item")
         )
       ).toBeInTheDocument();
     });
-    consoleErrorSpy.mockRestore();
   });
 });

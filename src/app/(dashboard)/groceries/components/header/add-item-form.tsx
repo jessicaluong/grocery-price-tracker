@@ -49,8 +49,7 @@ export default function AddItemForm({ onSuccess }: AddItemFormProps) {
         onSuccess();
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
-      setServerErrors({ form: "An unexpected error occurred" });
+      setServerErrors({ form: "An error occurred while adding item" });
     }
   }
 
