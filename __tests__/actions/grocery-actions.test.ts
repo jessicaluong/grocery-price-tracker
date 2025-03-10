@@ -441,6 +441,34 @@ describe("addItemAction", () => {
     });
   });
 
+  describe("brand normalization", () => {
+    it("should handle empty brand as null", async () => {
+      const emptyBrand = "";
+      const normalizedBrand = null;
+
+      const testData = {
+        name: "Test Item",
+        brand: emptyBrand,
+        store: "Test Store",
+        count: 1,
+        amount: 100,
+        unit: "mL",
+        price: 4.99,
+        date: new Date(),
+        isSale: false,
+      };
+
+      const result = await addItemAction(testData);
+
+      expect(result).toEqual({ success: true });
+      expect(addItem).toHaveBeenCalledWith({
+        ...testData,
+        brand: normalizedBrand,
+        userId: "test-user-id",
+      });
+    });
+  });
+
   describe("successful submission", () => {
     it("should return success true for valid complete data", async () => {
       const testData = {
@@ -509,29 +537,6 @@ describe("addItemAction", () => {
       expect(result).toEqual({ success: true });
       expect(addItem).toHaveBeenCalledWith({
         ...testData,
-        userId: "test-user-id",
-      });
-    });
-
-    it("should handle empty brand as null", async () => {
-      const testData = {
-        name: "Test Item",
-        brand: "",
-        store: "Test Store",
-        count: 1,
-        amount: 100,
-        unit: "mL",
-        price: 4.99,
-        date: new Date(),
-        isSale: false,
-      };
-
-      const result = await addItemAction(testData);
-
-      expect(result).toEqual({ success: true });
-      expect(addItem).toHaveBeenCalledWith({
-        ...testData,
-        brand: null,
         userId: "test-user-id",
       });
     });
