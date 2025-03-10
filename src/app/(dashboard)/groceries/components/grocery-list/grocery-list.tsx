@@ -1,8 +1,10 @@
 import GroceryItemCard from "./grocery-item-card";
 import { ItemWithView, SortParamValues, ViewParamValues } from "@/lib/types";
-import GroceryItemDialog from "./grocery-item-dialog";
-import { getGroups, getItems } from "@/data-access/item-repository";
+import { getItems } from "@/data-access/item-repository";
 import { getFilteredItemsWithView } from "./grocery-list-utils";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
 
 type GroceryListProps = {
   viewMode: ViewParamValues;
@@ -15,7 +17,12 @@ export default async function GroceryList({
   sortBy,
   searchQuery,
 }: GroceryListProps) {
-  const initialItems = await getItems();
+  const session = await getServerSession(authOptions);
+  if (!session || !session?.user?.id) {
+    redirect("/login");
+  }
+
+  const initialItems = await getItems(session.user.id);
   const { view, items, groupMap } = getFilteredItemsWithView(
     initialItems,
     searchQuery,
@@ -28,7 +35,6 @@ export default async function GroceryList({
       {items.map((item) => {
         const itemWithView = { view, item, groupMap } as ItemWithView;
         return <GroceryItemCard key={item.id} {...itemWithView} />;
-        // return <GroceryItemDialog key={item.id} {...itemWithView} />;
       })}
     </div>
   );

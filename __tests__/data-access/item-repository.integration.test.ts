@@ -1,12 +1,51 @@
 import { addItem } from "@/data-access/item-repository";
 import prisma from "@/lib/db";
 import { Unit } from "@prisma/client";
+import { getServerSession } from "next-auth/next";
+
+jest.mock("next-auth/next", () => ({
+  getServerSession: jest.fn(),
+}));
+
+jest.mock("next/navigation", () => ({
+  redirect: jest.fn(),
+}));
+
+jest.mock("@/app/api/auth/[...nextauth]/route", () => ({
+  authOptions: jest.fn(),
+}));
 
 describe("Item Repository integration tests", () => {
+  const mockSession = {
+    user: { id: "test-user-id", email: "test@example.com" },
+  };
+
+  const userId = "test-user-id";
+
+  beforeAll(async () => {
+    await prisma.user.deleteMany({
+      where: { email: "test@example.com" },
+    });
+
+    await prisma.user.create({
+      data: {
+        id: userId,
+        email: "test@example.com",
+        hashedPassword: "test-password-hash",
+      },
+    });
+  });
+
+  beforeEach(() => {
+    (getServerSession as jest.Mock).mockResolvedValue(mockSession);
+  });
+
   afterAll(async () => {
     const deleteItem = prisma.item.deleteMany({});
     const deleteGroup = prisma.group.deleteMany({});
-    await prisma.$transaction([deleteItem, deleteGroup]);
+    const deleteUser = prisma.user.deleteMany({});
+
+    await prisma.$transaction([deleteItem, deleteGroup, deleteUser]);
     await prisma.$disconnect();
   });
 
@@ -27,34 +66,18 @@ describe("Item Repository integration tests", () => {
       price: 4.99,
       date: new Date("2024-03-01"),
       isSale: true,
+      userId,
     };
 
     it("should create a new group with an item when no matching group exists", async () => {
-      const result = await prisma.group.create({
-        data: {
-          name: baseItem.name,
-          brand: baseItem.brand,
-          store: baseItem.store,
-          count: baseItem.count,
-          amount: baseItem.amount,
-          unit: baseItem.unit,
-          items: {
-            create: {
-              date: baseItem.date,
-              price: baseItem.price,
-              isSale: baseItem.isSale,
-            },
-          },
-        },
-      });
-
-      expect(result).toBeDefined();
+      await addItem(baseItem);
 
       const group = await prisma.group.findFirst({
         where: {
           name: baseItem.name,
           brand: baseItem.brand,
           store: baseItem.store,
+          userId,
         },
         include: {
           items: true,
@@ -69,6 +92,7 @@ describe("Item Repository integration tests", () => {
       expect(group?.count).toBe(baseItem.count);
       expect(group?.amount).toBe(baseItem.amount);
       expect(group?.unit).toBe(baseItem.unit);
+      expect(group?.userId).toBe(userId);
 
       expect(group?.items.length).toBe(1);
       expect(group?.items[0].price).toBe(baseItem.price);
@@ -85,6 +109,7 @@ describe("Item Repository integration tests", () => {
           name: baseItem.name,
           brand: baseItem.brand,
           store: baseItem.store,
+          userId,
         },
       });
 
@@ -142,6 +167,7 @@ describe("Item Repository integration tests", () => {
         where: {
           name: itemWithNullBrand.name,
           brand: null,
+          userId,
         },
       });
 
@@ -168,6 +194,7 @@ describe("Item Repository integration tests", () => {
         where: {
           name: baseItem.name,
           store: baseItem.store,
+          userId,
         },
         include: {
           items: true,
@@ -200,6 +227,7 @@ describe("Item Repository integration tests", () => {
         where: {
           name: baseItem.name,
           store: baseItem.store,
+          userId,
         },
         include: {
           items: true,
@@ -233,6 +261,7 @@ describe("Item Repository integration tests", () => {
         where: {
           name: baseItem.name,
           brand: baseItem.brand,
+          userId,
         },
         include: {
           items: true,
@@ -267,6 +296,7 @@ describe("Item Repository integration tests", () => {
           name: baseItem.name,
           brand: baseItem.brand,
           store: baseItem.store,
+          userId,
         },
         include: {
           items: true,
@@ -301,6 +331,7 @@ describe("Item Repository integration tests", () => {
           name: baseItem.name,
           brand: baseItem.brand,
           store: baseItem.store,
+          userId,
         },
         include: {
           items: true,
@@ -335,6 +366,7 @@ describe("Item Repository integration tests", () => {
           name: baseItem.name,
           brand: baseItem.brand,
           store: baseItem.store,
+          userId,
         },
         include: {
           items: true,
@@ -368,6 +400,7 @@ describe("Item Repository integration tests", () => {
         where: {
           brand: baseItem.brand,
           store: baseItem.store,
+          userId,
         },
         include: {
           items: true,
@@ -400,6 +433,7 @@ describe("Item Repository integration tests", () => {
           name: baseItem.name,
           brand: baseItem.brand,
           store: baseItem.store,
+          userId,
         },
         include: {
           items: true,
@@ -414,6 +448,60 @@ describe("Item Repository integration tests", () => {
       // Verify both prices are present
       const prices = groups[0].items.map((item) => item.price).sort();
       expect(prices).toEqual([5.99, 6.99].sort());
+    });
+
+    it("should isolate items between different users", async () => {
+      await addItem(baseItem);
+
+      const otherUserId = "different-user";
+
+      await prisma.user.create({
+        data: {
+          id: otherUserId,
+          email: "different@example.com",
+          hashedPassword: "test-password-hash",
+        },
+      });
+
+      const otherUserItem = {
+        ...baseItem,
+        userId: otherUserId,
+      };
+
+      const otherUserSession = {
+        user: { id: otherUserId, email: "different@example.com" },
+      };
+      (getServerSession as jest.Mock).mockResolvedValueOnce(otherUserSession);
+      await addItem(otherUserItem);
+
+      const firstUserGroups = await prisma.group.findMany({
+        where: { userId },
+        include: { items: true },
+      });
+
+      const secondUserGroups = await prisma.group.findMany({
+        where: { userId: otherUserId },
+        include: { items: true },
+      });
+
+      // Verify each user has their own data
+      expect(firstUserGroups.length).toBe(1);
+      expect(secondUserGroups.length).toBe(1);
+
+      // Verify items exist for each user
+      expect(firstUserGroups[0].items.length).toBeGreaterThan(0);
+      expect(secondUserGroups[0].items.length).toBeGreaterThan(0);
+
+      // Verify the groups are different despite having the same characteristics
+      expect(firstUserGroups[0].id).not.toBe(secondUserGroups[0].id);
+
+      // Verify we can query for both items simultaneously
+      const allGroups = await prisma.group.count();
+      expect(allGroups).toBe(2);
+
+      // Verify the actual data content
+      expect(firstUserGroups[0].name).toBe(baseItem.name);
+      expect(secondUserGroups[0].name).toBe(baseItem.name);
     });
   });
 });

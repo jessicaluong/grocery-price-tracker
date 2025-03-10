@@ -1,7 +1,7 @@
 import { SearchBar } from "./search-bar";
-import { Button } from "../../../../../components/ui/button";
 import SortAndViewControls from "./sort-and-view-controls";
 import AddItemDialog from "./add-item-dialog";
+import UserButton from "./user-button";
 
 export default function Header() {
   return (
@@ -9,9 +9,7 @@ export default function Header() {
       <div className="flex flex-col gap-4 w-full">
         <div className="flex justify-end items-center gap-2">
           <AddItemDialog />
-          <Button size="icon" variant="secondary">
-            J
-          </Button>
+          <UserButton />
         </div>
         <div className="flex flex-col gap-2 md:flex-row md:justify-between">
           <SearchBar />

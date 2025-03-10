@@ -9,7 +9,7 @@ export type Unit = PrismaUnit;
 export { PrismaUnit as UnitEnum };
 
 type DbItem = Omit<PrismaItem, "createdAt" | "updatedAt">;
-type DbGroup = Omit<PrismaGroup, "createdAt" | "updatedAt">;
+type DbGroup = Omit<PrismaGroup, "createdAt" | "updatedAt" | "userId">;
 
 /**
  * Core Item type

@@ -1,12 +1,84 @@
 import { addItemAction } from "@/actions/grocery-actions";
 import { addItem } from "@/data-access/item-repository";
 import { Unit } from "@/lib/types";
+import { getServerSession } from "next-auth/next";
+import { revalidatePath } from "next/cache";
 
 jest.mock("@/data-access/item-repository", () => ({
   addItem: jest.fn(),
 }));
 
+jest.mock("next-auth/next", () => ({
+  getServerSession: jest.fn(),
+}));
+
+jest.mock("next/cache", () => ({
+  revalidatePath: jest.fn(),
+}));
+
+jest.mock("@/app/api/auth/[...nextauth]/route", () => ({
+  authOptions: jest.fn(),
+}));
+
 describe("addItemAction", () => {
+  const mockSession = {
+    user: { id: "test-user-id", email: "test@example.com" },
+  };
+
+  beforeEach(() => {
+    (getServerSession as jest.Mock).mockResolvedValue(mockSession);
+  });
+
+  describe("authentication", () => {
+    it("should return an error if user is not authenticated", async () => {
+      (getServerSession as jest.Mock).mockResolvedValue(null);
+
+      const result = await addItemAction({
+        name: "Test Name",
+        brand: "Test Brand",
+        store: "Test Store",
+        count: 1,
+        amount: 100,
+        unit: "mL",
+        price: 4.99,
+        date: new Date(),
+        isSale: false,
+      });
+
+      expect(result).toHaveProperty("errors");
+      expect(result.errors).toHaveProperty(
+        "form",
+        "You must be logged in to add an item"
+      );
+      expect(addItem).not.toHaveBeenCalled();
+    });
+
+    it("should return an error if user id is missing", async () => {
+      (getServerSession as jest.Mock).mockResolvedValue({
+        user: { email: "test@example.com" },
+      });
+
+      const result = await addItemAction({
+        name: "Test Name",
+        brand: "Test Brand",
+        store: "Test Store",
+        count: 1,
+        amount: 100,
+        unit: "mL",
+        price: 4.99,
+        date: new Date(),
+        isSale: false,
+      });
+
+      expect(result).toHaveProperty("errors");
+      expect(result.errors).toHaveProperty(
+        "form",
+        "You must be logged in to add an item"
+      );
+      expect(addItem).not.toHaveBeenCalled();
+    });
+  });
+
   describe("validation", () => {
     describe("name", () => {
       it("should return validation errors for empty name", async () => {
@@ -386,7 +458,11 @@ describe("addItemAction", () => {
       const result = await addItemAction(testData);
 
       expect(result).toEqual({ success: true });
-      expect(addItem).toHaveBeenCalledWith(testData);
+      expect(addItem).toHaveBeenCalledWith({
+        ...testData,
+        userId: "test-user-id",
+      });
+      expect(revalidatePath).toHaveBeenCalledWith("/groceries");
     });
 
     it("trims whitespace from strings", async () => {
@@ -410,6 +486,7 @@ describe("addItemAction", () => {
           name: "Test Name",
           brand: "Test Brand",
           store: "Test Store",
+          userId: "test-user-id",
         })
       );
     });
@@ -430,7 +507,10 @@ describe("addItemAction", () => {
       const result = await addItemAction(testData);
 
       expect(result).toEqual({ success: true });
-      expect(addItem).toHaveBeenCalledWith(testData);
+      expect(addItem).toHaveBeenCalledWith({
+        ...testData,
+        userId: "test-user-id",
+      });
     });
 
     it("should handle empty brand as null", async () => {
@@ -452,6 +532,7 @@ describe("addItemAction", () => {
       expect(addItem).toHaveBeenCalledWith({
         ...testData,
         brand: null,
+        userId: "test-user-id",
       });
     });
 
@@ -473,7 +554,8 @@ describe("addItemAction", () => {
       expect(result).toEqual({ success: true });
       expect(addItem).toHaveBeenCalledWith({
         ...testData,
-        price: 5.0, // Should be rounded to 2 decimal places
+        price: 5.0,
+        userId: "test-user-id",
       });
     });
 
@@ -496,6 +578,7 @@ describe("addItemAction", () => {
       expect(addItem).toHaveBeenCalledWith({
         ...testData,
         price: 0,
+        userId: "test-user-id",
       });
     });
 
@@ -519,6 +602,7 @@ describe("addItemAction", () => {
         ...testData,
         count: 1,
         isSale: false,
+        userId: "test-user-id",
       });
     });
   });

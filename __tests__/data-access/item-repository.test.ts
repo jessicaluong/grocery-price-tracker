@@ -1,8 +1,30 @@
 import { addItem } from "@/data-access/item-repository";
 import { prismaMock } from "../../test/prisma-mock";
 import { Unit } from "@prisma/client";
+import { getServerSession } from "next-auth/next";
+import { redirect } from "next/navigation";
+
+jest.mock("next-auth/next", () => ({
+  getServerSession: jest.fn(),
+}));
+
+jest.mock("next/navigation", () => ({
+  redirect: jest.fn(),
+}));
+
+jest.mock("@/app/api/auth/[...nextauth]/route", () => ({
+  authOptions: jest.fn(),
+}));
 
 describe("Item Repository", () => {
+  const mockSession = {
+    user: { id: "test-user-id", email: "test@example.com" },
+  };
+
+  beforeEach(() => {
+    (getServerSession as jest.Mock).mockResolvedValue(mockSession);
+  });
+
   describe("addItem", () => {
     const item = {
       name: "oats",
@@ -14,7 +36,30 @@ describe("Item Repository", () => {
       price: 5.99,
       date: new Date("2025-03-01"),
       isSale: false,
+      userId: "test-user-id",
     };
+
+    it("should redirect to login when user is not authenticated", async () => {
+      (getServerSession as jest.Mock).mockResolvedValue(null);
+
+      await addItem(item);
+
+      expect(redirect).toHaveBeenCalledWith("/login");
+    });
+
+    it("should throw error when user tries to add item for another user", async () => {
+      (getServerSession as jest.Mock).mockResolvedValue({
+        user: { id: "different-user", email: "different@example.com" },
+      });
+
+      await expect(addItem(item)).rejects.toThrow(
+        "Unauthorized access to items"
+      );
+
+      expect(prismaMock.group.findFirst).not.toHaveBeenCalled();
+      expect(prismaMock.group.create).not.toHaveBeenCalled();
+      expect(prismaMock.item.create).not.toHaveBeenCalled();
+    });
 
     it("should add item to existing group", async () => {
       const mockExistingGroup = {
@@ -27,6 +72,7 @@ describe("Item Repository", () => {
         count: 1,
         amount: 1,
         unit: Unit.kg,
+        userId: "test-user-id",
       };
 
       const mockNewItem = {
@@ -60,6 +106,7 @@ describe("Item Repository", () => {
           count: item.count,
           amount: item.amount,
           unit: item.unit,
+          userId: item.userId,
         },
       });
       expect(prismaMock.item.create).toHaveBeenCalledWith({
@@ -83,6 +130,7 @@ describe("Item Repository", () => {
         count: 1,
         amount: 1,
         unit: Unit.kg,
+        userId: "test-user-id",
       };
 
       prismaMock.group.findFirst.mockResolvedValue(null);
@@ -98,6 +146,7 @@ describe("Item Repository", () => {
           count: item.count,
           amount: item.amount,
           unit: item.unit,
+          userId: item.userId,
           items: {
             create: {
               date: item.date,
@@ -126,6 +175,7 @@ describe("Item Repository", () => {
         count: 1,
         amount: 1,
         unit: Unit.kg,
+        userId: "test-user-id",
       };
 
       prismaMock.group.findFirst.mockResolvedValue(null);
@@ -146,6 +196,7 @@ describe("Item Repository", () => {
           count: item.count,
           amount: item.amount,
           unit: item.unit,
+          userId: item.userId,
           items: {
             create: {
               date: item.date,
