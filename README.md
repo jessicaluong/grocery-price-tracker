@@ -2,7 +2,7 @@
 
 A full-stack Next.js application being developed to help shoppers track grocery prices over time.
 
-![app](https://github.com/user-attachments/assets/77a2c533-cf29-4991-8229-69269b8ded59)
+<img width="1212" alt="app-2" src="https://github.com/user-attachments/assets/125cd889-3fab-4c8c-9701-221d75573aec" />
 
 ## Table of Contents
 
@@ -11,20 +11,21 @@ A full-stack Next.js application being developed to help shoppers track grocery 
 - [Database Design](#db)
 - [Data Access](#data)
 - [Security](#security)
-- [Testing Strategy](#tests)
+- [Testing Strategy](#test)
 - [Current Development Status](#status)
 
 <div id="preview"></div>
 
 ## Project Overview
 
-This application aims to help users determine if grocery prices represent good value by providing historical prices for an item. The application allows users to:
+This application aims to help users determine if grocery prices represent good value by providing historical prices for an item. 
 
+  <img width="450" alt="price-table" src="https://github.com/user-attachments/assets/0dbfe3af-2c6b-4d41-a6f8-6c2699f86191" />  
+
+The application allows users to:
 - Track prices across different stores, brands, and product sizes
 - Compare unit pricing for better value assessment
-- Search and sort products with responsive UI
-
-[comment]: # "insert image of data table"
+- Search for and sort products
 
 <div id="tech"></div>
 
@@ -49,7 +50,7 @@ This application aims to help users determine if grocery prices represent good v
 ![Backend tech](https://skillicons.dev/icons?i=prisma,postgres)
 
 - **PostgreSQL** for database
-- **Prisma ORM** for type-safe database queries and database schema management
+- **Prisma ORM** for type-safe database queries
 - **NextAuth.js** for authentication
 
 ### Testing
@@ -63,22 +64,22 @@ This application aims to help users determine if grocery prices represent good v
 
 ## Database Design
 
-[comment]: # "insert image of database schema"
+### Key tables include:
+
+- **Group**: Product details (name, brand, store, etc.)
+- **Item**: Price points with timestamps
+- **User**: Account information and authentication
+- Supporting tables for authentication
+
+<img width="1141" alt="db" src="https://github.com/user-attachments/assets/6e7835dd-719f-4435-b752-cec0485a01bb" />
 
 The database is designed with:
 
-- Normalized schema: Optimized for complex querying and analysis
-- Relation modeling: Proper foreign key constraints and indexes
-- Migration management: Version-controlled schema changes
+- **Normalized schema**: Properly separated concerns with distinct tables for users, product groups, and price points
+- **Relation modeling**: Proper foreign key constraints with cascade rules
+- **Performance optimization**: Strategic indexes on foreign keys and frequently queried fields
 
-### Key tables include:
-
-- User: Account information and authentication
-- Group: Product details (name, brand, store, etc.)
-- Item: Price points with timestamps
-- Supporting tables for authentication
-
-<div id="data access"></div>
+<div id="data"></div>
 
 ## Data Access
 
@@ -86,6 +87,7 @@ The application uses Next.js for data fetching and mutations:
 
 - **Server Components**: For server-rendered data fetching directly from the database
 - **Server Actions**: For form submissions and data mutations
+- **NextAuth Routes**: For authentication flows
 
 [comment]: # "- **Route Handler**: Limited API endpoints for client-side data fetching e.g., price history"
 
@@ -95,13 +97,19 @@ The application uses Next.js for data fetching and mutations:
 
 Security is implemented at multiple levels:
 
-- JWT-based authentication with NextAuth.js
-- Multiple providers including credentials and OAuth (Google)
-- Authentication and authorization checks on all data access functions
-- Middleware protection for secured routes
-- Password hashing using bcrypt
+**Authentication & Authorization**
 
-[comment]: # "- CSRF protection through Next.js server actions"
+- **JWT-based authentication** with NextAuth.js
+- **Multiple providers** including credentials and OAuth (Google)  
+  <img width="400" alt="login" src="https://github.com/user-attachments/assets/4305e9ba-9537-46b1-a6b0-0b3f47b6704e" />
+- **Authentication and authorization** checks on data access functions
+- **Middleware protection** for secured routes
+- **Password hashing** using bcrypt
+
+**Data & Request Validation**
+- **Input validation** using Zod schema validation
+- **CSRF protection** through Next.js server actions
+- **XSS prevention** through React's built-in escaping 
 
 <div id="test"></div>
 
@@ -119,13 +127,14 @@ The application is under active development.
 
 ### Completed
 
-- Item management: adding an item
-- View items: filter items (search), group items or display them individually
-- Authentication through Google account and credentials (basic)
+- Core data model and database schema
+- User authentication 
+- Item management (adding items)
+- Search and sorting capabilities
 
 ### In Progress
 
-- Item management: editing and deleting items
+- Item management (editing and deleting items)
 - Authentication through credentials (add email verification, rate limiting, password reset)
 
 ### Possible Future Enhancements
