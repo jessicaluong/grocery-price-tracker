@@ -8,7 +8,7 @@ export default function GoogleLoginButton() {
     <Button
       variant="outline"
       className="w-full"
-      onClick={() => signIn("google")}
+      onClick={() => signIn("google", { callbackUrl: "/groceries" })}
     >
       Continue with Google
     </Button>

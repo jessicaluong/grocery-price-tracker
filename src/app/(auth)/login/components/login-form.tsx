@@ -45,7 +45,7 @@ export default function LoginForm({ className }: LoginFormProps) {
       if (response?.error) {
         setServerErrors({ form: "Invalid email or password" });
       } else if (response?.ok) {
-        router.push("/");
+        router.push("/groceries");
       }
     } catch (error) {
       setServerErrors({ form: "An error occurred during login" });

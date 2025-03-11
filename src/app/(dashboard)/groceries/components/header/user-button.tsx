@@ -13,7 +13,13 @@ import { signOut, useSession } from "next-auth/react";
 
 export default function UserButton() {
   const { data: session } = useSession();
-  const firstLetter = session?.user?.email?.[0]?.toUpperCase() || "?";
+
+  const displayName = session?.user?.name || session?.user?.email || "User";
+
+  const firstLetter =
+    session?.user?.name?.[0].toUpperCase() ||
+    session?.user?.email?.[0].toUpperCase() ||
+    "U";
 
   return (
     <DropdownMenu>
@@ -23,9 +29,9 @@ export default function UserButton() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
+        <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/login" })}>
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
