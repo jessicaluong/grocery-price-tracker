@@ -44,3 +44,10 @@ next-env.d.ts
 
 /.vscode
 /readme_assets
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
