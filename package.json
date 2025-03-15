@@ -7,15 +7,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:unit": "jest --testPathIgnorePatterns=\\.integration\\.test\\.",
-    "test:integration": "dotenv -e .env.test -- jest --testMatch='**/*.integration.test.ts' -i --config jest.integration.config.ts ",
-    "test:all": "npm run test:unit && npm run test:integration",
     "db:test:up": "docker compose -f docker-compose.test.yml up -d",
     "db:test:down": "docker compose -f docker-compose.test.yml down",
     "db:test:migrate": "dotenv -e .env.test -- npx prisma migrate deploy",
     "db:test:studio": "dotenv -e .env.test -- npx prisma studio",
     "db:test:setup": "npm run db:test:up && npm run db:test:migrate",
-    "test:integration:full": "npm run db:test:setup && npm run test:integration && npm run db:test:down"
+    "test:unit": "jest",
+    "test:integration": "dotenv -e .env.test -- jest -i --config jest.integration.config.ts ",
+    "test:integration:full": "npm run db:test:setup && npm run test:integration && npm run db:test:down",
+    "test:jest": "npm run test:unit && npm run test:integration:full",
+    "test:e2e": "playwright test",
+    "test:e2e:full": "npm run db:test:setup && npm run test:e2e && npm run db:test:down"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
