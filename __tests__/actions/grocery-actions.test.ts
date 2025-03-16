@@ -305,24 +305,6 @@ describe("addItemAction", () => {
         expect(addItem).not.toHaveBeenCalled();
       });
 
-      it("should return validation errors for non-integer amount", async () => {
-        const result = await addItemAction({
-          name: "Test Name",
-          brand: "Test Brand",
-          store: "Test Store",
-          count: 1,
-          amount: 100.5,
-          unit: "mL",
-          price: 4.99,
-          date: new Date(),
-          isSale: false,
-        });
-
-        expect(result).toHaveProperty("errors");
-        expect(result.errors).toHaveProperty("amount");
-        expect(addItem).not.toHaveBeenCalled();
-      });
-
       it("should return validation errors for zero amount", async () => {
         const result = await addItemAction({
           name: "Test Name",

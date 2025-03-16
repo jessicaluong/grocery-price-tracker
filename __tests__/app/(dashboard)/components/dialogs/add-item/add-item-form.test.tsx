@@ -129,19 +129,14 @@ describe("AddItemForm", () => {
         const user = userEvent.setup();
         render(<AddItemForm onSuccess={mockOnSuccess} />);
 
-        const amountInput = screen.getByLabelText("Amount");
         const countInput = screen.getByLabelText("Count");
         await user.clear(countInput);
 
         const decimalNumber = "1.99";
-        await user.type(amountInput, decimalNumber);
         await user.type(countInput, decimalNumber);
         await user.click(screen.getByRole("button", { name: "Submit" }));
 
         await waitFor(() => {
-          expect(
-            screen.getByText("Amount must be a whole number")
-          ).toBeInTheDocument();
           expect(
             screen.getByText("Count must be a whole number")
           ).toBeInTheDocument();

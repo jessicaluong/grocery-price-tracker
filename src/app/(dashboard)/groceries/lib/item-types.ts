@@ -29,9 +29,6 @@ export const addItemSchema = z.object({
     .number({
       invalid_type_error: "Amount must be a number",
     })
-    .int({
-      message: "Amount must be a whole number",
-    })
     .positive("Amount must be at least 1"),
   unit: unitSchema,
   date: z.date(),
