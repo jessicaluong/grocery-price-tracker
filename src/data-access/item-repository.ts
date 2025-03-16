@@ -1,5 +1,5 @@
 import prisma from "@/lib/db";
-import { AddItemInput } from "@/app/(dashboard)/groceries/lib/item-types";
+import { AddItemInput } from "@/zod-schemas/item-schemas";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
@@ -192,7 +192,3 @@ export async function addItem(item: AddItemInput & { userId: string }) {
     });
   }
 }
-
-export async function updateItems() {}
-
-export async function deleteGroceryItems() {}

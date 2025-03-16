@@ -1,6 +1,6 @@
 "use server";
 
-import { registerSchema } from "@/app/(auth)/register/lib/auth-types";
+import { registerSchema } from "@/zod-schemas/auth-schemas";
 import { registerUser } from "@/data-access/user-repository";
 
 export async function registerUserAction(values: unknown) {

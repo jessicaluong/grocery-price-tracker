@@ -6,7 +6,10 @@ import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import FormInput from "@/components/form/form-input";
-import { registerSchema, TRegisterSchema } from "../lib/auth-types";
+import {
+  registerSchema,
+  TRegisterSchema,
+} from "../../../../zod-schemas/auth-schemas";
 import { registerUserAction } from "@/actions/auth-actions";
 import { useState } from "react";
 import ErrorCallout from "@/components/form/error-callout";

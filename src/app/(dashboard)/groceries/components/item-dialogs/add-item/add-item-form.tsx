@@ -6,10 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { ServerErrors, UnitEnum } from "@/lib/types";
 import FormButton from "../../../../../../components/form/form-button";
-import {
-  addItemSchema,
-  TAddItemSchema,
-} from "@/app/(dashboard)/groceries/lib/item-types";
+import { addItemSchema, TAddItemSchema } from "@/zod-schemas/item-schemas";
 import { useState } from "react";
 import ErrorCallout from "../../../../../../components/form/error-callout";
 import { Form } from "../../../../../../components/ui/form";

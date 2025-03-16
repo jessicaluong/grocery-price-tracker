@@ -1,7 +1,7 @@
 "use server";
 
 import { addItem } from "@/data-access/item-repository";
-import { addItemSchema } from "@/app/(dashboard)/groceries/lib/item-types";
+import { addItemSchema } from "@/zod-schemas/item-schemas";
 import { Unit } from "@/lib/types";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth/next";
@@ -42,3 +42,5 @@ export async function addItemAction(values: unknown) {
     return { errors: { form: "Failed to add item" } };
   }
 }
+
+export async function editGroupAction(values: unknown) {}
