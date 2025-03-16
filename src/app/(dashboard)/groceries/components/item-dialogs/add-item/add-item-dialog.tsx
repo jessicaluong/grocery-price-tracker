@@ -10,8 +10,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
-import AddItemForm from "./add-item-form";
 import { useState } from "react";
+import AddItemForm from "./add-item-form";
 
 export default function AddItemDialog() {
   const [open, setOpen] = useState(false);

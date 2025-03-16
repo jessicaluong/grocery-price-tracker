@@ -12,10 +12,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
-import EditItemDialogContent from "./edit-item-dialog-content";
+import EditItemDialogContent from "../../item-dialogs/edit-item/edit-item-dialog-content";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import DeleteItemDialogContent from "./delete-item-dialog-content";
-import CopyItemDialogContent from "./copy-item-dialog-content";
+import DeleteItemDialogContent from "../../item-dialogs/delete-item/delete-item-dialog-content";
+import CopyItemDialogContent from "../../item-dialogs/copy-item/copy-item-dialog-content";
 
 export const columns: ColumnDef<PricePoint>[] = [
   {

@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { ShoppingCart } from "lucide-react";
-import AddItemDialog from "../header/add-item-dialog";
+import AddItemDialog from "../item-dialogs/add-item/add-item-dialog";
 
 type GroceryListProps = {
   viewMode: ViewParamValues;

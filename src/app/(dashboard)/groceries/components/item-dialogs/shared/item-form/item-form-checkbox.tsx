@@ -1,38 +1,26 @@
+import { Checkbox } from "@/components/ui/checkbox";
 import {
-  FormControl,
   FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FieldPath, FieldValues, UseFormReturn } from "react-hook-form";
-import FormSelectContent from "../../../../../components/form/form-select-content";
 
-type FormSelectProps<
-  TFieldValues extends FieldValues,
-  TOptions extends readonly string[] = string[]
-> = {
+type FormCheckboxProps<TFieldValues extends FieldValues> = {
   form: UseFormReturn<TFieldValues>;
   name: FieldPath<TFieldValues>;
   label: string;
-  placeholder?: string;
-  options: TOptions;
   description?: string;
 };
 
-export function FormSelect<
-  TFieldValues extends FieldValues,
-  TOptions extends readonly string[] = string[]
->({
+export default function FormCheckbox<TFieldValues extends FieldValues>({
   form,
   name,
   label,
-  placeholder,
-  options,
   description,
-}: FormSelectProps<TFieldValues, TOptions>) {
+}: FormCheckboxProps<TFieldValues>) {
   return (
     <FormField
       control={form.control}
@@ -41,14 +29,11 @@ export function FormSelect<
         <FormItem>
           <div className="grid grid-cols-4 items-center gap-4">
             <FormLabel className="text-right">{label}</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl className="col-span-3">
-                <SelectTrigger>
-                  <SelectValue placeholder={placeholder} />
-                </SelectTrigger>
-              </FormControl>
-              <FormSelectContent options={options} />
-            </Select>
+            <Checkbox
+              className="col-span-3"
+              checked={field.value}
+              onCheckedChange={field.onChange}
+            />
           </div>
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-1" />

@@ -1,7 +1,7 @@
 import { SearchBar } from "./search-bar";
 import SortAndViewControls from "./sort-and-view-controls";
-import AddItemDialog from "./add-item-dialog";
-import UserButton from "./user-button";
+import AddItemDialog from "../item-dialogs/add-item/add-item-dialog";
+import UserButton from "./user-profile-dialog";
 
 export default function Header() {
   return (
