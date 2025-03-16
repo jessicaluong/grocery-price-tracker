@@ -4,11 +4,17 @@ type ItemQuantityProps = {
   count: number;
   amount: number;
   unit: Unit;
+  className?: string;
 };
 
-export function ItemQuantity({ count, amount, unit }: ItemQuantityProps) {
+export function ItemQuantity({
+  count,
+  amount,
+  unit,
+  className,
+}: ItemQuantityProps) {
   return (
-    <span className="shrink-0 ml-2 sm:ml-1 text-sm">
+    <span className={className}>
       {count !== 1 && `${count} x `}
       {amount} {unit}
     </span>

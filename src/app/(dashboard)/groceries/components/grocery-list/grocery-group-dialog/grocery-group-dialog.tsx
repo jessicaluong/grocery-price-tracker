@@ -36,6 +36,7 @@ export default function GroceryGroupDialog({
                 count={item.count}
                 amount={item.amount}
                 unit={item.unit}
+                className="shrink-0 ml-2 sm:ml-1 text-sm"
               />
             </div>
             {item.brand && <div className="h-7">{item.brand}</div>}

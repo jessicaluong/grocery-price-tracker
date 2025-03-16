@@ -40,6 +40,7 @@ export default function GroceryItemCard({
                   count={item.count}
                   amount={item.amount}
                   unit={item.unit}
+                  className="shrink-0 ml-2 sm:ml-1 text-sm"
                 />
               </div>
               <div className="h-7">{item.brand && item.brand}</div>
