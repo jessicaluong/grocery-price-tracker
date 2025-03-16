@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { ItemWithView } from "@/lib/types";
-import GroceryItemDialog from "./grocery-item-dialog";
+import GroceryGroupDialog from "./grocery-group-dialog/grocery-group-dialog";
 import { useState } from "react";
 import { ItemQuantity } from "./item-quantity";
 import {
@@ -100,7 +100,7 @@ export default function GroceryItemCard({
         </CardContent>
       </Card>
       {isDialogOpen && (
-        <GroceryItemDialog
+        <GroceryGroupDialog
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           itemWithView={itemWithView}

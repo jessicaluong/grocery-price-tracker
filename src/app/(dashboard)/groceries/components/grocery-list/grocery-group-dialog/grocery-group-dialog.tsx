@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { ItemWithView } from "@/lib/types";
 import { currencyFormat } from "@/lib/utils";
-import { ItemQuantity } from "./item-quantity";
+import { ItemQuantity } from "../item-quantity";
 import GroceryGroupTable from "./grocery-group-table/grocery-group-table";
 import { columns } from "./grocery-group-table/grocery-group-table-column";
 
@@ -17,7 +17,7 @@ type GroceryItemDialogProps = {
   itemWithView: ItemWithView;
 };
 
-export default function GroceryItemDialog({
+export default function GroceryGroupDialog({
   open,
   onOpenChange,
   itemWithView: { view, item, groupMap },
@@ -30,18 +30,16 @@ export default function GroceryItemDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            <div>
-              <span className="truncate font-semibold capitalize">
-                {item.name}
-              </span>
+            <div className="flex">
+              <span className="truncate font-semibold">{item.name}</span>
               <ItemQuantity
                 count={item.count}
                 amount={item.amount}
                 unit={item.unit}
               />
             </div>
-            {item.brand && <div className="capitalize h-7">{item.brand}</div>}
-            <div className="font-light capitalize">
+            {item.brand && <div className="h-7">{item.brand}</div>}
+            <div className="font-light">
               {group &&
                 (group.maxPrice === group.minPrice
                   ? currencyFormat(group.minPrice)
