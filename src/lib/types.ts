@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { SORT_OPTIONS, VIEW_OPTIONS } from "./constants";
 import {
   Item as PrismaItem,
@@ -6,10 +7,11 @@ import {
 } from "@prisma/client";
 
 export type Unit = PrismaUnit;
-export { PrismaUnit as UnitEnum };
+export const UnitEnum = PrismaUnit;
+export const UnitSchema = z.enum(Object.values(UnitEnum) as [Unit, ...Unit[]]);
 
 type DbItem = Omit<PrismaItem, "createdAt" | "updatedAt">;
-type DbGroup = Omit<PrismaGroup, "createdAt" | "updatedAt" | "userId">;
+export type DbGroup = Omit<PrismaGroup, "createdAt" | "updatedAt" | "userId">;
 
 /**
  * Core Item type

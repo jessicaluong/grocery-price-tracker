@@ -1,7 +1,5 @@
 import { z } from "zod";
-import { Unit, UnitEnum } from "../lib/types";
-
-const unitSchema = z.enum(Object.values(UnitEnum) as [string, ...string[]]);
+import { Unit, UnitSchema } from "../lib/types";
 
 export const addItemSchema = z.object({
   name: z
@@ -30,7 +28,7 @@ export const addItemSchema = z.object({
       invalid_type_error: "Amount must be a number",
     })
     .positive("Amount must be at least 1"),
-  unit: unitSchema,
+  unit: UnitSchema,
   date: z.date(),
   price: z.coerce
     .number({ invalid_type_error: "Price must be a number" })
@@ -41,14 +39,6 @@ export const addItemSchema = z.object({
 
 export type TAddItemSchema = z.infer<typeof addItemSchema>;
 
-export type AddItemInput = {
-  name: string;
-  brand: string | null;
-  store: string;
-  count: number;
-  amount: number;
+export type AddItemInput = Omit<TAddItemSchema, "unit"> & {
   unit: Unit;
-  price: number;
-  date: Date;
-  isSale: boolean;
 };

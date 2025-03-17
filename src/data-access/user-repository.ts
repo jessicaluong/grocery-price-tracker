@@ -1,12 +1,8 @@
 import bcrypt from "bcrypt";
 import prisma from "@/lib/db";
+import { TRegisterSchema } from "@/zod-schemas/auth-schemas";
 
-type RegisterUserInput = {
-  email: string;
-  password: string;
-};
-
-export async function registerUser({ email, password }: RegisterUserInput) {
+export async function registerUser({ email, password }: TRegisterSchema) {
   const existingUser = await prisma.user.findUnique({
     where: { email },
   });
