@@ -42,7 +42,6 @@ export default function AddItemForm({ onSuccess }: AddItemFormProps) {
       if (response.errors) {
         setServerErrors(response.errors);
       } else if (response.success) {
-        form.reset();
         onSuccess();
       }
     } catch (error) {

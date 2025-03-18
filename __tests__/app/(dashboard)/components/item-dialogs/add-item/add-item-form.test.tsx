@@ -12,27 +12,31 @@ describe("AddItemForm", () => {
   const mockOnSuccess = jest.fn();
   const user = userEvent.setup();
 
-  it("renders the form correctly", () => {
-    render(<AddItemForm onSuccess={mockOnSuccess} />);
+  describe("render", () => {
+    it("renders the form correctly", () => {
+      render(<AddItemForm onSuccess={mockOnSuccess} />);
 
-    expect(screen.getByLabelText("Name")).toBeInTheDocument();
-    expect(screen.getByLabelText("Brand")).toBeInTheDocument();
-    expect(screen.getByLabelText("Store")).toBeInTheDocument();
-    expect(screen.getByLabelText("Count")).toBeInTheDocument();
-    expect(screen.getByLabelText("Amount")).toBeInTheDocument();
-    expect(screen.getByLabelText("Unit")).toBeInTheDocument();
-    expect(screen.getByLabelText("Price")).toBeInTheDocument();
-    expect(screen.getByLabelText("Date")).toBeInTheDocument();
+      expect(screen.getByLabelText("Name")).toBeInTheDocument();
+      expect(screen.getByLabelText("Brand")).toBeInTheDocument();
+      expect(screen.getByLabelText("Store")).toBeInTheDocument();
+      expect(screen.getByLabelText("Count")).toBeInTheDocument();
+      expect(screen.getByLabelText("Amount")).toBeInTheDocument();
+      expect(screen.getByLabelText("Unit")).toBeInTheDocument();
+      expect(screen.getByLabelText("Price")).toBeInTheDocument();
+      expect(screen.getByLabelText("Date")).toBeInTheDocument();
 
-    const saleLabel = screen.getByText("Sale Price?");
-    const container = saleLabel.closest("div");
-    const checkbox = container?.querySelector('[role="checkbox"]');
-    expect(checkbox).toBeInTheDocument();
+      const saleLabel = screen.getByText("Sale Price?");
+      const container = saleLabel.closest("div");
+      const checkbox = container?.querySelector('[role="checkbox"]');
+      expect(checkbox).toBeInTheDocument();
 
-    expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Submit" })
+      ).toBeInTheDocument();
+    });
   });
 
-  describe("field validation", () => {
+  describe("validation", () => {
     describe("string field", () => {
       it("shows correct error messages for non-nullable empty field", async () => {
         render(<AddItemForm onSuccess={mockOnSuccess} />);
@@ -145,134 +149,137 @@ describe("AddItemForm", () => {
     });
   });
 
-  it("calls addItemAction, resets form, and calls onSuccess when form submission is successful", async () => {
-    (addItemAction as jest.Mock).mockResolvedValue({ success: true });
+  describe("successful submission", () => {
+    it("calls addItemAction and onSuccess when form submission is successful", async () => {
+      (addItemAction as jest.Mock).mockResolvedValue({ success: true });
 
-    render(<AddItemForm onSuccess={mockOnSuccess} />);
+      render(<AddItemForm onSuccess={mockOnSuccess} />);
 
-    const nameInput = screen.getByLabelText("Name");
-    await user.type(nameInput, "Orange Juice");
+      // Fill in required fields
+      await user.type(screen.getByLabelText("Name"), "orange juice");
+      await user.type(screen.getByLabelText("Brand"), "Tropicana");
+      await user.type(screen.getByLabelText("Store"), "Walmart");
+      await user.type(screen.getByLabelText("Amount"), "100");
+      await user.type(screen.getByLabelText("Price"), "4.99");
 
-    // Fill in required fields
-    await user.type(screen.getByLabelText("Brand"), "Tropicana");
-    await user.type(screen.getByLabelText("Store"), "Walmart");
-    await user.type(screen.getByLabelText("Amount"), "100");
-    await user.type(screen.getByLabelText("Price"), "4.99");
+      await user.click(screen.getByRole("button", { name: "Submit" }));
 
-    await user.click(screen.getByRole("button", { name: "Submit" }));
-
-    await waitFor(() => {
-      expect(addItemAction).toHaveBeenCalled();
-      expect(mockOnSuccess).toHaveBeenCalled();
-      expect(nameInput).toHaveValue("");
+      await waitFor(() => {
+        expect(addItemAction).toHaveBeenCalled();
+        expect(mockOnSuccess).toHaveBeenCalled();
+      });
     });
-  });
 
-  it("handles form values correctly", async () => {
-    (addItemAction as jest.Mock).mockResolvedValue({ success: true });
+    it("handles form values correctly", async () => {
+      (addItemAction as jest.Mock).mockResolvedValue({ success: true });
 
-    render(<AddItemForm onSuccess={mockOnSuccess} />);
+      render(<AddItemForm onSuccess={mockOnSuccess} />);
 
-    await user.type(screen.getByLabelText("Name"), "Orange Juice");
-    await user.type(screen.getByLabelText("Brand"), "Tropicana");
-    await user.type(screen.getByLabelText("Store"), "Walmart");
-    await user.type(screen.getByLabelText("Amount"), "100");
-    await user.type(screen.getByLabelText("Price"), "4.99");
-    const countInput = screen.getByLabelText("Count");
-    await user.clear(countInput);
-    await user.type(screen.getByLabelText("Count"), "2");
+      await user.type(screen.getByLabelText("Name"), "Orange Juice");
+      await user.type(screen.getByLabelText("Brand"), "Tropicana");
+      await user.type(screen.getByLabelText("Store"), "Walmart");
+      await user.type(screen.getByLabelText("Amount"), "100");
+      await user.type(screen.getByLabelText("Price"), "4.99");
+      const countInput = screen.getByLabelText("Count");
+      await user.clear(countInput);
+      await user.type(screen.getByLabelText("Count"), "2");
 
-    await user.click(screen.getByRole("button", { name: "Submit" }));
+      await user.click(screen.getByRole("button", { name: "Submit" }));
 
-    await waitFor(() => {
-      expect(addItemAction).toHaveBeenCalledWith({
-        name: "Orange Juice",
-        brand: "Tropicana",
-        store: "Walmart",
-        count: 2,
-        amount: 100,
-        unit: "g",
-        price: 4.99,
-        isSale: false,
-        date: expect.any(Date),
+      await waitFor(() => {
+        expect(addItemAction).toHaveBeenCalledWith({
+          name: "Orange Juice",
+          brand: "Tropicana",
+          store: "Walmart",
+          count: 2,
+          amount: 100,
+          unit: "g",
+          price: 4.99,
+          isSale: false,
+          date: expect.any(Date),
+        });
+      });
+    });
+
+    it("shows loading state during submission", async () => {
+      let resolveAction: (value: any) => void;
+      const actionPromise = new Promise((resolve) => {
+        resolveAction = resolve;
+      });
+
+      (addItemAction as jest.Mock).mockReturnValue(actionPromise);
+
+      render(<AddItemForm onSuccess={mockOnSuccess} />);
+
+      // Fill in required fields
+      await user.type(screen.getByLabelText("Name"), "Orange Juice");
+      await user.type(screen.getByLabelText("Brand"), "Tropicana");
+      await user.type(screen.getByLabelText("Store"), "Walmart");
+      await user.type(screen.getByLabelText("Amount"), "100");
+      await user.type(screen.getByLabelText("Price"), "4.99");
+
+      await user.click(screen.getByRole("button", { name: "Submit" }));
+
+      expect(screen.getByText("Adding...")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Adding..." })).toBeDisabled();
+
+      // Resolve the promise to complete the submission
+      resolveAction!({ success: true });
+
+      await waitFor(() => {
+        expect(screen.queryByText("Adding...")).not.toBeInTheDocument();
       });
     });
   });
 
-  it("shows loading state during submission", async () => {
-    let resolveAction: (value: any) => void;
-    const actionPromise = new Promise((resolve) => {
-      resolveAction = resolve;
+  describe("error handling", () => {
+    it("displays server-side errors", async () => {
+      const serverErrors = { name: ["Server validation error"] };
+      (addItemAction as jest.Mock).mockResolvedValue({ errors: serverErrors });
+
+      render(<AddItemForm onSuccess={mockOnSuccess} />);
+
+      // Fill in required fields
+      await user.type(screen.getByLabelText("Name"), "Orange Juice");
+      await user.type(screen.getByLabelText("Brand"), "Tropicana");
+      await user.type(screen.getByLabelText("Store"), "Walmart");
+      await user.type(screen.getByLabelText("Amount"), "100");
+      await user.type(screen.getByLabelText("Price"), "4.99");
+
+      await user.click(screen.getByRole("button", { name: "Submit" }));
+
+      await waitFor(() => {
+        expect(
+          screen.getByText((content) =>
+            content.includes("Server validation error")
+          )
+        ).toBeInTheDocument();
+      });
     });
 
-    (addItemAction as jest.Mock).mockReturnValue(actionPromise);
+    it("handles unexpected errors during submission", async () => {
+      (addItemAction as jest.Mock).mockRejectedValue(
+        new Error("Network error")
+      );
 
-    render(<AddItemForm onSuccess={mockOnSuccess} />);
+      render(<AddItemForm onSuccess={mockOnSuccess} />);
 
-    // Fill in required fields
-    await user.type(screen.getByLabelText("Name"), "Orange Juice");
-    await user.type(screen.getByLabelText("Brand"), "Tropicana");
-    await user.type(screen.getByLabelText("Store"), "Walmart");
-    await user.type(screen.getByLabelText("Amount"), "100");
-    await user.type(screen.getByLabelText("Price"), "4.99");
+      // Fill in required fields
+      await user.type(screen.getByLabelText("Name"), "Orange Juice");
+      await user.type(screen.getByLabelText("Brand"), "Tropicana");
+      await user.type(screen.getByLabelText("Store"), "Walmart");
+      await user.type(screen.getByLabelText("Amount"), "100");
+      await user.type(screen.getByLabelText("Price"), "4.99");
 
-    await user.click(screen.getByRole("button", { name: "Submit" }));
+      await user.click(screen.getByRole("button", { name: "Submit" }));
 
-    expect(screen.getByText("Adding...")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Adding..." })).toBeDisabled();
-
-    // Resolve the promise to complete the submission
-    resolveAction!({ success: true });
-
-    await waitFor(() => {
-      expect(screen.queryByText("Adding...")).not.toBeInTheDocument();
-    });
-  });
-
-  it("displays server-side errors", async () => {
-    const serverErrors = { name: ["Server validation error"] };
-    (addItemAction as jest.Mock).mockResolvedValue({ errors: serverErrors });
-
-    render(<AddItemForm onSuccess={mockOnSuccess} />);
-
-    // Fill in required fields
-    await user.type(screen.getByLabelText("Name"), "Orange Juice");
-    await user.type(screen.getByLabelText("Brand"), "Tropicana");
-    await user.type(screen.getByLabelText("Store"), "Walmart");
-    await user.type(screen.getByLabelText("Amount"), "100");
-    await user.type(screen.getByLabelText("Price"), "4.99");
-
-    await user.click(screen.getByRole("button", { name: "Submit" }));
-
-    await waitFor(() => {
-      expect(
-        screen.getByText((content) =>
-          content.includes("Server validation error")
-        )
-      ).toBeInTheDocument();
-    });
-  });
-
-  it("handles unexpected errors during submission", async () => {
-    (addItemAction as jest.Mock).mockRejectedValue(new Error("Network error"));
-
-    render(<AddItemForm onSuccess={mockOnSuccess} />);
-
-    // Fill in required fields
-    await user.type(screen.getByLabelText("Name"), "Orange Juice");
-    await user.type(screen.getByLabelText("Brand"), "Tropicana");
-    await user.type(screen.getByLabelText("Store"), "Walmart");
-    await user.type(screen.getByLabelText("Amount"), "100");
-    await user.type(screen.getByLabelText("Price"), "4.99");
-
-    await user.click(screen.getByRole("button", { name: "Submit" }));
-
-    await waitFor(() => {
-      expect(
-        screen.getByText((content) =>
-          content.includes("An error occurred while adding item")
-        )
-      ).toBeInTheDocument();
+      await waitFor(() => {
+        expect(
+          screen.getByText((content) =>
+            content.includes("An error occurred while adding item")
+          )
+        ).toBeInTheDocument();
+      });
     });
   });
 });
