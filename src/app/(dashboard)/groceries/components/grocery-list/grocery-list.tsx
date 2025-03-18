@@ -2,11 +2,9 @@ import GroceryItemCard from "./grocery-item-card";
 import { ItemWithView, SortParamValues, ViewParamValues } from "@/lib/types";
 import { getItems } from "@/data-access/item-repository";
 import { getFilteredItemsWithView } from "./grocery-list-utils";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
 import { ShoppingCart } from "lucide-react";
 import AddItemDialog from "../item-dialogs/add-item/add-item-dialog";
+import { verifySession } from "@/lib/auth";
 
 type GroceryListProps = {
   viewMode: ViewParamValues;
@@ -19,12 +17,10 @@ export default async function GroceryList({
   sortBy,
   searchQuery,
 }: GroceryListProps) {
-  const session = await getServerSession(authOptions);
-  if (!session || !session?.user?.id) {
-    redirect("/login");
-  }
+  const session = await verifySession();
+  if (!session) return null;
 
-  const initialItems = await getItems(session.user.id);
+  const initialItems = await getItems();
   const { view, items, groupMap } = getFilteredItemsWithView(
     initialItems,
     searchQuery,

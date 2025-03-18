@@ -1,28 +1,19 @@
 import { addItem } from "@/data-access/item-repository";
 import { prismaMock } from "../../test/prisma-mock";
 import { Unit } from "@prisma/client";
-import { getServerSession } from "next-auth/next";
-import { redirect } from "next/navigation";
+import { verifySession } from "@/lib/auth";
 
-jest.mock("next-auth/next", () => ({
-  getServerSession: jest.fn(),
+jest.mock("@/lib/auth", () => ({
+  verifySession: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(),
 }));
 
-jest.mock("@/app/api/auth/[...nextauth]/route", () => ({
-  authOptions: jest.fn(),
-}));
-
 describe("Item Repository", () => {
-  const mockSession = {
-    user: { id: "test-user-id", email: "test@example.com" },
-  };
-
   beforeEach(() => {
-    (getServerSession as jest.Mock).mockResolvedValue(mockSession);
+    (verifySession as jest.Mock).mockResolvedValue({ userId: "test-user-id" });
   });
 
   describe("addItem", () => {
@@ -38,28 +29,6 @@ describe("Item Repository", () => {
       isSale: false,
       userId: "test-user-id",
     };
-
-    it("should redirect to login when user is not authenticated", async () => {
-      (getServerSession as jest.Mock).mockResolvedValue(null);
-
-      await addItem(item);
-
-      expect(redirect).toHaveBeenCalledWith("/login");
-    });
-
-    it("should throw error when user tries to add item for another user", async () => {
-      (getServerSession as jest.Mock).mockResolvedValue({
-        user: { id: "different-user", email: "different@example.com" },
-      });
-
-      await expect(addItem(item)).rejects.toThrow(
-        "Unauthorized access to items"
-      );
-
-      expect(prismaMock.group.findFirst).not.toHaveBeenCalled();
-      expect(prismaMock.group.create).not.toHaveBeenCalled();
-      expect(prismaMock.item.create).not.toHaveBeenCalled();
-    });
 
     it("should add item to existing group", async () => {
       const mockExistingGroup = {

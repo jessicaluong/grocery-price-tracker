@@ -1,25 +1,17 @@
 import { addItem } from "@/data-access/item-repository";
 import prisma from "@/lib/db";
 import { Unit } from "@prisma/client";
-import { getServerSession } from "next-auth/next";
+import { verifySession } from "@/lib/auth";
 
-jest.mock("next-auth/next", () => ({
-  getServerSession: jest.fn(),
+jest.mock("@/lib/auth", () => ({
+  verifySession: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(),
 }));
 
-jest.mock("@/app/api/auth/[...nextauth]/route", () => ({
-  authOptions: jest.fn(),
-}));
-
 describe("Item Repository integration tests", () => {
-  const mockSession = {
-    user: { id: "test-user-id", email: "test@example.com" },
-  };
-
   const userId = "test-user-id";
 
   beforeAll(async () => {
@@ -37,7 +29,7 @@ describe("Item Repository integration tests", () => {
   });
 
   beforeEach(() => {
-    (getServerSession as jest.Mock).mockResolvedValue(mockSession);
+    (verifySession as jest.Mock).mockResolvedValue({ userId: "test-user-id" });
   });
 
   afterAll(async () => {
@@ -469,9 +461,10 @@ describe("Item Repository integration tests", () => {
       };
 
       const otherUserSession = {
-        user: { id: otherUserId, email: "different@example.com" },
+        user: { id: otherUserId },
       };
-      (getServerSession as jest.Mock).mockResolvedValueOnce(otherUserSession);
+      (verifySession as jest.Mock).mockResolvedValue({ otherUserSession });
+
       await addItem(otherUserItem);
 
       const firstUserGroups = await prisma.group.findMany({

@@ -3,16 +3,16 @@
 import { addItem } from "@/data-access/item-repository";
 import { addItemSchema } from "@/zod-schemas/item-schemas";
 import { Unit } from "@/lib/types";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getServerSession } from "next-auth/next";
 import { revalidatePath } from "next/cache";
+import { verifySession } from "@/lib/auth";
 
 export async function addItemAction(values: unknown) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const session = await verifySession();
+  if (!session) {
     return { errors: { form: "You must be logged in to add an item" } };
   }
-  const userId = session.user.id;
+
+  const userId = session.userId;
 
   const validatedFields = addItemSchema.safeParse(values);
 
@@ -42,5 +42,3 @@ export async function addItemAction(values: unknown) {
     return { errors: { form: "Failed to add item" } };
   }
 }
-
-export async function editGroupAction(values: unknown) {}

@@ -1,62 +1,29 @@
 import { addItemAction } from "@/actions/grocery-actions";
 import { addItem } from "@/data-access/item-repository";
+import { verifySession } from "@/lib/auth";
 import { Unit } from "@/lib/types";
-import { getServerSession } from "next-auth/next";
 import { revalidatePath } from "next/cache";
+
+jest.mock("@/lib/auth", () => ({
+  verifySession: jest.fn(),
+}));
 
 jest.mock("@/data-access/item-repository", () => ({
   addItem: jest.fn(),
-}));
-
-jest.mock("next-auth/next", () => ({
-  getServerSession: jest.fn(),
 }));
 
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
 }));
 
-jest.mock("@/app/api/auth/[...nextauth]/route", () => ({
-  authOptions: jest.fn(),
-}));
-
 describe("addItemAction", () => {
-  const mockSession = {
-    user: { id: "test-user-id", email: "test@example.com" },
-  };
-
   beforeEach(() => {
-    (getServerSession as jest.Mock).mockResolvedValue(mockSession);
+    (verifySession as jest.Mock).mockResolvedValue({ userId: "test-user-id" });
   });
 
   describe("authentication", () => {
     it("should return an error if user is not authenticated", async () => {
-      (getServerSession as jest.Mock).mockResolvedValue(null);
-
-      const result = await addItemAction({
-        name: "Test Name",
-        brand: "Test Brand",
-        store: "Test Store",
-        count: 1,
-        amount: 100,
-        unit: "mL",
-        price: 4.99,
-        date: new Date(),
-        isSale: false,
-      });
-
-      expect(result).toHaveProperty("errors");
-      expect(result.errors).toHaveProperty(
-        "form",
-        "You must be logged in to add an item"
-      );
-      expect(addItem).not.toHaveBeenCalled();
-    });
-
-    it("should return an error if user id is missing", async () => {
-      (getServerSession as jest.Mock).mockResolvedValue({
-        user: { email: "test@example.com" },
-      });
+      (verifySession as jest.Mock).mockResolvedValue(null);
 
       const result = await addItemAction({
         name: "Test Name",

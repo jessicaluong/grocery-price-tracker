@@ -1,14 +1,10 @@
 import prisma from "@/lib/db";
 import { AddItemInput } from "@/zod-schemas/item-schemas";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
+import { verifySession } from "@/lib/auth";
 
 export async function getGroups() {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    redirect("/login");
-  }
+  const session = await verifySession();
+  if (!session) return [];
 
   const groups = await prisma.group.findMany({
     select: {
@@ -48,105 +44,101 @@ export async function getGroups() {
   }));
 }
 
-export async function getItems(userId: string) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    redirect("/login");
-  }
+export async function getItems() {
+  const session = await verifySession();
+  if (!session) return [];
 
-  if (session.user?.id !== userId) {
-    return [];
-  }
-
-  const items = await prisma.item.findMany({
-    where: {
-      group: {
-        userId,
-      },
-    },
-    orderBy: { date: "desc" },
-    select: {
-      id: true,
-      date: true,
-      price: true,
-      isSale: true,
-      groupId: true,
-      group: {
-        select: {
-          name: true,
-          brand: true,
-          store: true,
-          count: true,
-          amount: true,
-          unit: true,
+  try {
+    const items = await prisma.item.findMany({
+      where: {
+        group: {
+          userId: session.userId,
         },
       },
-    },
-  });
+      orderBy: { date: "desc" },
+      select: {
+        id: true,
+        date: true,
+        price: true,
+        isSale: true,
+        groupId: true,
+        group: {
+          select: {
+            name: true,
+            brand: true,
+            store: true,
+            count: true,
+            amount: true,
+            unit: true,
+          },
+        },
+      },
+    });
 
-  return items.map((item) => ({
-    id: item.id,
-    name: item.group.name,
-    brand: item.group.brand,
-    store: item.group.store,
-    count: item.group.count,
-    amount: item.group.amount,
-    unit: item.group.unit,
-    price: item.price,
-    date: item.date,
-    isSale: item.isSale,
-    groupId: item.groupId,
-  }));
+    return items.map((item) => ({
+      id: item.id,
+      name: item.group.name,
+      brand: item.group.brand,
+      store: item.group.store,
+      count: item.group.count,
+      amount: item.group.amount,
+      unit: item.group.unit,
+      price: item.price,
+      date: item.date,
+      isSale: item.isSale,
+      groupId: item.groupId,
+    }));
+  } catch (error) {
+    console.log("Failed to fetch items");
+    return [];
+  }
 }
 
 export async function getPriceHistoryByGroupId(id: string) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    redirect("/login");
-  }
+  const session = await verifySession();
+  if (!session) return null;
 
   const group = await prisma.group.findUnique({
     where: { id: id },
     select: { userId: true },
   });
 
-  if (!group || group.userId !== session.user?.id) {
+  if (!group || group.userId !== session.userId) {
     throw new Error("Unauthorized access to price history");
   }
 
-  const items = await prisma.group.findUnique({
-    where: { id },
-    select: {
-      items: {
-        select: { id: true, date: true, price: true, isSale: true },
-        orderBy: { date: "asc" },
+  try {
+    const items = await prisma.group.findUnique({
+      where: { id },
+      select: {
+        items: {
+          select: { id: true, date: true, price: true, isSale: true },
+          orderBy: { date: "asc" },
+        },
       },
-    },
-  });
+    });
 
-  const priceHistory = items?.items ?? [];
-  return {
-    priceHistory,
-    minPrice:
-      priceHistory.length > 0
-        ? Math.min(...priceHistory.map((pricePoint) => pricePoint.price))
-        : 0,
-    maxPrice:
-      priceHistory.length > 0
-        ? Math.max(...priceHistory.map((pricePoint) => pricePoint.price))
-        : 0,
-  };
+    const priceHistory = items?.items ?? [];
+    return {
+      priceHistory,
+      minPrice:
+        priceHistory.length > 0
+          ? Math.min(...priceHistory.map((pricePoint) => pricePoint.price))
+          : 0,
+      maxPrice:
+        priceHistory.length > 0
+          ? Math.max(...priceHistory.map((pricePoint) => pricePoint.price))
+          : 0,
+    };
+  } catch (error) {
+    console.log("Failed to fetch price history");
+    return null;
+  }
 }
 
 export async function addItem(item: AddItemInput & { userId: string }) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    redirect("/login");
-  }
-
-  if (session && session.user?.id !== item.userId) {
-    throw new Error("Unauthorized access to items");
-  }
+  const session = await verifySession();
+  if (!session) return null;
 
   const normalizedBrand = item.brand === "" ? null : item.brand;
 
