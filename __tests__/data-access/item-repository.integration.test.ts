@@ -1,4 +1,4 @@
-import { addItem } from "@/data-access/item-repository";
+import { addItem, editGroup } from "@/data-access/item-repository";
 import prisma from "@/lib/db";
 import { Unit } from "@prisma/client";
 import { verifySession } from "@/lib/auth";
@@ -15,10 +15,6 @@ describe("Item Repository integration tests", () => {
   const userId = "test-user-id";
 
   beforeAll(async () => {
-    await prisma.user.deleteMany({
-      where: { email: "test@example.com" },
-    });
-
     await prisma.user.create({
       data: {
         id: userId,
@@ -29,7 +25,7 @@ describe("Item Repository integration tests", () => {
   });
 
   beforeEach(() => {
-    (verifySession as jest.Mock).mockResolvedValue({ userId: "test-user-id" });
+    (verifySession as jest.Mock).mockResolvedValue({ userId: userId });
   });
 
   afterAll(async () => {
@@ -41,13 +37,13 @@ describe("Item Repository integration tests", () => {
     await prisma.$disconnect();
   });
 
-  beforeEach(async () => {
-    const deleteItem = prisma.item.deleteMany({});
-    const deleteGroup = prisma.group.deleteMany({});
-    await prisma.$transaction([deleteItem, deleteGroup]);
-  });
-
   describe("addItem", () => {
+    beforeEach(async () => {
+      const deleteItem = prisma.item.deleteMany({});
+      const deleteGroup = prisma.group.deleteMany({});
+      await prisma.$transaction([deleteItem, deleteGroup]);
+    });
+
     const baseItem = {
       name: "test juice",
       brand: "Test Brand",
@@ -495,6 +491,69 @@ describe("Item Repository integration tests", () => {
       // Verify the actual data content
       expect(firstUserGroups[0].name).toBe(baseItem.name);
       expect(secondUserGroups[0].name).toBe(baseItem.name);
+    });
+  });
+
+  describe("editGroup", () => {
+    const otherUserId = "other-user-id";
+    const existingGroupData = {
+      name: "Original Name",
+      brand: "Original Brand",
+      store: "Original Store",
+      count: 1,
+      amount: 1,
+      unit: Unit.kg,
+      userId,
+    };
+
+    let groupId: string;
+
+    const updateData = {
+      name: "Updated Name",
+      brand: "Updated Brand",
+      store: "Updated Store",
+      count: 2,
+      amount: 200,
+      unit: Unit.mL,
+    };
+
+    beforeAll(async () => {
+      // Create a group owned by test user
+      const group = await prisma.group.create({ data: existingGroupData });
+      groupId = group.id;
+    });
+
+    it("should update a group successfully", async () => {
+      await editGroup(updateData, groupId);
+
+      const updatedGroup = await prisma.group.findUnique({
+        where: { id: groupId },
+      });
+
+      expect(updatedGroup).toMatchObject(updateData);
+    });
+
+    it("should prevent updates from unauthorized users", async () => {
+      (verifySession as jest.Mock).mockResolvedValue({ userId: otherUserId });
+
+      const updateData = {
+        name: "Unauthorized Update",
+        brand: "Brand",
+        store: "Store",
+        count: 1,
+        amount: 100,
+        unit: Unit.g,
+      };
+
+      await expect(editGroup(updateData, groupId)).rejects.toThrow(
+        "You don't have permission to edit this group"
+      );
+
+      const group = await prisma.group.findUnique({
+        where: { id: groupId },
+      });
+
+      expect(group!.name).not.toBe("Unauthorized Update");
     });
   });
 });

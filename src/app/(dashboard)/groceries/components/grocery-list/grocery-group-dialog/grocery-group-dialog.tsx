@@ -10,6 +10,7 @@ import { currencyFormat } from "@/lib/utils";
 import { ItemQuantity } from "../item-quantity";
 import GroceryGroupTable from "./grocery-group-table/grocery-group-table";
 import { columns } from "./grocery-group-table/grocery-group-table-column";
+import GroceryGroupDropdown from "./grocery-group-dropdown";
 
 type GroceryItemDialogProps = {
   open: boolean;
@@ -22,8 +23,8 @@ export default function GroceryGroupDialog({
   onOpenChange,
   itemWithView: { view, item, groupMap },
 }: GroceryItemDialogProps) {
-  const group =
-    view === "LIST" ? groupMap.get(item.groupId) : groupMap.get(item.id);
+  const groupId = view === "LIST" ? item.groupId : item.id;
+  const group = groupMap.get(groupId);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -38,6 +39,21 @@ export default function GroceryGroupDialog({
                 unit={item.unit}
                 className="shrink-0 ml-2 sm:ml-1 text-sm"
               />
+              <div className="ml-2">
+                {group && (
+                  <GroceryGroupDropdown
+                    group={{
+                      id: groupId,
+                      name: group.name,
+                      brand: group.brand,
+                      store: group.store,
+                      count: group.count,
+                      amount: group.amount,
+                      unit: group.unit,
+                    }}
+                  />
+                )}
+              </div>
             </div>
             {item.brand && <div className="h-7">{item.brand}</div>}
             <div className="font-light">

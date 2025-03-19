@@ -1,4 +1,4 @@
-import { addItem } from "@/data-access/item-repository";
+import { addItem, editGroup } from "@/data-access/item-repository";
 import { prismaMock } from "../../test/prisma-mock";
 import { Unit } from "@prisma/client";
 import { verifySession } from "@/lib/auth";
@@ -173,6 +173,96 @@ describe("Item Repository", () => {
               isSale: item.isSale,
             },
           },
+        },
+      });
+    });
+  });
+
+  describe("editGroup", () => {
+    const validGroupData = {
+      name: "oats",
+      brand: "Quaker",
+      store: "Superstore",
+      count: 1,
+      amount: 1,
+      unit: Unit.kg,
+    };
+
+    const validGroupId = "test-group-id";
+
+    const mockFoundGroup = {
+      id: "test-group-id",
+      userId: "test-user-id",
+      name: "oats",
+      brand: "Quaker",
+      store: "Superstore",
+      count: 1,
+      amount: 1,
+      unit: Unit.kg,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    it("should throw error when user doesn't own group (authorization check)", async () => {
+      // unauthorized
+      prismaMock.group.findFirst.mockResolvedValue(null);
+
+      await expect(editGroup(validGroupData, validGroupId)).rejects.toThrow(
+        "You don't have permission to edit this group"
+      );
+      expect(prismaMock.group.update).not.toHaveBeenCalled();
+    });
+
+    it("should update group when user is authorized", async () => {
+      // authorized
+      prismaMock.group.findFirst.mockResolvedValue(mockFoundGroup);
+
+      await editGroup(validGroupData, validGroupId);
+
+      expect(prismaMock.group.update).toHaveBeenCalledWith({
+        where: { id: validGroupId },
+        data: {
+          name: validGroupData.name,
+          brand: validGroupData.brand,
+          store: validGroupData.store,
+          count: validGroupData.count,
+          amount: validGroupData.amount,
+          unit: validGroupData.unit,
+        },
+      });
+    });
+
+    it("should propagate errors from database operations", async () => {
+      // authorized
+      prismaMock.group.findFirst.mockResolvedValue(mockFoundGroup);
+
+      prismaMock.group.update.mockRejectedValue(new Error("Database error"));
+
+      await expect(editGroup(validGroupData, validGroupId)).rejects.toThrow(
+        "Database error"
+      );
+    });
+
+    it("should normalize empty brand string to null", async () => {
+      // authorized
+      prismaMock.group.findFirst.mockResolvedValue(mockFoundGroup);
+
+      const groupWithNullBrand = {
+        ...validGroupData,
+        brand: "",
+      };
+
+      await editGroup(groupWithNullBrand, validGroupId);
+
+      expect(prismaMock.group.update).toHaveBeenCalledWith({
+        where: { id: validGroupId },
+        data: {
+          name: validGroupData.name,
+          brand: null,
+          store: validGroupData.store,
+          count: validGroupData.count,
+          amount: validGroupData.amount,
+          unit: validGroupData.unit,
         },
       });
     });
