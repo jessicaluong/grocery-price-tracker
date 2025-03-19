@@ -14,6 +14,7 @@ import FormInput from "../shared/item-form/item-form-input";
 import { FormSelect } from "../shared/item-form/item-form-select";
 import FormCheckbox from "../shared/item-form/item-form-checkbox";
 import { FormDatePicker } from "../shared/item-form/item-form-date-picker";
+import { useToast } from "@/hooks/use-toast";
 
 type AddItemFormProps = {
   onSuccess: () => void;
@@ -35,6 +36,7 @@ export default function AddItemForm({ onSuccess }: AddItemFormProps) {
 
   const [serverErrors, setServerErrors] = useState<ServerErrors>(null);
   const { isSubmitting } = form.formState;
+  const { toast } = useToast();
 
   async function onSubmit(values: TAddItemSchema) {
     try {
@@ -42,6 +44,9 @@ export default function AddItemForm({ onSuccess }: AddItemFormProps) {
       if (response.errors) {
         setServerErrors(response.errors);
       } else if (response.success) {
+        toast({
+          description: "Item added.",
+        });
         onSuccess();
       }
     } catch (error) {

@@ -3,9 +3,16 @@ import userEvent from "@testing-library/user-event";
 import { addItemAction } from "@/actions/grocery-actions";
 import React from "react";
 import AddItemForm from "@/app/(dashboard)/groceries/components/item-dialogs/add-item/add-item-form";
+import { useToast } from "@/hooks/use-toast";
 
 jest.mock("@/actions/grocery-actions", () => ({
   addItemAction: jest.fn(),
+}));
+
+jest.mock("@/hooks/use-toast", () => ({
+  useToast: jest.fn(() => ({
+    toast: jest.fn(),
+  })),
 }));
 
 describe("AddItemForm", () => {
@@ -150,7 +157,10 @@ describe("AddItemForm", () => {
   });
 
   describe("successful submission", () => {
-    it("calls addItemAction and onSuccess when form submission is successful", async () => {
+    it("calls addItemAction, toast, and onSuccess when form submission is successful", async () => {
+      const mockToast = jest.fn();
+      (useToast as jest.Mock).mockReturnValue({ toast: mockToast });
+
       (addItemAction as jest.Mock).mockResolvedValue({ success: true });
 
       render(<AddItemForm onSuccess={mockOnSuccess} />);
@@ -166,6 +176,9 @@ describe("AddItemForm", () => {
 
       await waitFor(() => {
         expect(addItemAction).toHaveBeenCalled();
+        expect(mockToast).toHaveBeenCalledWith({
+          description: "Item added.",
+        });
         expect(mockOnSuccess).toHaveBeenCalled();
       });
     });

@@ -3,9 +3,16 @@ import userEvent from "@testing-library/user-event";
 import EditGroupForm from "@/app/(dashboard)/groceries/components/group-dialogs/edit-group/edit-group-form";
 import { editGroupAction } from "@/actions/grocery-actions";
 import { Unit } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 jest.mock("@/actions/grocery-actions", () => ({
   editGroupAction: jest.fn(),
+}));
+
+jest.mock("@/hooks/use-toast", () => ({
+  useToast: jest.fn(() => ({
+    toast: jest.fn(),
+  })),
 }));
 
 describe("EditGroupForm", () => {
@@ -55,7 +62,10 @@ describe("EditGroupForm", () => {
   });
 
   describe("successful submission", () => {
-    it("calls editGroupAction and onSuccess when form submission is successful", async () => {
+    it("calls editGroupAction, toast, and onSuccess when form submission is successful", async () => {
+      const mockToast = jest.fn();
+      (useToast as jest.Mock).mockReturnValue({ toast: mockToast });
+
       (editGroupAction as jest.Mock).mockResolvedValue({ success: true });
 
       render(<EditGroupForm group={group} onSuccess={mockOnSuccess} />);
@@ -64,6 +74,9 @@ describe("EditGroupForm", () => {
 
       await waitFor(() => {
         expect(editGroupAction).toHaveBeenCalled();
+        expect(mockToast).toHaveBeenCalledWith({
+          description: "Group edited.",
+        });
         expect(mockOnSuccess).toHaveBeenCalled();
       });
     });

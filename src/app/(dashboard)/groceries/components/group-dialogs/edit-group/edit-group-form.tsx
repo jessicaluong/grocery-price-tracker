@@ -12,6 +12,7 @@ import FormButton from "@/components/form/form-button";
 import { useState } from "react";
 import { editGroupSchema, TEditGroupSchema } from "@/zod-schemas/group-schemas";
 import { editGroupAction } from "@/actions/grocery-actions";
+import { useToast } from "@/hooks/use-toast";
 
 type EditGroupFormProps = {
   group: DbGroup;
@@ -36,6 +37,7 @@ export default function EditGroupForm({
 
   const [serverErrors, setServerErrors] = useState<ServerErrors>(null);
   const { isSubmitting } = form.formState;
+  const { toast } = useToast();
 
   async function onSubmit(values: TEditGroupSchema) {
     try {
@@ -43,6 +45,9 @@ export default function EditGroupForm({
       if (response.errors) {
         setServerErrors(response.errors);
       } else if (response.success) {
+        toast({
+          description: "Group edited.",
+        });
         onSuccess();
       }
     } catch (error) {
