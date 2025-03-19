@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 import { verifySession } from "@/lib/auth";
 
 export async function addItemAction(values: unknown) {
-  const session = await verifySession();
+  const session = await verifySession({ redirect: false });
   if (!session) {
     return { errors: { form: "You must be logged in to add an item" } };
   }

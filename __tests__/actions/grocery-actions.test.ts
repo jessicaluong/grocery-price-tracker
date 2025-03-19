@@ -37,6 +37,7 @@ describe("addItemAction", () => {
         isSale: false,
       });
 
+      expect(verifySession).toHaveBeenCalledWith({ redirect: false });
       expect(result).toHaveProperty("errors");
       expect(result.errors).toHaveProperty(
         "form",
