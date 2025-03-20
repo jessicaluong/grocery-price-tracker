@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Unit, UnitSchema } from "../lib/types";
+import { UnitSchema } from "../lib/types";
 
 export const addItemSchema = z.object({
   name: z
@@ -39,6 +39,13 @@ export const addItemSchema = z.object({
 
 export type TAddItemSchema = z.infer<typeof addItemSchema>;
 
-export type AddItemInput = Omit<TAddItemSchema, "unit"> & {
-  unit: Unit;
-};
+export const pricePointSchema = z.object({
+  date: z.date(),
+  price: z.coerce
+    .number({ invalid_type_error: "Price must be a number" })
+    .nonnegative("Price cannot be negative")
+    .transform((val) => parseFloat(val.toFixed(2))),
+  isSale: z.boolean().default(false),
+});
+
+export type TPricePointSchema = z.infer<typeof pricePointSchema>;

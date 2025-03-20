@@ -1,11 +1,13 @@
 "use server";
 
-import { addItem, editGroup } from "@/data-access/item-repository";
-import { addItemSchema } from "@/zod-schemas/item-schemas";
+import { addItem, editGroup, editItem } from "@/data-access/item-repository";
+import { addItemSchema, pricePointSchema } from "@/zod-schemas/item-schemas";
 import { Unit } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import { editGroupSchema } from "@/zod-schemas/group-schemas";
 import { verifySession } from "@/lib/auth";
+import { Prisma } from "@prisma/client";
+import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
 
 export async function addItemAction(values: unknown) {
   const session = await verifySession({ redirect: false });
@@ -44,6 +46,30 @@ export async function addItemAction(values: unknown) {
   }
 }
 
+export async function editItemAction(values: unknown, itemId: string) {
+  const session = await verifySession({ redirect: false });
+  if (!session) {
+    return { errors: { form: "You must be logged in to edit an item" } };
+  }
+
+  const validatedFields = pricePointSchema.safeParse(values);
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const data = validatedFields.data;
+    await editItem(data, itemId);
+    revalidatePath("/groceries");
+    return { success: true };
+  } catch (error) {
+    return { errors: { form: "Failed to edit item" } };
+  }
+}
+
 export async function editGroupAction(values: unknown, groupId: string) {
   const session = await verifySession({ redirect: false });
   if (!session) {
@@ -74,6 +100,11 @@ export async function editGroupAction(values: unknown, groupId: string) {
     revalidatePath("/groceries");
     return { success: true };
   } catch (error) {
+    if (error instanceof DuplicateGroupError) {
+      return { errors: { form: error.message } };
+    } else if (error instanceof AuthorizationError) {
+      return { errors: { form: error.message } };
+    }
     return { errors: { form: "Failed to edit group" } };
   }
 }

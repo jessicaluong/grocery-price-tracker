@@ -1,6 +1,8 @@
 import prisma from "@/lib/db";
-import { AddItemInput } from "@/zod-schemas/item-schemas";
+import { TAddItemSchema } from "@/zod-schemas/item-schemas";
+import { TEditGroupSchema } from "@/zod-schemas/group-schemas";
 import { verifySession } from "@/lib/auth";
+import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
 
 export async function getGroups() {
   const session = await verifySession();
@@ -89,7 +91,6 @@ export async function getItems() {
       groupId: item.groupId,
     }));
   } catch (error) {
-    console.log("Failed to fetch items");
     return [];
   }
 }
@@ -136,7 +137,7 @@ export async function getPriceHistoryByGroupId(id: string) {
   }
 }
 
-export async function addItem(item: AddItemInput & { userId: string }) {
+export async function addItem(item: TAddItemSchema & { userId: string }) {
   const session = await verifySession();
   if (!session) return null;
 
@@ -183,4 +184,50 @@ export async function addItem(item: AddItemInput & { userId: string }) {
       },
     });
   }
+}
+
+export async function editGroup(groupData: TEditGroupSchema, groupId: string) {
+  const session = await verifySession();
+  if (!session) return null;
+
+  // authorization
+  const foundGroup = await prisma.group.findFirst({
+    where: { id: groupId, userId: session.userId },
+  });
+
+  if (!foundGroup) {
+    throw new AuthorizationError();
+  }
+
+  const normalizedBrand = groupData.brand === "" ? null : groupData.brand;
+
+  // check if duplicate group exists
+  const existingGroup = await prisma.group.findFirst({
+    where: {
+      userId: session.userId,
+      name: groupData.name,
+      brand: normalizedBrand,
+      store: groupData.store,
+      count: groupData.count,
+      amount: groupData.amount,
+      unit: groupData.unit,
+      id: { not: groupId },
+    },
+  });
+
+  if (existingGroup) {
+    throw new DuplicateGroupError();
+  }
+
+  await prisma.group.update({
+    where: { id: groupId },
+    data: {
+      name: groupData.name,
+      brand: normalizedBrand,
+      store: groupData.store,
+      count: groupData.count,
+      amount: groupData.amount,
+      unit: groupData.unit,
+    },
+  });
 }

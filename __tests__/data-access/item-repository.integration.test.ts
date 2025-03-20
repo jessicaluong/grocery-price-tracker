@@ -2,6 +2,7 @@ import { addItem, editGroup } from "@/data-access/item-repository";
 import prisma from "@/lib/db";
 import { Unit } from "@prisma/client";
 import { verifySession } from "@/lib/auth";
+import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
 
 jest.mock("@/lib/auth", () => ({
   verifySession: jest.fn(),
@@ -517,10 +518,13 @@ describe("Item Repository integration tests", () => {
       unit: Unit.mL,
     };
 
-    beforeAll(async () => {
-      // Create a group owned by test user
+    beforeEach(async () => {
       const group = await prisma.group.create({ data: existingGroupData });
       groupId = group.id;
+    });
+
+    afterEach(async () => {
+      await prisma.group.deleteMany({});
     });
 
     it("should update a group successfully", async () => {
@@ -546,7 +550,7 @@ describe("Item Repository integration tests", () => {
       };
 
       await expect(editGroup(updateData, groupId)).rejects.toThrow(
-        "You don't have permission to edit this group"
+        AuthorizationError
       );
 
       const group = await prisma.group.findUnique({
@@ -554,6 +558,64 @@ describe("Item Repository integration tests", () => {
       });
 
       expect(group!.name).not.toBe("Unauthorized Update");
+    });
+
+    describe("duplicate groups", () => {
+      it("should not be able to create a duplicate group (non-null brand) by editing existing group", async () => {
+        const groupWithDifferentName = {
+          ...existingGroupData,
+          name: "different name",
+        };
+
+        const secondGroup = await prisma.group.create({
+          data: groupWithDifferentName,
+        });
+
+        // try to update second group to match the first
+        const duplicateData = {
+          name: existingGroupData.name,
+          brand: existingGroupData.brand,
+          store: existingGroupData.store,
+          count: existingGroupData.count,
+          amount: existingGroupData.amount,
+          unit: existingGroupData.unit,
+        };
+
+        await expect(editGroup(duplicateData, secondGroup.id)).rejects.toThrow(
+          DuplicateGroupError
+        );
+      });
+
+      it("should not be able to create a duplicate group (null brand) by editing existing group", async () => {
+        const originalGroup = await prisma.group.findFirst({
+          where: {
+            id: groupId,
+          },
+        });
+        console.log("Original group in DB:", originalGroup);
+
+        const groupWithDifferentNameNullBrand = {
+          ...existingGroupData,
+          name: "different name",
+          brand: null,
+        };
+
+        await prisma.group.create({ data: groupWithDifferentNameNullBrand });
+
+        // try to update first group to match the second
+        const duplicateData = {
+          name: "different name",
+          brand: null,
+          store: existingGroupData.store,
+          count: existingGroupData.count,
+          amount: existingGroupData.amount,
+          unit: existingGroupData.unit,
+        };
+
+        await expect(editGroup(duplicateData, groupId)).rejects.toThrow(
+          DuplicateGroupError
+        );
+      });
     });
   });
 });

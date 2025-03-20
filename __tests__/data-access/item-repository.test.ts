@@ -2,6 +2,7 @@ import { addItem, editGroup } from "@/data-access/item-repository";
 import { prismaMock } from "../../test/prisma-mock";
 import { Unit } from "@prisma/client";
 import { verifySession } from "@/lib/auth";
+import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
 
 jest.mock("@/lib/auth", () => ({
   verifySession: jest.fn(),
@@ -203,19 +204,20 @@ describe("Item Repository", () => {
       updatedAt: new Date(),
     };
 
-    it("should throw error when user doesn't own group (authorization check)", async () => {
+    it("should throw AuthorizationError when user doesn't own group", async () => {
       // unauthorized
       prismaMock.group.findFirst.mockResolvedValue(null);
 
       await expect(editGroup(validGroupData, validGroupId)).rejects.toThrow(
-        "You don't have permission to edit this group"
+        AuthorizationError
       );
       expect(prismaMock.group.update).not.toHaveBeenCalled();
     });
 
     it("should update group when user is authorized", async () => {
-      // authorized
-      prismaMock.group.findFirst.mockResolvedValue(mockFoundGroup);
+      prismaMock.group.findFirst
+        .mockResolvedValueOnce(mockFoundGroup) // authorization
+        .mockResolvedValueOnce(null); // check duplicate group
 
       await editGroup(validGroupData, validGroupId);
 
@@ -232,9 +234,63 @@ describe("Item Repository", () => {
       });
     });
 
+    it("should throw DuplicateGroupError when a duplicate group exists", async () => {
+      const mockExistingGroup = {
+        ...mockFoundGroup,
+        id: "test-group-id-2",
+      };
+
+      prismaMock.group.findFirst
+        .mockResolvedValue(mockFoundGroup) // authorization
+        .mockResolvedValue(mockExistingGroup); // duplicate exists
+
+      await expect(editGroup(validGroupData, validGroupId)).rejects.toThrow(
+        DuplicateGroupError
+      );
+
+      expect(prismaMock.group.update).not.toHaveBeenCalled();
+    });
+
+    it("should throw DuplicateGroupError for duplicate groups with null brands", async () => {
+      const mockFoundGroup = {
+        id: "test-group-id",
+        userId: "test-user-id",
+        name: "oats",
+        brand: null,
+        store: "Superstore",
+        count: 1,
+        amount: 1,
+        unit: Unit.kg,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const mockExistingGroup = {
+        ...mockFoundGroup,
+        brand: null,
+        id: "test-group-id-2",
+      };
+
+      const groupDataNullBrand = {
+        ...validGroupData,
+        brand: null,
+      };
+
+      prismaMock.group.findFirst
+        .mockResolvedValue(mockFoundGroup) // authorization
+        .mockResolvedValue(mockExistingGroup); // duplicate exists
+
+      await expect(editGroup(validGroupData, validGroupId)).rejects.toThrow(
+        DuplicateGroupError
+      );
+
+      expect(prismaMock.group.update).not.toHaveBeenCalled();
+    });
+
     it("should propagate errors from database operations", async () => {
-      // authorized
-      prismaMock.group.findFirst.mockResolvedValue(mockFoundGroup);
+      prismaMock.group.findFirst
+        .mockResolvedValueOnce(mockFoundGroup) // authorization
+        .mockResolvedValueOnce(null); // check duplicate group
 
       prismaMock.group.update.mockRejectedValue(new Error("Database error"));
 
@@ -244,9 +300,9 @@ describe("Item Repository", () => {
     });
 
     it("should normalize empty brand string to null", async () => {
-      // authorized
-      prismaMock.group.findFirst.mockResolvedValue(mockFoundGroup);
-
+      prismaMock.group.findFirst
+        .mockResolvedValueOnce(mockFoundGroup) // authorization
+        .mockResolvedValueOnce(null); // check duplicate group
       const groupWithNullBrand = {
         ...validGroupData,
         brand: "",
