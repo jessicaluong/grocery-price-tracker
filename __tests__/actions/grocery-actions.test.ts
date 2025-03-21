@@ -1,5 +1,9 @@
-import { addItemAction, editGroupAction } from "@/actions/grocery-actions";
-import { addItem, editGroup } from "@/data-access/item-repository";
+import {
+  addItemAction,
+  editGroupAction,
+  editItemAction,
+} from "@/actions/grocery-actions";
+import { addItem, editGroup, editItem } from "@/data-access/item-repository";
 import { verifySession } from "@/lib/auth";
 import { Unit } from "@/lib/types";
 import { revalidatePath } from "next/cache";
@@ -11,6 +15,7 @@ jest.mock("@/lib/auth", () => ({
 jest.mock("@/data-access/item-repository", () => ({
   addItem: jest.fn(),
   editGroup: jest.fn(),
+  editItem: jest.fn(),
 }));
 
 jest.mock("next/cache", () => ({
@@ -584,6 +589,59 @@ describe("Grocery server actions", () => {
 
         expect(result).toHaveProperty("errors");
         expect(result.errors).toHaveProperty("form", "Failed to add item");
+      });
+    });
+  });
+
+  describe("editItemAction", () => {
+    /**
+     * This server action uses the same validation as addItemAction
+     * These tests focus only on editItemAction-specific behavior
+     */
+
+    const itemId = "test-item-id";
+    const validItem = { price: 4.99, date: new Date(), isSale: true };
+
+    beforeEach(() => {
+      (verifySession as jest.Mock).mockResolvedValue({
+        userId: "test-user-id",
+      });
+    });
+
+    describe("authentication", () => {
+      it("should return an error if user is not authenticated", async () => {
+        (verifySession as jest.Mock).mockResolvedValue(null);
+
+        const result = await editItemAction(validItem, itemId);
+
+        expect(verifySession).toHaveBeenCalledWith({ redirect: false });
+        expect(result).toHaveProperty("errors");
+        expect(result.errors).toHaveProperty(
+          "form",
+          "You must be logged in to edit an item"
+        );
+        expect(editItem).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("successful submission", () => {
+      it("should return success true for valid complete data", async () => {
+        const result = await editItemAction(validItem, itemId);
+
+        expect(result).toEqual({ success: true });
+        expect(editItem).toHaveBeenCalledWith(validItem, itemId);
+        expect(revalidatePath).toHaveBeenCalledWith("/groceries");
+      });
+    });
+
+    describe("error handling", () => {
+      it("should handle repository errors gracefully", async () => {
+        (editItem as jest.Mock).mockRejectedValue(new Error("Database error"));
+
+        const result = await editItemAction(validItem, itemId);
+
+        expect(result).toHaveProperty("errors");
+        expect(result.errors).toHaveProperty("form", "Failed to edit item");
       });
     });
   });

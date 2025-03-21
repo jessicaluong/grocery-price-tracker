@@ -1,38 +1,28 @@
-import { Button } from "@/components/ui/button";
 import {
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { PricePoint } from "@/lib/types";
+import EditItemForm from "./edit-item-form";
 
-export default function EditItemDialogContent() {
+type EditItemDialogContentProps = {
+  item: PricePoint;
+  handleClose: () => void;
+};
+
+export default function EditItemDialogContent({
+  item,
+  handleClose,
+}: EditItemDialogContentProps) {
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>Edit item</DialogTitle>
-        <DialogDescription>
-          Make changes to your profile here. Click save when you're done.
-        </DialogDescription>
+        <DialogDescription>Make changes to this price point.</DialogDescription>
       </DialogHeader>
-      {/* <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="name" className="text-right">
-            Name
-          </Label>
-          <Input id="name" value="Pedro Duarte" className="col-span-3" />
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="username" className="text-right">
-            Username
-          </Label>
-          <Input id="username" value="@peduarte" className="col-span-3" />
-        </div>
-      </div> */}
-      <DialogFooter>
-        <Button type="submit">Save changes</Button>
-      </DialogFooter>
+      <EditItemForm item={item} onSuccess={handleClose} />
     </DialogContent>
   );
 }

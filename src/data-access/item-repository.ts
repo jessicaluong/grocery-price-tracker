@@ -1,5 +1,5 @@
 import prisma from "@/lib/db";
-import { TAddItemSchema } from "@/zod-schemas/item-schemas";
+import { TAddItemSchema, TPricePointSchema } from "@/zod-schemas/item-schemas";
 import { TEditGroupSchema } from "@/zod-schemas/group-schemas";
 import { verifySession } from "@/lib/auth";
 import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
@@ -184,6 +184,29 @@ export async function addItem(item: TAddItemSchema & { userId: string }) {
       },
     });
   }
+}
+
+export async function editItem(itemData: TPricePointSchema, itemId: string) {
+  const session = await verifySession();
+  if (!session) return null;
+
+  // authorization
+  const currentItem = await prisma.item.findFirst({
+    where: { id: itemId, group: { userId: session.userId } },
+  });
+
+  if (!currentItem) {
+    throw new AuthorizationError();
+  }
+
+  await prisma.item.update({
+    where: { id: itemId },
+    data: {
+      date: itemData.date,
+      price: itemData.price,
+      isSale: itemData.isSale,
+    },
+  });
 }
 
 export async function editGroup(groupData: TEditGroupSchema, groupId: string) {

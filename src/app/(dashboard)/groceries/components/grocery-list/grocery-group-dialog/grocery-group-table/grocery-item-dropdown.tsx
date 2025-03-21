@@ -27,6 +27,10 @@ export default function GroceryItemDropdown({ rowData }: DropdownDialogProps) {
     "copy" | "edit" | "delete"
   >();
 
+  const handleClose = () => {
+    setOpenedDialog(undefined);
+  };
+
   return (
     <>
       <Dialog>
@@ -74,7 +78,9 @@ export default function GroceryItemDropdown({ rowData }: DropdownDialogProps) {
           </DropdownMenuContent>
         </DropdownMenu>
         {openedDialog === "delete" && <DeleteItemDialogContent />}
-        {openedDialog === "edit" && <EditItemDialogContent />}
+        {openedDialog === "edit" && (
+          <EditItemDialogContent item={rowData} handleClose={handleClose} />
+        )}
         {openedDialog === "copy" && <CopyItemDialogContent />}
       </Dialog>
     </>

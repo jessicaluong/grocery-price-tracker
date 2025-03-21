@@ -1,4 +1,4 @@
-import { addItem, editGroup } from "@/data-access/item-repository";
+import { addItem, editGroup, editItem } from "@/data-access/item-repository";
 import prisma from "@/lib/db";
 import { Unit } from "@prisma/client";
 import { verifySession } from "@/lib/auth";
@@ -495,6 +495,91 @@ describe("Item Repository integration tests", () => {
     });
   });
 
+  describe("editItem", () => {
+    const existingGroupData = {
+      name: "Original Name",
+      brand: "Original Brand",
+      store: "Original Store",
+      count: 1,
+      amount: 1,
+      unit: Unit.kg,
+      userId,
+    };
+    const existingItemData = {
+      price: 4.99,
+      date: new Date("2025-03-15"),
+      isSale: true,
+    };
+    const otherUserId = "other-user-id";
+
+    const updateItemData = {
+      price: 1.99,
+      date: new Date("2025-03-18"),
+      isSale: false,
+    };
+
+    let existingItemId: string;
+
+    beforeEach(async () => {
+      // create an existing item to edit later
+      const existingGroup = await prisma.group.create({
+        data: {
+          ...existingGroupData,
+          items: {
+            create: existingItemData,
+          },
+        },
+      });
+
+      const existingGroupId = existingGroup.id;
+      const existingItem = await prisma.item.findFirst({
+        where: { groupId: existingGroupId },
+      });
+
+      if (!existingItem) {
+        throw new Error("Failed to create test item");
+      }
+
+      existingItemId = existingItem.id;
+    });
+
+    afterEach(async () => {
+      const deleteItem = prisma.item.deleteMany({});
+      const deleteGroup = prisma.group.deleteMany({});
+      await prisma.$transaction([deleteItem, deleteGroup]);
+    });
+
+    it("should update an item successfully", async () => {
+      await editItem(updateItemData, existingItemId);
+
+      const updatedItem = await prisma.item.findUnique({
+        where: { id: existingItemId },
+      });
+
+      expect(updatedItem).toMatchObject(updateItemData);
+    });
+
+    it("should prevent updates from unauthorized users", async () => {
+      (verifySession as jest.Mock).mockResolvedValue({ userId: otherUserId });
+
+      await expect(editItem(updateItemData, existingItemId)).rejects.toThrow(
+        AuthorizationError
+      );
+
+      const item = await prisma.item.findUnique({
+        where: { id: existingItemId },
+      });
+
+      if (!item) {
+        throw new Error("No existing item");
+      }
+
+      expect(item.price).not.toBe(1.99);
+      expect(item.date).not.toEqual(new Date("2025-03-18"));
+      expect(item.isSale).not.toBe(false);
+    });
+  });
+
   describe("editGroup", () => {
     const otherUserId = "other-user-id";
     const existingGroupData = {
@@ -592,7 +677,6 @@ describe("Item Repository integration tests", () => {
             id: groupId,
           },
         });
-        console.log("Original group in DB:", originalGroup);
 
         const groupWithDifferentNameNullBrand = {
           ...existingGroupData,
