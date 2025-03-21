@@ -653,6 +653,14 @@ describe("Grocery server actions", () => {
      */
 
     const groupId = "test-group-id";
+    const validGroup = {
+      name: "Test Name",
+      brand: "Test Brand",
+      store: "Test Store",
+      count: 1,
+      amount: 100,
+      unit: "mL",
+    };
 
     beforeEach(() => {
       (verifySession as jest.Mock).mockResolvedValue({
@@ -664,17 +672,7 @@ describe("Grocery server actions", () => {
       it("should return an error if user is not authenticated", async () => {
         (verifySession as jest.Mock).mockResolvedValue(null);
 
-        const result = await editGroupAction(
-          {
-            name: "Test Name",
-            brand: "Test Brand",
-            store: "Test Store",
-            count: 1,
-            amount: 100,
-            unit: "mL",
-          },
-          groupId
-        );
+        const result = await editGroupAction(validGroup, groupId);
 
         expect(verifySession).toHaveBeenCalledWith({ redirect: false });
         expect(result).toHaveProperty("errors");
@@ -688,24 +686,10 @@ describe("Grocery server actions", () => {
 
     describe("successful submission", () => {
       it("should return success true for valid complete data", async () => {
-        const testData = {
-          name: "Test Name",
-          brand: "Test Brand",
-          store: "Test Store",
-          count: 1,
-          amount: 100,
-          unit: "mL",
-        };
-
-        const result = await editGroupAction(testData, groupId);
+        const result = await editGroupAction(validGroup, groupId);
 
         expect(result).toEqual({ success: true });
-        expect(editGroup).toHaveBeenCalledWith(
-          {
-            ...testData,
-          },
-          groupId
-        );
+        expect(editGroup).toHaveBeenCalledWith(validGroup, groupId);
         expect(revalidatePath).toHaveBeenCalledWith("/groceries");
       });
     });
@@ -714,17 +698,7 @@ describe("Grocery server actions", () => {
       it("should handle repository errors gracefully", async () => {
         (editGroup as jest.Mock).mockRejectedValue(new Error("Database error"));
 
-        const result = await editGroupAction(
-          {
-            name: "Test Item",
-            brand: "Test Brand",
-            store: "Test Store",
-            count: 1,
-            amount: 100,
-            unit: "mL",
-          },
-          groupId
-        );
+        const result = await editGroupAction(validGroup, groupId);
 
         expect(result).toHaveProperty("errors");
         expect(result.errors).toHaveProperty("form", "Failed to edit group");
