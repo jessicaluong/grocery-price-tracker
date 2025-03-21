@@ -73,7 +73,7 @@ export default function EditGroupForm({
           label="Count"
           description="Count is for bulk items."
         />
-        <FormInput form={form} name="amount" label="Amount" type="number" />
+        <FormInput form={form} name="amount" label="Amount" />
         <FormSelect
           form={form}
           name="unit"

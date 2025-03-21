@@ -50,7 +50,9 @@ describe("EditGroupForm", () => {
       expect(screen.getByLabelText("Count")).toHaveValue(
         group.count.toString()
       );
-      expect(screen.getByLabelText("Amount")).toHaveValue(group.amount);
+      expect(screen.getByLabelText("Amount")).toHaveValue(
+        group.amount.toString()
+      );
       expect(screen.getByRole("combobox", { name: "Unit" })).toHaveTextContent(
         group.unit
       );
@@ -88,11 +90,15 @@ describe("EditGroupForm", () => {
 
       const nameInput = screen.getByLabelText("Name");
       await user.clear(nameInput);
-      await user.type(screen.getByLabelText("Name"), "apple juice");
+      await user.type(nameInput, "apple juice");
+
+      const amountInput = screen.getByLabelText("Amount");
+      await user.clear(amountInput);
+      await user.type(amountInput, "500");
 
       const countInput = screen.getByLabelText("Count");
       await user.clear(countInput);
-      await user.type(screen.getByLabelText("Count"), "3");
+      await user.type(countInput, "3");
 
       await user.click(screen.getByRole("button", { name: "Save changes" }));
 
@@ -100,6 +106,7 @@ describe("EditGroupForm", () => {
         expect(editGroupAction).toHaveBeenCalledWith(
           expect.objectContaining({
             name: "apple juice",
+            amount: 500,
             count: 3,
           }),
           group.id
