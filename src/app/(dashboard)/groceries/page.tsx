@@ -2,6 +2,8 @@ import { DEFAULT_SORT, DEFAULT_VIEW } from "@/lib/constants";
 import Header from "@/app/(dashboard)/groceries/components/header/header";
 import GroceryList from "@/app/(dashboard)/groceries/components/grocery-list/grocery-list";
 import { SortParamValues, ViewParamValues } from "@/lib/types";
+import { Suspense } from "react";
+import GroceryListLoading from "./components/grocery-list/grocery-list-loading";
 
 type PageProps = {
   searchParams: {
@@ -21,11 +23,13 @@ export default async function Page({ searchParams }: PageProps) {
       <div className="flex w-full max-w-[1200px] sm:border rounded-xl">
         <div className="flex-1 min-w-0  p-[10px]">
           <Header />
-          <GroceryList
-            searchQuery={searchQuery}
-            sortBy={sortBy}
-            viewMode={viewMode}
-          />
+          <Suspense fallback={<GroceryListLoading />}>
+            <GroceryList
+              searchQuery={searchQuery}
+              sortBy={sortBy}
+              viewMode={viewMode}
+            />
+          </Suspense>
         </div>
       </div>
     </main>
