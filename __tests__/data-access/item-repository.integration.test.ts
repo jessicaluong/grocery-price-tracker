@@ -1,5 +1,6 @@
 import {
   addItem,
+  deleteGroup,
   deleteItem,
   editGroup,
   editItem,
@@ -777,6 +778,63 @@ describe("Item Repository integration tests", () => {
       await expect(editGroup(duplicateData, existingGroupId)).rejects.toThrow(
         DuplicateGroupError
       );
+    });
+  });
+
+  describe("deleteGroup", () => {
+    const otherUserId = "other-user-id";
+    const existingGroupData = {
+      name: "Original Name",
+      brand: "Original Brand",
+      store: "Original Store",
+      count: 1,
+      amount: 1,
+      unit: Unit.kg,
+      userId,
+    };
+    let existingGroupId: string;
+
+    beforeEach(async () => {
+      const existingGroup = await prisma.group.create({
+        data: existingGroupData,
+      });
+      existingGroupId = existingGroup.id;
+    });
+
+    afterEach(async () => {
+      await prisma.group.deleteMany({});
+    });
+
+    it("should delete a group successfully", async () => {
+      const groupBeforeDeletion = await prisma.group.findUnique({
+        where: { id: existingGroupId },
+      });
+      expect(groupBeforeDeletion).not.toBeNull();
+
+      await deleteGroup(existingGroupId);
+
+      const groupAfterDeletion = await prisma.group.findUnique({
+        where: { id: existingGroupId },
+      });
+      expect(groupAfterDeletion).toBeNull();
+    });
+
+    it("should prevent delete from unauthorized users", async () => {
+      const groupBeforeAttempt = await prisma.group.findUnique({
+        where: { id: existingGroupId },
+      });
+      expect(groupBeforeAttempt).not.toBeNull();
+
+      (verifySession as jest.Mock).mockResolvedValue({ userId: otherUserId });
+
+      await expect(deleteGroup(existingGroupId)).rejects.toThrow(
+        AuthorizationError
+      );
+
+      const groupAfterAttempt = await prisma.group.findUnique({
+        where: { id: existingGroupId },
+      });
+      expect(groupAfterAttempt).not.toBeNull();
     });
   });
 });

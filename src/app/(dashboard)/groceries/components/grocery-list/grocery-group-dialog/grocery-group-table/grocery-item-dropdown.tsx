@@ -53,49 +53,47 @@ export default function GroceryItemDropdown({ rowData }: DropdownDialogProps) {
   };
 
   return (
-    <>
-      <Dialog>
-        <DropdownMenu modal={false}>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-4 w-4 p-0  flex items-center justify-center"
-            >
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontalIcon />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DialogTrigger
-              asChild
-              onClick={() => {
-                setOpenedDialog("copy");
-              }}
-            >
-              <DropdownMenuItem>
-                <CopyIcon /> Copy Item
-              </DropdownMenuItem>
-            </DialogTrigger>
-            <DialogTrigger
-              asChild
-              onClick={() => {
-                setOpenedDialog("edit");
-              }}
-            >
-              <DropdownMenuItem>
-                <SquarePenIcon /> Edit Item
-              </DropdownMenuItem>
-            </DialogTrigger>
-            <DropdownMenuItem onClick={() => handleDeleteItem()}>
-              <TrashIcon /> Delete Item
+    <Dialog>
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="h-4 w-4 p-0  flex items-center justify-center"
+          >
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontalIcon />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DialogTrigger
+            asChild
+            onClick={() => {
+              setOpenedDialog("copy");
+            }}
+          >
+            <DropdownMenuItem>
+              <CopyIcon /> Copy Item
             </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {openedDialog === "edit" && (
-          <EditItemDialogContent item={rowData} handleClose={handleClose} />
-        )}
-        {openedDialog === "copy" && <CopyItemDialogContent />}
-      </Dialog>
-    </>
+          </DialogTrigger>
+          <DialogTrigger
+            asChild
+            onClick={() => {
+              setOpenedDialog("edit");
+            }}
+          >
+            <DropdownMenuItem>
+              <SquarePenIcon /> Edit Item
+            </DropdownMenuItem>
+          </DialogTrigger>
+          <DropdownMenuItem onClick={() => handleDeleteItem()}>
+            <TrashIcon /> Delete Item
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {openedDialog === "edit" && (
+        <EditItemDialogContent item={rowData} handleClose={handleClose} />
+      )}
+      {openedDialog === "copy" && <CopyItemDialogContent />}
+    </Dialog>
   );
 }

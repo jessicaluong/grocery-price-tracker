@@ -2,6 +2,7 @@
 
 import {
   addItem,
+  deleteGroup,
   deleteItem,
   editGroup,
   editItem,
@@ -125,5 +126,20 @@ export async function editGroupAction(values: unknown, groupId: string) {
       return { errors: { form: error.message } };
     }
     return { errors: { form: "Failed to edit group" } };
+  }
+}
+
+export async function deleteGroupAction(groupId: string) {
+  const session = await verifySession({ redirect: false });
+  if (!session) {
+    return { error: "You must be logged in to delete a group" };
+  }
+
+  try {
+    await deleteGroup(groupId);
+    revalidatePath("/groceries");
+    return { success: true };
+  } catch (error) {
+    return { error: "Failed to delete group" };
   }
 }

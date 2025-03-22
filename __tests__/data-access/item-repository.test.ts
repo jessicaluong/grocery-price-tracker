@@ -1,5 +1,6 @@
 import {
   addItem,
+  deleteGroup,
   deleteItem,
   editGroup,
   editItem,
@@ -413,6 +414,50 @@ describe("Item Repository", () => {
           unit: validGroupData.unit,
         },
       });
+    });
+  });
+
+  describe("deleteGroup", () => {
+    const validGroupId = "test-group-id";
+
+    const mockFoundGroup = {
+      id: "test-group-id",
+      userId: "test-user-id",
+      name: "oats",
+      brand: "Quaker",
+      store: "Superstore",
+      count: 1,
+      amount: 1,
+      unit: Unit.kg,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    it("should throw AuthorizationError when user doesn't own group", async () => {
+      prismaMock.group.findFirst.mockResolvedValue(null); // unauthorized
+
+      await expect(deleteGroup(validGroupId)).rejects.toThrow(
+        AuthorizationError
+      );
+      expect(prismaMock.group.delete).not.toHaveBeenCalled();
+    });
+
+    it("should delete item when user is authorized", async () => {
+      prismaMock.group.findFirst.mockResolvedValue(mockFoundGroup); // authorized
+
+      await deleteGroup(validGroupId);
+
+      expect(prismaMock.group.delete).toHaveBeenCalledWith({
+        where: { id: validGroupId },
+      });
+    });
+
+    it("should propagate errors from database operations", async () => {
+      prismaMock.group.findFirst.mockResolvedValue(mockFoundGroup); // authorized
+
+      prismaMock.group.delete.mockRejectedValue(new Error("Database error"));
+
+      await expect(deleteGroup(validGroupId)).rejects.toThrow("Database error");
     });
   });
 });

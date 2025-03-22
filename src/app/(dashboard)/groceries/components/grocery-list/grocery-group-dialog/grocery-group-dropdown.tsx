@@ -18,6 +18,8 @@ import { useState } from "react";
 import EditGroupDialogContent from "../../group-dialogs/edit-group/edit-group-dialog-content";
 import AddItemForGroupDialog from "./add-item-for-group-dialog";
 import { DbGroup } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
+import { deleteGroupAction } from "@/actions/grocery-actions";
 
 type GroceryGroupDropdownProps = {
   group: DbGroup;
@@ -26,10 +28,32 @@ type GroceryGroupDropdownProps = {
 export default function GroceryGroupDropdown({
   group,
 }: GroceryGroupDropdownProps) {
-  const [openedDialog, setOpenedDialog] = useState<"add" | "edit" | "delete">();
+  const [openedDialog, setOpenedDialog] = useState<"add" | "edit">();
+  const { toast } = useToast();
 
   const handleClose = () => {
     setOpenedDialog(undefined);
+  };
+
+  const handleDeleteGroup = async () => {
+    try {
+      const response = await deleteGroupAction(group.id);
+      if (response.error) {
+        toast({
+          variant: "destructive",
+          description: response.error,
+        });
+      } else if (response.success) {
+        toast({
+          description: "Group deleted.",
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "An error occurred while deleting group",
+      });
+    }
   };
 
   return (
@@ -62,16 +86,9 @@ export default function GroceryGroupDropdown({
               <SquarePenIcon /> Edit Group
             </DropdownMenuItem>
           </DialogTrigger>
-          {/* <DialogTrigger
-            asChild
-            onClick={() => {
-              setOpenedDialog("delete");
-            }}
-          > */}
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleDeleteGroup()}>
             <TrashIcon /> Delete Group
           </DropdownMenuItem>
-          {/* </DialogTrigger> */}
         </DropdownMenuContent>
       </DropdownMenu>
       {openedDialog === "add" && (
@@ -80,7 +97,6 @@ export default function GroceryGroupDropdown({
       {openedDialog === "edit" && (
         <EditGroupDialogContent group={group} handleClose={handleClose} />
       )}
-      {/* {openedDialog === "delete" && <DeleteItemDialogContent />} */}
     </Dialog>
   );
 }

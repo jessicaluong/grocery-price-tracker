@@ -1,11 +1,13 @@
 import {
   addItemAction,
+  deleteGroupAction,
   deleteItemAction,
   editGroupAction,
   editItemAction,
 } from "@/actions/grocery-actions";
 import {
   addItem,
+  deleteGroup,
   deleteItem,
   editGroup,
   editItem,
@@ -23,6 +25,7 @@ jest.mock("@/data-access/item-repository", () => ({
   editItem: jest.fn(),
   deleteItem: jest.fn(),
   editGroup: jest.fn(),
+  deleteGroup: jest.fn(),
 }));
 
 jest.mock("next/cache", () => ({
@@ -737,6 +740,46 @@ describe("Grocery server actions", () => {
 
         expect(result).toHaveProperty("errors");
         expect(result.errors).toHaveProperty("form", "Failed to edit group");
+      });
+    });
+  });
+
+  describe("deleteGroupAction", () => {
+    const groupId = "test-group-id";
+
+    describe("authentication", () => {
+      it("should return an error if user is not authenticated", async () => {
+        (verifySession as jest.Mock).mockResolvedValue(null);
+
+        const result = await deleteGroupAction(groupId);
+
+        expect(verifySession).toHaveBeenCalledWith({ redirect: false });
+        expect(result).toHaveProperty("error");
+        expect(result.error).toBe("You must be logged in to delete a group");
+        expect(deleteGroup).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("successful submission", () => {
+      it("should return success true for valid complete data", async () => {
+        const result = await deleteGroupAction(groupId);
+
+        expect(result).toEqual({ success: true });
+        expect(deleteGroup).toHaveBeenCalledWith(groupId);
+        expect(revalidatePath).toHaveBeenCalledWith("/groceries");
+      });
+    });
+
+    describe("error handling", () => {
+      it("should handle repository errors gracefully", async () => {
+        (deleteGroup as jest.Mock).mockRejectedValue(
+          new Error("Database error")
+        );
+
+        const result = await deleteGroupAction(groupId);
+
+        expect(result).toHaveProperty("error");
+        expect(result.error).toBe("Failed to delete group");
       });
     });
   });

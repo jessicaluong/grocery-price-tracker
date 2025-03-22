@@ -209,6 +209,24 @@ export async function editItem(itemData: TPricePointSchema, itemId: string) {
   });
 }
 
+export async function deleteItem(itemId: string) {
+  const session = await verifySession();
+  if (!session) return null;
+
+  // authorization
+  const currentItem = await prisma.item.findFirst({
+    where: { id: itemId, group: { userId: session.userId } },
+  });
+
+  if (!currentItem) {
+    throw new AuthorizationError();
+  }
+
+  await prisma.item.delete({
+    where: { id: itemId },
+  });
+}
+
 export async function editGroup(groupData: TEditGroupSchema, groupId: string) {
   const session = await verifySession();
   if (!session) return null;
@@ -252,5 +270,23 @@ export async function editGroup(groupData: TEditGroupSchema, groupId: string) {
       amount: groupData.amount,
       unit: groupData.unit,
     },
+  });
+}
+
+export async function deleteGroup(groupId: string) {
+  const session = await verifySession();
+  if (!session) return null;
+
+  // authorization
+  const foundGroup = await prisma.group.findFirst({
+    where: { id: groupId, userId: session.userId },
+  });
+
+  if (!foundGroup) {
+    throw new AuthorizationError();
+  }
+
+  await prisma.group.delete({
+    where: { id: groupId },
   });
 }
