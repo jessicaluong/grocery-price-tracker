@@ -1,4 +1,9 @@
-import { addItem, editGroup, editItem } from "@/data-access/item-repository";
+import {
+  addItem,
+  deleteItem,
+  editGroup,
+  editItem,
+} from "@/data-access/item-repository";
 import prisma from "@/lib/db";
 import { Unit } from "@prisma/client";
 import { verifySession } from "@/lib/auth";
@@ -39,7 +44,7 @@ describe("Item Repository integration tests", () => {
   });
 
   describe("addItem", () => {
-    beforeEach(async () => {
+    afterEach(async () => {
       const deleteItem = prisma.item.deleteMany({});
       const deleteGroup = prisma.group.deleteMany({});
       await prisma.$transaction([deleteItem, deleteGroup]);
@@ -496,6 +501,7 @@ describe("Item Repository integration tests", () => {
   });
 
   describe("editItem", () => {
+    const otherUserId = "other-user-id";
     const existingGroupData = {
       name: "Original Name",
       brand: "Original Brand",
@@ -510,14 +516,11 @@ describe("Item Repository integration tests", () => {
       date: new Date("2025-03-15"),
       isSale: true,
     };
-    const otherUserId = "other-user-id";
-
     const updateItemData = {
       price: 1.99,
       date: new Date("2025-03-18"),
       isSale: false,
     };
-
     let existingItemId: string;
 
     beforeEach(async () => {
@@ -530,7 +533,6 @@ describe("Item Repository integration tests", () => {
           },
         },
       });
-
       const existingGroupId = existingGroup.id;
       const existingItem = await prisma.item.findFirst({
         where: { groupId: existingGroupId },
@@ -577,6 +579,85 @@ describe("Item Repository integration tests", () => {
       expect(item.price).not.toBe(1.99);
       expect(item.date).not.toEqual(new Date("2025-03-18"));
       expect(item.isSale).not.toBe(false);
+    });
+  });
+
+  describe("deleteItem", () => {
+    const otherUserId = "other-user-id";
+    const existingGroupData = {
+      name: "Original Name",
+      brand: "Original Brand",
+      store: "Original Store",
+      count: 1,
+      amount: 1,
+      unit: Unit.kg,
+      userId,
+    };
+    const existingItemData = {
+      price: 4.99,
+      date: new Date("2025-03-15"),
+      isSale: true,
+    };
+    let existingItemId: string;
+
+    beforeEach(async () => {
+      // create an existing item to delete later
+      const existingGroup = await prisma.group.create({
+        data: {
+          ...existingGroupData,
+          items: {
+            create: existingItemData,
+          },
+        },
+      });
+      const existingGroupId = existingGroup.id;
+      const existingItem = await prisma.item.findFirst({
+        where: { groupId: existingGroupId },
+      });
+
+      if (!existingItem) {
+        throw new Error("Failed to create test item");
+      }
+
+      existingItemId = existingItem.id;
+    });
+
+    afterEach(async () => {
+      const deleteItem = prisma.item.deleteMany({});
+      const deleteGroup = prisma.group.deleteMany({});
+      await prisma.$transaction([deleteItem, deleteGroup]);
+    });
+
+    it("should delete an item successfully", async () => {
+      const itemBeforeDeletion = await prisma.item.findUnique({
+        where: { id: existingItemId },
+      });
+      expect(itemBeforeDeletion).not.toBeNull();
+
+      await deleteItem(existingItemId);
+
+      const itemAfterDeletion = await prisma.item.findUnique({
+        where: { id: existingItemId },
+      });
+      expect(itemAfterDeletion).toBeNull();
+    });
+
+    it("should prevent delete from unauthorized users", async () => {
+      const itemBeforeAttempt = await prisma.item.findUnique({
+        where: { id: existingItemId },
+      });
+      expect(itemBeforeAttempt).not.toBeNull();
+
+      (verifySession as jest.Mock).mockResolvedValue({ userId: otherUserId });
+
+      await expect(deleteItem(existingItemId)).rejects.toThrow(
+        AuthorizationError
+      );
+
+      const itemAfterAttempt = await prisma.item.findUnique({
+        where: { id: existingItemId },
+      });
+      expect(itemAfterAttempt).not.toBeNull();
     });
   });
 

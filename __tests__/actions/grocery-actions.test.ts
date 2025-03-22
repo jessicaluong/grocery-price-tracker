@@ -1,9 +1,15 @@
 import {
   addItemAction,
+  deleteItemAction,
   editGroupAction,
   editItemAction,
 } from "@/actions/grocery-actions";
-import { addItem, editGroup, editItem } from "@/data-access/item-repository";
+import {
+  addItem,
+  deleteItem,
+  editGroup,
+  editItem,
+} from "@/data-access/item-repository";
 import { verifySession } from "@/lib/auth";
 import { Unit } from "@/lib/types";
 import { revalidatePath } from "next/cache";
@@ -14,8 +20,9 @@ jest.mock("@/lib/auth", () => ({
 
 jest.mock("@/data-access/item-repository", () => ({
   addItem: jest.fn(),
-  editGroup: jest.fn(),
   editItem: jest.fn(),
+  deleteItem: jest.fn(),
+  editGroup: jest.fn(),
 }));
 
 jest.mock("next/cache", () => ({
@@ -23,13 +30,13 @@ jest.mock("next/cache", () => ({
 }));
 
 describe("Grocery server actions", () => {
-  describe("addItemAction", () => {
-    beforeEach(() => {
-      (verifySession as jest.Mock).mockResolvedValue({
-        userId: "test-user-id",
-      });
+  beforeEach(() => {
+    (verifySession as jest.Mock).mockResolvedValue({
+      userId: "test-user-id",
     });
+  });
 
+  describe("addItemAction", () => {
     describe("authentication", () => {
       it("should return an error if user is not authenticated", async () => {
         (verifySession as jest.Mock).mockResolvedValue(null);
@@ -602,12 +609,6 @@ describe("Grocery server actions", () => {
     const itemId = "test-item-id";
     const validItem = { price: 4.99, date: new Date(), isSale: true };
 
-    beforeEach(() => {
-      (verifySession as jest.Mock).mockResolvedValue({
-        userId: "test-user-id",
-      });
-    });
-
     describe("authentication", () => {
       it("should return an error if user is not authenticated", async () => {
         (verifySession as jest.Mock).mockResolvedValue(null);
@@ -646,6 +647,46 @@ describe("Grocery server actions", () => {
     });
   });
 
+  describe("deleteItemAction", () => {
+    const itemId = "test-item-id";
+
+    describe("authentication", () => {
+      it("should return an error if user is not authenticated", async () => {
+        (verifySession as jest.Mock).mockResolvedValue(null);
+
+        const result = await deleteItemAction(itemId);
+
+        expect(verifySession).toHaveBeenCalledWith({ redirect: false });
+        expect(result).toHaveProperty("error");
+        expect(result.error).toBe("You must be logged in to delete an item");
+        expect(deleteItem).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("successful submission", () => {
+      it("should return success true for valid complete data", async () => {
+        const result = await deleteItemAction(itemId);
+
+        expect(result).toEqual({ success: true });
+        expect(deleteItem).toHaveBeenCalledWith(itemId);
+        expect(revalidatePath).toHaveBeenCalledWith("/groceries");
+      });
+    });
+
+    describe("error handling", () => {
+      it("should handle repository errors gracefully", async () => {
+        (deleteItem as jest.Mock).mockRejectedValue(
+          new Error("Database error")
+        );
+
+        const result = await deleteItemAction(itemId);
+
+        expect(result).toHaveProperty("error");
+        expect(result.error).toBe("Failed to delete item");
+      });
+    });
+  });
+
   describe("editGroupAction", () => {
     /**
      * This server action uses the same validation as addItemAction
@@ -661,12 +702,6 @@ describe("Grocery server actions", () => {
       amount: 100,
       unit: "mL",
     };
-
-    beforeEach(() => {
-      (verifySession as jest.Mock).mockResolvedValue({
-        userId: "test-user-id",
-      });
-    });
 
     describe("authentication", () => {
       it("should return an error if user is not authenticated", async () => {

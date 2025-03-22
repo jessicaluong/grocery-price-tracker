@@ -1,12 +1,16 @@
 "use server";
 
-import { addItem, editGroup, editItem } from "@/data-access/item-repository";
+import {
+  addItem,
+  deleteItem,
+  editGroup,
+  editItem,
+} from "@/data-access/item-repository";
 import { addItemSchema, pricePointSchema } from "@/zod-schemas/item-schemas";
 import { Unit } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import { editGroupSchema } from "@/zod-schemas/group-schemas";
 import { verifySession } from "@/lib/auth";
-import { Prisma } from "@prisma/client";
 import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
 
 export async function addItemAction(values: unknown) {
@@ -67,6 +71,21 @@ export async function editItemAction(values: unknown, itemId: string) {
     return { success: true };
   } catch (error) {
     return { errors: { form: "Failed to edit item" } };
+  }
+}
+
+export async function deleteItemAction(itemId: string) {
+  const session = await verifySession({ redirect: false });
+  if (!session) {
+    return { error: "You must be logged in to delete an item" };
+  }
+
+  try {
+    await deleteItem(itemId);
+    revalidatePath("/groceries");
+    return { success: true };
+  } catch (error) {
+    return { error: "Failed to delete item" };
   }
 }
 

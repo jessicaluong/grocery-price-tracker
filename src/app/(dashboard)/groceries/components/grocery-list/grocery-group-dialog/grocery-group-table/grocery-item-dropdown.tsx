@@ -14,21 +14,42 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { PricePoint } from "@/lib/types";
-import DeleteItemDialogContent from "../../../item-dialogs/delete-item/delete-item-dialog-content";
 import EditItemDialogContent from "../../../item-dialogs/edit-item/edit-item-dialog-content";
 import CopyItemDialogContent from "../../../item-dialogs/copy-item/copy-item-dialog-content";
+import { deleteItemAction } from "@/actions/grocery-actions";
+import { useToast } from "@/hooks/use-toast";
 
 type DropdownDialogProps = {
   rowData: PricePoint;
 };
 
 export default function GroceryItemDropdown({ rowData }: DropdownDialogProps) {
-  const [openedDialog, setOpenedDialog] = useState<
-    "copy" | "edit" | "delete"
-  >();
+  const [openedDialog, setOpenedDialog] = useState<"copy" | "edit">();
+  const { toast } = useToast();
 
   const handleClose = () => {
     setOpenedDialog(undefined);
+  };
+
+  const handleDeleteItem = async () => {
+    try {
+      const response = await deleteItemAction(rowData.id);
+      if (response.error) {
+        toast({
+          variant: "destructive",
+          description: response.error,
+        });
+      } else if (response.success) {
+        toast({
+          description: "Item deleted.",
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "An error occurred while deleting item",
+      });
+    }
   };
 
   return (
@@ -65,19 +86,11 @@ export default function GroceryItemDropdown({ rowData }: DropdownDialogProps) {
                 <SquarePenIcon /> Edit Item
               </DropdownMenuItem>
             </DialogTrigger>
-            <DialogTrigger
-              asChild
-              onClick={() => {
-                setOpenedDialog("delete");
-              }}
-            >
-              <DropdownMenuItem>
-                <TrashIcon /> Delete Item
-              </DropdownMenuItem>
-            </DialogTrigger>
+            <DropdownMenuItem onClick={() => handleDeleteItem()}>
+              <TrashIcon /> Delete Item
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        {openedDialog === "delete" && <DeleteItemDialogContent />}
         {openedDialog === "edit" && (
           <EditItemDialogContent item={rowData} handleClose={handleClose} />
         )}

@@ -1,4 +1,9 @@
-import { addItem, editGroup, editItem } from "@/data-access/item-repository";
+import {
+  addItem,
+  deleteItem,
+  editGroup,
+  editItem,
+} from "@/data-access/item-repository";
 import { prismaMock } from "../../test/prisma-mock";
 import { Unit } from "@prisma/client";
 import { verifySession } from "@/lib/auth";
@@ -178,6 +183,45 @@ describe("Item Repository", () => {
           },
         },
       });
+    });
+  });
+
+  describe("deleteItem", () => {
+    const validItemId = "test-item-id";
+
+    const mockFoundItem = {
+      date: new Date("2025-03-01"),
+      price: 5.99,
+      isSale: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      id: validItemId,
+      groupId: "test-group-id",
+    };
+
+    it("should throw AuthorizationError when user doesn't own item", async () => {
+      prismaMock.item.findFirst.mockResolvedValue(null); // unauthorized
+
+      await expect(deleteItem(validItemId)).rejects.toThrow(AuthorizationError);
+      expect(prismaMock.item.delete).not.toHaveBeenCalled();
+    });
+
+    it("should delete item when user is authorized", async () => {
+      prismaMock.item.findFirst.mockResolvedValue(mockFoundItem); // authorized
+
+      await deleteItem(validItemId);
+
+      expect(prismaMock.item.delete).toHaveBeenCalledWith({
+        where: { id: validItemId },
+      });
+    });
+
+    it("should propagate errors from database operations", async () => {
+      prismaMock.item.findFirst.mockResolvedValue(mockFoundItem); // authorized
+
+      prismaMock.item.delete.mockRejectedValue(new Error("Database error"));
+
+      await expect(deleteItem(validItemId)).rejects.toThrow("Database error");
     });
   });
 
