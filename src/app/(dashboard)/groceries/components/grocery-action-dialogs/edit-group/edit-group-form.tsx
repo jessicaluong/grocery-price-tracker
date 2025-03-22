@@ -2,7 +2,7 @@
 
 import ErrorCallout from "@/components/form/error-callout";
 import { Form } from "@/components/ui/form";
-import { DbGroup, ServerErrors, UnitEnum } from "@/lib/types";
+import { DbGroup, ServerErrors, UnitEnum } from "@/types/grocery";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import FormInput from "../../grocery-action-dialogs/shared/item-form/item-form-input";

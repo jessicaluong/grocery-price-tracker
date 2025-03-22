@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { useUrlParams } from "@/lib/hooks";
+import { useUrlParams } from "@/hooks/use-url-params";
 import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";

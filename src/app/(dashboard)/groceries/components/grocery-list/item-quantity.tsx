@@ -1,4 +1,4 @@
-import { Unit } from "@/lib/types";
+import { Unit } from "@/types/grocery";
 
 type ItemQuantityProps = {
   count: number;

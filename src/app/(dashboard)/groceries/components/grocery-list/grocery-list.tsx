@@ -1,5 +1,9 @@
 import GroceryItemCard from "./grocery-item-card";
-import { ItemWithView, SortParamValues, ViewParamValues } from "@/lib/types";
+import {
+  ItemWithView,
+  SortParamValues,
+  ViewParamValues,
+} from "@/types/grocery";
 import { getItems } from "@/data-access/grocery-data";
 import { getFilteredItemsWithView } from "./grocery-list-utils";
 import { ShoppingCart } from "lucide-react";

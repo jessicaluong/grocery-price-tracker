@@ -9,7 +9,7 @@ import { z } from "zod";
 import FormInput from "@/components/form/form-input";
 import { signIn } from "next-auth/react";
 import ErrorCallout from "@/components/form/error-callout";
-import { ServerErrors } from "@/lib/types";
+import { ServerErrors } from "@/types/grocery";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 

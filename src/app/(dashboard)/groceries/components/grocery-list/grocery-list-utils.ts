@@ -6,7 +6,7 @@ import {
   GroupMap,
   SortParamValues,
   ViewParamValues,
-} from "@/lib/types";
+} from "@/types/grocery";
 import { VIEW_OPTIONS } from "@/lib/constants";
 
 export const compareNumbersAscending = (a: number, b: number): number => a - b;

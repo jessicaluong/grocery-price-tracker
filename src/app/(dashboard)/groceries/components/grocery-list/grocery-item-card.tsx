@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { ItemWithView } from "@/lib/types";
+import { ItemWithView } from "@/types/grocery";
 import GroceryGroupDialog from "./grocery-group-dialog/grocery-group-dialog";
 import { useState } from "react";
 import { ItemQuantity } from "./item-quantity";

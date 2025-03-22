@@ -9,7 +9,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { PricePoint } from "@/lib/types";
+import { PricePoint } from "@/types/grocery";
 
 type PriceChartProps = {
   priceHistory: PricePoint[];

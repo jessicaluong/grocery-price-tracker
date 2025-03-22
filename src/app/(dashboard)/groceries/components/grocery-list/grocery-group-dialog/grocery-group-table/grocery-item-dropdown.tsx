@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontalIcon, TrashIcon, SquarePenIcon } from "lucide-react";
 import { useState } from "react";
-import { PricePoint } from "@/lib/types";
+import { PricePoint } from "@/types/grocery";
 import EditItemDialogContent from "../../../grocery-action-dialogs/edit-item/edit-item-dialog-content";
 import { deleteItemAction } from "@/actions/grocery-actions";
 import { useToast } from "@/hooks/use-toast";

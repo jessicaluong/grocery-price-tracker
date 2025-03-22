@@ -9,7 +9,7 @@ import {
   editItem,
 } from "@/data-access/grocery-data";
 import { itemSchema, pricePointSchema } from "@/zod-schemas/grocery-schemas";
-import { Unit } from "@/lib/types";
+import { Unit } from "@/types/grocery";
 import { revalidatePath } from "next/cache";
 import { groupSchema } from "@/zod-schemas/grocery-schemas";
 import { verifySession } from "@/lib/auth";

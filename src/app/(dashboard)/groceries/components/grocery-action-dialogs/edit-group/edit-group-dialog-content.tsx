@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import EditGroupForm from "./edit-group-form";
-import { DbGroup } from "@/lib/types";
+import { DbGroup } from "@/types/grocery";
 import { ItemQuantity } from "../../grocery-list/item-quantity";
 
 type EditGroupDialogProps = {

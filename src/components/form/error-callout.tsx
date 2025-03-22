@@ -1,7 +1,7 @@
 import { AlertCircle } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ServerErrors } from "@/lib/types";
+import { ServerErrors } from "@/types/grocery";
 
 type ErrorCalloutProps = {
   errors: ServerErrors;

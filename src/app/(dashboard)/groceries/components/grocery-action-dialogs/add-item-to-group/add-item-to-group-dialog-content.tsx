@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { DbGroup } from "@/lib/types";
+import { DbGroup } from "@/types/grocery";
 import { ItemQuantity } from "../../grocery-list/item-quantity";
 import AddItemToGroupForm from "./add-item-to-group-form";
 

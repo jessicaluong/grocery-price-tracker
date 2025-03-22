@@ -1,9 +1,9 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import SortAndViewControls from "@/app/(dashboard)/groceries/components/header/sort-and-view-controls";
-import { useUrlParams } from "@/lib/hooks";
+import { useUrlParams } from "@/hooks/use-url-params";
 import { SORT_OPTIONS, VIEW_OPTIONS } from "@/lib/constants";
 
-jest.mock("@/lib/hooks", () => ({
+jest.mock("@/hooks/use-url-params", () => ({
   useUrlParams: jest.fn(),
 }));
 

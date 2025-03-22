@@ -1,7 +1,7 @@
 import { DEFAULT_SORT, DEFAULT_VIEW } from "@/lib/constants";
 import Header from "@/app/(dashboard)/groceries/components/header/header";
 import GroceryList from "@/app/(dashboard)/groceries/components/grocery-list/grocery-list";
-import { SortParamValues, ViewParamValues } from "@/lib/types";
+import { SortParamValues, ViewParamValues } from "@/types/grocery";
 import { Suspense } from "react";
 import GroceryListLoading from "./components/grocery-list/grocery-list-loading";
 

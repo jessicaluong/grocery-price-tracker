@@ -13,7 +13,7 @@ import {
 import { registerUserAction } from "@/actions/auth-actions";
 import { useState } from "react";
 import ErrorCallout from "@/components/form/error-callout";
-import { ServerErrors } from "@/lib/types";
+import { ServerErrors } from "@/types/grocery";
 import { useRouter } from "next/navigation";
 
 type RegisterFormProps = {

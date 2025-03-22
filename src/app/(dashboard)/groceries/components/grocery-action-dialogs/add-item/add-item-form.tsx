@@ -4,7 +4,7 @@ import { addItemAction } from "@/actions/grocery-actions";
 import { DialogFooter } from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { ServerErrors, UnitEnum } from "@/lib/types";
+import { ServerErrors, UnitEnum } from "@/types/grocery";
 import FormButton from "@/components/form/form-button";
 import { itemSchema, TItemSchema } from "@/zod-schemas/grocery-schemas";
 import { useState } from "react";

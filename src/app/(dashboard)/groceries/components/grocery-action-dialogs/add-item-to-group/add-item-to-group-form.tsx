@@ -2,7 +2,7 @@ import { addItemToGroupAction } from "@/actions/grocery-actions";
 import ErrorCallout from "@/components/form/error-callout";
 import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { DbGroup, ServerErrors } from "@/lib/types";
+import { DbGroup, ServerErrors } from "@/types/grocery";
 import {
   pricePointSchema,
   TPricePointSchema,

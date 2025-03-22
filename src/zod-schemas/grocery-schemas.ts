@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UnitSchema } from "../lib/types";
+import { UnitSchema } from "../types/grocery";
 
 export const pricePointSchema = z.object({
   date: z.date(),

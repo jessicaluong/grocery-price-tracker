@@ -2,8 +2,8 @@
 
 import SortAndViewSelect from "./sort-and-view-select";
 import { SORT_OPTIONS, VIEW_OPTIONS } from "@/lib/constants";
-import { SortDisplayValues, ViewDisplayValues } from "@/lib/types";
-import { useUrlParams } from "@/lib/hooks";
+import { SortDisplayValues, ViewDisplayValues } from "@/types/grocery";
+import { useUrlParams } from "@/hooks/use-url-params";
 
 export default function SortAndViewControls() {
   const { getDisplayValue, updateParam } = useUrlParams();

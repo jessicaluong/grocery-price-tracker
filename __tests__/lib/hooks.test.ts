@@ -1,7 +1,7 @@
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { getDisplayFromParam, getParamFromDisplay } from "@/lib/utils";
 import { act, renderHook } from "@testing-library/react";
-import { useUrlParams } from "@/lib/hooks";
+import { useUrlParams } from "@/hooks/use-url-params";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),

@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { editGroupAction } from "@/actions/grocery-actions";
-import { Unit } from "@/lib/types";
+import { Unit } from "@/types/grocery";
 import { useToast } from "@/hooks/use-toast";
 import EditGroupForm from "@/app/(dashboard)/groceries/components/grocery-action-dialogs/edit-group/edit-group-form";
 

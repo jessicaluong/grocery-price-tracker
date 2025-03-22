@@ -1,4 +1,4 @@
-import { PricePoint } from "@/lib/types";
+import { PricePoint } from "@/types/grocery";
 import { currencyFormat, formatDate } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { SaleIndicator } from "../../sale-indicator";

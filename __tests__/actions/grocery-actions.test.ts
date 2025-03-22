@@ -15,7 +15,7 @@ import {
   editItem,
 } from "@/data-access/grocery-data";
 import { verifySession } from "@/lib/auth";
-import { Unit } from "@/lib/types";
+import { Unit } from "@/types/grocery";
 import { revalidatePath } from "next/cache";
 
 jest.mock("@/lib/auth", () => ({

@@ -1,9 +1,9 @@
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { SearchBar } from "@/app/(dashboard)/groceries/components/header/search-bar";
-import { useUrlParams } from "@/lib/hooks";
+import { useUrlParams } from "@/hooks/use-url-params";
 
-jest.mock("@/lib/hooks", () => ({
+jest.mock("@/hooks/use-url-params", () => ({
   useUrlParams: jest.fn(),
 }));
 

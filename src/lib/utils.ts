@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Unit } from "./types";
+import { Unit } from "../types/grocery";
 import {
   DEFAULT_SORT,
   DEFAULT_VIEW,

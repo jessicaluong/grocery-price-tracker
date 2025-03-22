@@ -9,7 +9,12 @@ import {
   sortGroups,
   groupMapToArray,
 } from "@/app/(dashboard)/groceries/components/grocery-list/grocery-list-utils";
-import { GroceryGroup, GroceryItem, GroupMap, PricePoint } from "@/lib/types";
+import {
+  GroceryGroup,
+  GroceryItem,
+  GroupMap,
+  PricePoint,
+} from "@/types/grocery";
 
 describe("GroceryListUtils", () => {
   describe("compareNumbersAscending", () => {

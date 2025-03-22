@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PricePoint } from "@/lib/types";
+import { PricePoint } from "@/types/grocery";
 import EditItemForm from "./edit-item-form";
 
 type EditItemDialogContentProps = {

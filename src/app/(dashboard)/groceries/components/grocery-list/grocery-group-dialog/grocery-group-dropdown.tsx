@@ -15,7 +15,7 @@ import {
   TrashIcon,
 } from "lucide-react";
 import { useState } from "react";
-import { DbGroup } from "@/lib/types";
+import { DbGroup } from "@/types/grocery";
 import { useToast } from "@/hooks/use-toast";
 import { deleteGroupAction } from "@/actions/grocery-actions";
 import AddItemToGroupDialogContent from "../../grocery-action-dialogs/add-item-to-group/add-item-to-group-dialog-content";

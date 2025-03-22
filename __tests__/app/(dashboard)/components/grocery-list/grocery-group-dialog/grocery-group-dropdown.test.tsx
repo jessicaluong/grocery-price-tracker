@@ -1,6 +1,6 @@
 import { deleteGroupAction } from "@/actions/grocery-actions";
 import GroceryGroupDropdown from "@/app/(dashboard)/groceries/components/grocery-list/grocery-group-dialog/grocery-group-dropdown";
-import { Unit } from "@/lib/types";
+import { Unit } from "@/types/grocery";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useToast } from "@/hooks/use-toast";

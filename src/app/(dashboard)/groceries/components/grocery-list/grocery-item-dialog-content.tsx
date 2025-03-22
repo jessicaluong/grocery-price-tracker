@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ItemWithView, PriceHistoryData } from "@/lib/types";
+import { ItemWithView, PriceHistoryData } from "@/types/grocery";
 import { PriceChart } from "./price-chart";
 import { currencyFormat } from "@/lib/utils";
 import { SaleIndicator } from "./sale-indicator";

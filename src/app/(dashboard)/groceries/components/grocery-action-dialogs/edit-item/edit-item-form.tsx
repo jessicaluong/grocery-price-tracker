@@ -4,7 +4,7 @@ import { addItemAction, editItemAction } from "@/actions/grocery-actions";
 import { DialogFooter } from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { PricePoint, ServerErrors } from "@/lib/types";
+import { PricePoint, ServerErrors } from "@/types/grocery";
 import FormButton from "@/components/form/form-button";
 import {
   pricePointSchema,
