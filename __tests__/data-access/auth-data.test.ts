@@ -1,4 +1,4 @@
-import { registerUser } from "@/data-access/user-repository";
+import { registerUser } from "@/data-access/auth-data";
 import prisma from "@/lib/db";
 import bcrypt from "bcrypt";
 

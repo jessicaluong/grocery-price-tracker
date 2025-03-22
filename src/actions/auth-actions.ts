@@ -1,7 +1,7 @@
 "use server";
 
 import { registerSchema } from "@/zod-schemas/auth-schemas";
-import { registerUser } from "@/data-access/user-repository";
+import { registerUser } from "@/data-access/auth-data";
 
 export async function registerUserAction(values: unknown) {
   const validatedFields = registerSchema.safeParse(values);

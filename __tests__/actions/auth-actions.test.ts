@@ -1,7 +1,7 @@
 import { registerUserAction } from "@/actions/auth-actions";
-import { registerUser } from "@/data-access/user-repository";
+import { registerUser } from "@/data-access/auth-data";
 
-jest.mock("@/data-access/user-repository", () => ({
+jest.mock("@/data-access/auth-data", () => ({
   registerUser: jest.fn(),
 }));
 

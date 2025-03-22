@@ -7,7 +7,7 @@ import {
   deleteItem,
   editGroup,
   editItem,
-} from "@/data-access/item-repository";
+} from "@/data-access/grocery-data";
 import { addItemSchema, pricePointSchema } from "@/zod-schemas/item-schemas";
 import { Unit } from "@/lib/types";
 import { revalidatePath } from "next/cache";

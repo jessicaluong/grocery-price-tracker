@@ -5,7 +5,7 @@ import {
   deleteItem,
   editGroup,
   editItem,
-} from "@/data-access/item-repository";
+} from "@/data-access/grocery-data";
 import prisma from "@/lib/db";
 import { Unit } from "@prisma/client";
 import { verifySession } from "@/lib/auth";

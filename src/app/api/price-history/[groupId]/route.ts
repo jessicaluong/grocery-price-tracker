@@ -1,4 +1,4 @@
-import { getPriceHistoryByGroupId } from "@/data-access/item-repository";
+import { getPriceHistoryByGroupId } from "@/data-access/grocery-data";
 import { NextResponse } from "next/server";
 
 // TODO: add cache (Next.js side or Prisma side?)

@@ -13,7 +13,7 @@ import {
   deleteItem,
   editGroup,
   editItem,
-} from "@/data-access/item-repository";
+} from "@/data-access/grocery-data";
 import { verifySession } from "@/lib/auth";
 import { Unit } from "@/lib/types";
 import { revalidatePath } from "next/cache";
@@ -22,7 +22,7 @@ jest.mock("@/lib/auth", () => ({
   verifySession: jest.fn(),
 }));
 
-jest.mock("@/data-access/item-repository", () => ({
+jest.mock("@/data-access/grocery-data", () => ({
   addItem: jest.fn(),
   editItem: jest.fn(),
   deleteItem: jest.fn(),
