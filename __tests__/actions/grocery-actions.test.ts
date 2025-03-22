@@ -1,5 +1,6 @@
 import {
   addItemAction,
+  addItemToGroupAction,
   deleteGroupAction,
   deleteItemAction,
   editGroupAction,
@@ -7,6 +8,7 @@ import {
 } from "@/actions/grocery-actions";
 import {
   addItem,
+  addItemToGroup,
   deleteGroup,
   deleteItem,
   editGroup,
@@ -26,6 +28,7 @@ jest.mock("@/data-access/item-repository", () => ({
   deleteItem: jest.fn(),
   editGroup: jest.fn(),
   deleteGroup: jest.fn(),
+  addItemToGroup: jest.fn(),
 }));
 
 jest.mock("next/cache", () => ({
@@ -686,6 +689,54 @@ describe("Grocery server actions", () => {
 
         expect(result).toHaveProperty("error");
         expect(result.error).toBe("Failed to delete item");
+      });
+    });
+  });
+
+  describe("addItemToGroupAction", () => {
+    /**
+     * This server action uses the same validation as addItemAction
+     * These tests focus only on addItemToGroupAction-specific behavior
+     */
+    const groupId = "test-group-id";
+    const validItem = { price: 4.99, date: new Date(), isSale: true };
+
+    describe("authentication", () => {
+      it("should return an error if user is not authenticated", async () => {
+        (verifySession as jest.Mock).mockResolvedValue(null);
+
+        const result = await addItemToGroupAction(validItem, groupId);
+
+        expect(verifySession).toHaveBeenCalledWith({ redirect: false });
+        expect(result).toHaveProperty("errors");
+        expect(result.errors).toHaveProperty(
+          "form",
+          "You must be logged in to add an item"
+        );
+        expect(addItemToGroup).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("successful submission", () => {
+      it("should return success true for valid complete data", async () => {
+        const result = await addItemToGroupAction(validItem, groupId);
+
+        expect(result).toEqual({ success: true });
+        expect(addItemToGroup).toHaveBeenCalledWith(validItem, groupId);
+        expect(revalidatePath).toHaveBeenCalledWith("/groceries");
+      });
+    });
+
+    describe("error handling", () => {
+      it("should handle repository errors gracefully", async () => {
+        (addItemToGroup as jest.Mock).mockRejectedValue(
+          new Error("Database error")
+        );
+
+        const result = await addItemToGroupAction(validItem, groupId);
+
+        expect(result).toHaveProperty("errors");
+        expect(result.errors).toHaveProperty("form", "Failed to add item");
       });
     });
   });

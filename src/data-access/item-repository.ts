@@ -227,6 +227,32 @@ export async function deleteItem(itemId: string) {
   });
 }
 
+export async function addItemToGroup(
+  itemData: TPricePointSchema,
+  groupId: string
+) {
+  const session = await verifySession();
+  if (!session) return null;
+
+  // authorization
+  const foundGroup = await prisma.group.findFirst({
+    where: { id: groupId, userId: session.userId },
+  });
+
+  if (!foundGroup) {
+    throw new AuthorizationError();
+  }
+
+  await prisma.item.create({
+    data: {
+      date: itemData.date,
+      price: itemData.price,
+      isSale: itemData.isSale,
+      groupId: groupId,
+    },
+  });
+}
+
 export async function editGroup(groupData: TEditGroupSchema, groupId: string) {
   const session = await verifySession();
   if (!session) return null;

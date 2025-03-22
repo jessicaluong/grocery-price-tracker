@@ -1,5 +1,6 @@
 import {
   addItem,
+  addItemToGroup,
   deleteGroup,
   deleteItem,
   editGroup,
@@ -275,6 +276,64 @@ describe("Item Repository", () => {
       prismaMock.item.update.mockRejectedValue(new Error("Database error"));
 
       await expect(editItem(validItemData, validItemId)).rejects.toThrow(
+        "Database error"
+      );
+    });
+  });
+
+  describe("addItemToGroup", () => {
+    const validGroupId = "test-group-id";
+
+    const validItemData = {
+      date: new Date("2025-03-01"),
+      price: 5.99,
+      isSale: true,
+    };
+
+    const mockFoundGroup = {
+      id: "test-group-id",
+      userId: "test-user-id",
+      name: "oats",
+      brand: "Quaker",
+      store: "Superstore",
+      count: 1,
+      amount: 1,
+      unit: Unit.kg,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    it("should throw AuthorizationError when user doesn't own group", async () => {
+      prismaMock.group.findFirst.mockResolvedValue(null); // unauthorized
+
+      await expect(addItemToGroup(validItemData, validGroupId)).rejects.toThrow(
+        AuthorizationError
+      );
+
+      expect(prismaMock.item.create).not.toHaveBeenCalled();
+    });
+
+    it("should add item to group when user is authorized", async () => {
+      prismaMock.group.findFirst.mockResolvedValue(mockFoundGroup); // authorized
+
+      await addItemToGroup(validItemData, validGroupId);
+
+      expect(prismaMock.item.create).toHaveBeenCalledWith({
+        data: {
+          date: validItemData.date,
+          price: validItemData.price,
+          isSale: validItemData.isSale,
+          groupId: validGroupId,
+        },
+      });
+    });
+
+    it("should propagate errors from database operations", async () => {
+      prismaMock.group.findFirst.mockResolvedValue(mockFoundGroup); // authorized
+
+      prismaMock.item.create.mockRejectedValue(new Error("Database error"));
+
+      await expect(addItemToGroup(validItemData, validGroupId)).rejects.toThrow(
         "Database error"
       );
     });

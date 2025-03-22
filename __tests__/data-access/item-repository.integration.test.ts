@@ -1,5 +1,6 @@
 import {
   addItem,
+  addItemToGroup,
   deleteGroup,
   deleteItem,
   editGroup,
@@ -661,6 +662,89 @@ describe("Item Repository integration tests", () => {
         where: { id: existingItemId },
       });
       expect(itemAfterAttempt).not.toBeNull();
+    });
+  });
+
+  describe("addItemToGroup", () => {
+    const otherUserId = "other-user-id";
+
+    const newItemData = {
+      price: 4.99,
+      date: new Date("2025-03-15"),
+      isSale: true,
+    };
+
+    const existingGroupData = {
+      name: "Original Name",
+      brand: "Original Brand",
+      store: "Original Store",
+      count: 1,
+      amount: 1,
+      unit: Unit.kg,
+      userId,
+    };
+
+    let existingGroupId: string;
+
+    beforeAll(async () => {
+      const existingGroup = await prisma.group.create({
+        data: existingGroupData,
+      });
+      existingGroupId = existingGroup.id;
+    });
+
+    afterEach(async () => {
+      await prisma.item.deleteMany({});
+    });
+
+    afterAll(async () => {
+      const deleteItem = prisma.item.deleteMany({});
+      const deleteGroup = prisma.group.deleteMany({});
+      await prisma.$transaction([deleteItem, deleteGroup]);
+    });
+
+    it("should add an item to group successfully", async () => {
+      const groupBeforeAdd = await prisma.group.findUnique({
+        where: { id: existingGroupId },
+        include: { items: true },
+      });
+      expect(groupBeforeAdd?.items.length).toBe(0);
+
+      await addItemToGroup(newItemData, existingGroupId);
+
+      const groupAfterAdd = await prisma.group.findUnique({
+        where: { id: existingGroupId },
+        include: { items: true },
+      });
+      expect(groupAfterAdd?.items.length).toBe(1);
+
+      const addedItem = groupAfterAdd?.items[0];
+      expect(addedItem?.price).toBe(newItemData.price);
+      expect(addedItem?.isSale).toBe(newItemData.isSale);
+      expect(addedItem?.date.toISOString()).toBe(
+        newItemData.date.toISOString()
+      );
+      expect(addedItem?.groupId).toBe(existingGroupId);
+    });
+
+    it("should prevent add from unauthorized users", async () => {
+      const groupBeforeAttempt = await prisma.group.findUnique({
+        where: { id: existingGroupId },
+        include: { items: true },
+      });
+      expect(groupBeforeAttempt?.items.length).toBe(0);
+
+      (verifySession as jest.Mock).mockResolvedValue({ userId: otherUserId });
+
+      await expect(
+        addItemToGroup(newItemData, existingGroupId)
+      ).rejects.toThrow(AuthorizationError);
+
+      const groupAfterAttempt = await prisma.group.findUnique({
+        where: { id: existingGroupId },
+        include: { items: true },
+      });
+      expect(groupAfterAttempt?.items.length).toBe(0);
     });
   });
 

@@ -2,6 +2,7 @@
 
 import {
   addItem,
+  addItemToGroup,
   deleteGroup,
   deleteItem,
   editGroup,
@@ -87,6 +88,30 @@ export async function deleteItemAction(itemId: string) {
     return { success: true };
   } catch (error) {
     return { error: "Failed to delete item" };
+  }
+}
+
+export async function addItemToGroupAction(values: unknown, groupId: string) {
+  const session = await verifySession({ redirect: false });
+  if (!session) {
+    return { errors: { form: "You must be logged in to add an item" } };
+  }
+
+  const validatedFields = pricePointSchema.safeParse(values);
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const data = validatedFields.data;
+    await addItemToGroup(data, groupId);
+    revalidatePath("/groceries");
+    return { success: true };
+  } catch (error) {
+    return { errors: { form: "Failed to add item" } };
   }
 }
 

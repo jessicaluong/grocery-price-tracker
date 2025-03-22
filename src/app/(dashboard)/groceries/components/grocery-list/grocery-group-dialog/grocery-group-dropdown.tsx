@@ -16,10 +16,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import EditGroupDialogContent from "../../group-dialogs/edit-group/edit-group-dialog-content";
-import AddItemForGroupDialog from "./add-item-for-group-dialog";
 import { DbGroup } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { deleteGroupAction } from "@/actions/grocery-actions";
+import AddItemToGroupDialogContent from "../../group-dialogs/add-item-to-group/add-item-to-group-dialog-content";
 
 type GroceryGroupDropdownProps = {
   group: DbGroup;
@@ -92,7 +92,7 @@ export default function GroceryGroupDropdown({
         </DropdownMenuContent>
       </DropdownMenu>
       {openedDialog === "add" && (
-        <AddItemForGroupDialog group={group} handleClose={handleClose} />
+        <AddItemToGroupDialogContent group={group} handleClose={handleClose} />
       )}
       {openedDialog === "edit" && (
         <EditGroupDialogContent group={group} handleClose={handleClose} />
