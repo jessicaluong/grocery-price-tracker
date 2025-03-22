@@ -10,7 +10,7 @@ import { FormSelect } from "../../item-dialogs/shared/item-form/item-form-select
 import { DialogFooter } from "@/components/ui/dialog";
 import FormButton from "@/components/form/form-button";
 import { useState } from "react";
-import { editGroupSchema, TEditGroupSchema } from "@/zod-schemas/group-schemas";
+import { groupSchema, TGroupSchema } from "@/zod-schemas/grocery-schemas";
 import { editGroupAction } from "@/actions/grocery-actions";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,8 +23,8 @@ export default function EditGroupForm({
   group,
   onSuccess,
 }: EditGroupFormProps) {
-  const form = useForm<TEditGroupSchema>({
-    resolver: zodResolver(editGroupSchema),
+  const form = useForm<TGroupSchema>({
+    resolver: zodResolver(groupSchema),
     defaultValues: {
       name: group.name,
       brand: group.brand,
@@ -39,7 +39,7 @@ export default function EditGroupForm({
   const { isSubmitting } = form.formState;
   const { toast } = useToast();
 
-  async function onSubmit(values: TEditGroupSchema) {
+  async function onSubmit(values: TGroupSchema) {
     try {
       const response = await editGroupAction(values, group.id);
       if (response.errors) {

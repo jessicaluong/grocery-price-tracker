@@ -1,7 +1,18 @@
 import { z } from "zod";
 import { UnitSchema } from "../lib/types";
 
-export const editGroupSchema = z.object({
+export const pricePointSchema = z.object({
+  date: z.date(),
+  price: z.coerce
+    .number({ invalid_type_error: "Price must be a number" })
+    .nonnegative("Price cannot be negative")
+    .transform((val) => parseFloat(val.toFixed(2))),
+  isSale: z.boolean().default(false),
+});
+
+export type TPricePointSchema = z.infer<typeof pricePointSchema>;
+
+export const groupSchema = z.object({
   name: z
     .string()
     .min(1, "Item name is required")
@@ -31,4 +42,8 @@ export const editGroupSchema = z.object({
   unit: UnitSchema,
 });
 
-export type TEditGroupSchema = z.infer<typeof editGroupSchema>;
+export type TGroupSchema = z.infer<typeof groupSchema>;
+
+export const itemSchema = groupSchema.merge(pricePointSchema);
+
+export type TItemSchema = z.infer<typeof itemSchema>;

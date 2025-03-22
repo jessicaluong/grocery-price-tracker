@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { ServerErrors, UnitEnum } from "@/lib/types";
 import FormButton from "@/components/form/form-button";
-import { addItemSchema, TAddItemSchema } from "@/zod-schemas/item-schemas";
+import { itemSchema, TItemSchema } from "@/zod-schemas/grocery-schemas";
 import { useState } from "react";
 import ErrorCallout from "@/components/form/error-callout";
 import { Form } from "@/components/ui/form";
@@ -21,8 +21,8 @@ type AddItemFormProps = {
 };
 
 export default function AddItemForm({ onSuccess }: AddItemFormProps) {
-  const form = useForm<TAddItemSchema>({
-    resolver: zodResolver(addItemSchema),
+  const form = useForm<TItemSchema>({
+    resolver: zodResolver(itemSchema),
     defaultValues: {
       name: "",
       brand: "",
@@ -38,7 +38,7 @@ export default function AddItemForm({ onSuccess }: AddItemFormProps) {
   const { isSubmitting } = form.formState;
   const { toast } = useToast();
 
-  async function onSubmit(values: TAddItemSchema) {
+  async function onSubmit(values: TItemSchema) {
     try {
       const response = await addItemAction(values);
       if (response.errors) {

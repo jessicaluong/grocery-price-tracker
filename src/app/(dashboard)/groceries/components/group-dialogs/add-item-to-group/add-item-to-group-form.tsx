@@ -6,7 +6,7 @@ import { DbGroup, ServerErrors } from "@/lib/types";
 import {
   pricePointSchema,
   TPricePointSchema,
-} from "@/zod-schemas/item-schemas";
+} from "@/zod-schemas/grocery-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";

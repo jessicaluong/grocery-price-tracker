@@ -1,6 +1,6 @@
 import prisma from "@/lib/db";
-import { TAddItemSchema, TPricePointSchema } from "@/zod-schemas/item-schemas";
-import { TEditGroupSchema } from "@/zod-schemas/group-schemas";
+import { TItemSchema, TPricePointSchema } from "@/zod-schemas/grocery-schemas";
+import { TGroupSchema } from "@/zod-schemas/grocery-schemas";
 import { verifySession } from "@/lib/auth";
 import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
 
@@ -137,7 +137,7 @@ export async function getPriceHistoryByGroupId(id: string) {
   }
 }
 
-export async function addItem(item: TAddItemSchema & { userId: string }) {
+export async function addItem(item: TItemSchema & { userId: string }) {
   const session = await verifySession();
   if (!session) return null;
 
@@ -253,7 +253,7 @@ export async function addItemToGroup(
   });
 }
 
-export async function editGroup(groupData: TEditGroupSchema, groupId: string) {
+export async function editGroup(groupData: TGroupSchema, groupId: string) {
   const session = await verifySession();
   if (!session) return null;
 

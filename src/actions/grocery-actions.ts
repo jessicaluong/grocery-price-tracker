@@ -8,10 +8,10 @@ import {
   editGroup,
   editItem,
 } from "@/data-access/grocery-data";
-import { addItemSchema, pricePointSchema } from "@/zod-schemas/item-schemas";
+import { itemSchema, pricePointSchema } from "@/zod-schemas/grocery-schemas";
 import { Unit } from "@/lib/types";
 import { revalidatePath } from "next/cache";
-import { editGroupSchema } from "@/zod-schemas/group-schemas";
+import { groupSchema } from "@/zod-schemas/grocery-schemas";
 import { verifySession } from "@/lib/auth";
 import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
 
@@ -23,7 +23,7 @@ export async function addItemAction(values: unknown) {
 
   const userId = session.userId;
 
-  const validatedFields = addItemSchema.safeParse(values);
+  const validatedFields = itemSchema.safeParse(values);
 
   if (!validatedFields.success) {
     return {
@@ -121,7 +121,7 @@ export async function editGroupAction(values: unknown, groupId: string) {
     return { errors: { form: "You must be logged in to edit the group" } };
   }
 
-  const validatedFields = editGroupSchema.safeParse(values);
+  const validatedFields = groupSchema.safeParse(values);
 
   if (!validatedFields.success) {
     return {

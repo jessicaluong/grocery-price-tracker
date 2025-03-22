@@ -9,7 +9,7 @@ import FormButton from "@/components/form/form-button";
 import {
   pricePointSchema,
   TPricePointSchema,
-} from "@/zod-schemas/item-schemas";
+} from "@/zod-schemas/grocery-schemas";
 import { useState } from "react";
 import ErrorCallout from "@/components/form/error-callout";
 import { Form } from "@/components/ui/form";
