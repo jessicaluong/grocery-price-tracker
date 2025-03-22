@@ -552,33 +552,35 @@ describe("Item Repository integration tests", () => {
     });
 
     it("should update an item successfully", async () => {
-      await editItem(updateItemData, existingItemId);
-
-      const updatedItem = await prisma.item.findUnique({
+      const itemBeforeUpdate = await prisma.item.findUnique({
         where: { id: existingItemId },
       });
+      expect(itemBeforeUpdate).toMatchObject(existingItemData);
 
-      expect(updatedItem).toMatchObject(updateItemData);
+      await editItem(updateItemData, existingItemId);
+
+      const itemAfterUpdate = await prisma.item.findUnique({
+        where: { id: existingItemId },
+      });
+      expect(itemAfterUpdate).toMatchObject(updateItemData);
     });
 
     it("should prevent updates from unauthorized users", async () => {
       (verifySession as jest.Mock).mockResolvedValue({ userId: otherUserId });
 
+      const itemBeforeAttempt = await prisma.item.findUnique({
+        where: { id: existingItemId },
+      });
+      expect(itemBeforeAttempt).toMatchObject(existingItemData);
+
       await expect(editItem(updateItemData, existingItemId)).rejects.toThrow(
         AuthorizationError
       );
 
-      const item = await prisma.item.findUnique({
+      const itemAfterAttempt = await prisma.item.findUnique({
         where: { id: existingItemId },
       });
-
-      if (!item) {
-        throw new Error("No existing item");
-      }
-
-      expect(item.price).not.toBe(1.99);
-      expect(item.date).not.toEqual(new Date("2025-03-18"));
-      expect(item.isSale).not.toBe(false);
+      expect(itemAfterAttempt).toMatchObject(existingItemData);
     });
   });
 
@@ -697,31 +699,35 @@ describe("Item Repository integration tests", () => {
     });
 
     it("should update a group successfully", async () => {
-      await editGroup(updateGroupData, existingGroupId);
-
-      const updatedGroup = await prisma.group.findUnique({
+      const groupBeforeUpdate = await prisma.group.findUnique({
         where: { id: existingGroupId },
       });
+      expect(groupBeforeUpdate).toMatchObject(existingGroupData);
 
-      expect(updatedGroup).toMatchObject(updateGroupData);
+      await editGroup(updateGroupData, existingGroupId);
+
+      const groupAfterUpdate = await prisma.group.findUnique({
+        where: { id: existingGroupId },
+      });
+      expect(groupAfterUpdate).toMatchObject(updateGroupData);
     });
 
     it("should prevent updates from unauthorized users", async () => {
       (verifySession as jest.Mock).mockResolvedValue({ userId: otherUserId });
 
+      const groupBeforeUpdate = await prisma.group.findUnique({
+        where: { id: existingGroupId },
+      });
+      expect(groupBeforeUpdate).toMatchObject(existingGroupData);
+
       await expect(editGroup(updateGroupData, existingGroupId)).rejects.toThrow(
         AuthorizationError
       );
 
-      const group = await prisma.group.findUnique({
+      const groupAfterUpdate = await prisma.group.findUnique({
         where: { id: existingGroupId },
       });
-
-      if (!group) {
-        throw new Error("No existing group");
-      }
-
-      expect(group.name).not.toBe(updateGroupData.name);
+      expect(groupAfterUpdate).toMatchObject(existingGroupData);
     });
 
     it("should not be able to create a duplicate group (non-null brand) by editing existing group", async () => {
