@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import EditGroupForm from "@/app/(dashboard)/groceries/components/group-dialogs/edit-group/edit-group-form";
 import { editGroupAction } from "@/actions/grocery-actions";
 import { Unit } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import EditGroupForm from "@/app/(dashboard)/groceries/components/grocery-action-dialogs/edit-group/edit-group-form";
 
 jest.mock("@/actions/grocery-actions", () => ({
   editGroupAction: jest.fn(),

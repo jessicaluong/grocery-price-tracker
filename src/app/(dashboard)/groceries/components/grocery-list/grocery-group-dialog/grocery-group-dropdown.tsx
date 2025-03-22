@@ -15,11 +15,11 @@ import {
   TrashIcon,
 } from "lucide-react";
 import { useState } from "react";
-import EditGroupDialogContent from "../../group-dialogs/edit-group/edit-group-dialog-content";
 import { DbGroup } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { deleteGroupAction } from "@/actions/grocery-actions";
-import AddItemToGroupDialogContent from "../../group-dialogs/add-item-to-group/add-item-to-group-dialog-content";
+import AddItemToGroupDialogContent from "../../grocery-action-dialogs/add-item-to-group/add-item-to-group-dialog-content";
+import EditGroupDialogContent from "../../grocery-action-dialogs/edit-group/edit-group-dialog-content";
 
 type GroceryGroupDropdownProps = {
   group: DbGroup;

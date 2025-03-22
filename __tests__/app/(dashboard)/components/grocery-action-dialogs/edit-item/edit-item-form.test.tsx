@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Unit } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import EditItemForm from "@/app/(dashboard)/groceries/components/item-dialogs/edit-item/edit-item-form";
+import EditItemForm from "@/app/(dashboard)/groceries/components/grocery-action-dialogs/edit-item/edit-item-form";
 import { editItemAction } from "@/actions/grocery-actions";
 
 jest.mock("@/hooks/use-toast", () => ({

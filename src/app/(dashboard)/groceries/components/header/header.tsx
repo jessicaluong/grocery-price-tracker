@@ -1,6 +1,6 @@
 import { SearchBar } from "./search-bar";
 import SortAndViewControls from "./sort-and-view-controls";
-import AddItemDialog from "../item-dialogs/add-item/add-item-dialog";
+import AddItemDialog from "../grocery-action-dialogs/add-item/add-item-dialog";
 import UserButton from "./user-profile-dialog";
 
 export default function Header() {

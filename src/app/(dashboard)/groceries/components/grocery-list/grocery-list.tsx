@@ -3,7 +3,7 @@ import { ItemWithView, SortParamValues, ViewParamValues } from "@/lib/types";
 import { getItems } from "@/data-access/grocery-data";
 import { getFilteredItemsWithView } from "./grocery-list-utils";
 import { ShoppingCart } from "lucide-react";
-import AddItemDialog from "../item-dialogs/add-item/add-item-dialog";
+import AddItemDialog from "../grocery-action-dialogs/add-item/add-item-dialog";
 import { verifySession } from "@/lib/auth";
 
 type GroceryListProps = {

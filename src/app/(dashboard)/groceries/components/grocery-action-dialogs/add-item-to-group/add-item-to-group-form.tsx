@@ -10,9 +10,9 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import FormInput from "../../item-dialogs/shared/item-form/item-form-input";
-import { FormDatePicker } from "../../item-dialogs/shared/item-form/item-form-date-picker";
-import FormCheckbox from "../../item-dialogs/shared/item-form/item-form-checkbox";
+import FormInput from "../../grocery-action-dialogs/shared/item-form/item-form-input";
+import { FormDatePicker } from "../../grocery-action-dialogs/shared/item-form/item-form-date-picker";
+import FormCheckbox from "../../grocery-action-dialogs/shared/item-form/item-form-checkbox";
 import { DialogFooter } from "@/components/ui/dialog";
 import FormButton from "@/components/form/form-button";
 
