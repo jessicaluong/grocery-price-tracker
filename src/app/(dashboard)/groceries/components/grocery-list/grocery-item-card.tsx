@@ -43,7 +43,9 @@ export default function GroceryItemCard({
                   className="shrink-0 ml-2 sm:ml-1 text-sm"
                 />
               </div>
-              <div className="h-7">{item.brand && item.brand}</div>
+              <div className="h-7 font-semibold tracking-tight">
+                {item.brand && item.brand}
+              </div>
             </div>
             <p className="font-light">{item.store}</p>
           </div>
