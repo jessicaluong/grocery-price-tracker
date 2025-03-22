@@ -6,16 +6,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import {
-  MoreHorizontalIcon,
-  CopyIcon,
-  TrashIcon,
-  SquarePenIcon,
-} from "lucide-react";
+import { MoreHorizontalIcon, TrashIcon, SquarePenIcon } from "lucide-react";
 import { useState } from "react";
 import { PricePoint } from "@/lib/types";
 import EditItemDialogContent from "../../../item-dialogs/edit-item/edit-item-dialog-content";
-import CopyItemDialogContent from "../../../item-dialogs/copy-item/copy-item-dialog-content";
 import { deleteItemAction } from "@/actions/grocery-actions";
 import { useToast } from "@/hooks/use-toast";
 
@@ -68,16 +62,6 @@ export default function GroceryItemDropdown({ rowData }: DropdownDialogProps) {
           <DialogTrigger
             asChild
             onClick={() => {
-              setOpenedDialog("copy");
-            }}
-          >
-            <DropdownMenuItem>
-              <CopyIcon /> Copy Item
-            </DropdownMenuItem>
-          </DialogTrigger>
-          <DialogTrigger
-            asChild
-            onClick={() => {
               setOpenedDialog("edit");
             }}
           >
@@ -93,7 +77,6 @@ export default function GroceryItemDropdown({ rowData }: DropdownDialogProps) {
       {openedDialog === "edit" && (
         <EditItemDialogContent item={rowData} handleClose={handleClose} />
       )}
-      {openedDialog === "copy" && <CopyItemDialogContent />}
     </Dialog>
   );
 }
