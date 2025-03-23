@@ -34,7 +34,7 @@ export default function GroceryItemCard({
         <CardContent className="flex leading-tight">
           <div className="grow mr-4 min-w-0">
             <div>
-              <div className="flex items-baseline tracking-tight">
+              <div className="flex tracking-tight">
                 <span className="truncate font-semibold">{item.name}</span>
                 <ItemQuantity
                   count={item.count}
@@ -43,11 +43,15 @@ export default function GroceryItemCard({
                   className="shrink-0 ml-2 sm:ml-1 text-sm"
                 />
               </div>
-              <div className="h-7 font-semibold tracking-tight">
-                {item.brand && item.brand}
+              <div className="flex">
+                <span className="truncate h-7 font-semibold tracking-tight">
+                  {item.brand && item.brand}
+                </span>
               </div>
             </div>
-            <p className="font-light">{item.store}</p>
+            <div className="flex">
+              <p className="font-light truncate">{item.store}</p>
+            </div>
           </div>
           <div className="shrink-0 text-right">
             {view === "LIST" && (
