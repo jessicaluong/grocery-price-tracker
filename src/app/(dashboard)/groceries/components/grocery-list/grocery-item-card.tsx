@@ -77,7 +77,7 @@ export default function GroceryItemCard({
                     `${currencyFormat(item.minPrice)}-`}
                   {currencyFormat(item.maxPrice)}
                 </p>
-                <p className="text-sm text-muted-foreground tracking-tighter h-7">
+                <p className="text-sm text-brand tracking-tighter h-7">
                   {item.minPrice !== item.maxPrice &&
                     `${currencyFormat(
                       getConvertedPrice(
