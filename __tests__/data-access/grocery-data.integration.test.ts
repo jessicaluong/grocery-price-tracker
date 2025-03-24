@@ -33,7 +33,7 @@ describe("Item Repository integration tests", () => {
   });
 
   beforeEach(() => {
-    (verifySession as jest.Mock).mockResolvedValue({ userId: userId });
+    (verifySession as jest.Mock).mockResolvedValue({ userId });
   });
 
   afterAll(async () => {
@@ -62,7 +62,6 @@ describe("Item Repository integration tests", () => {
       price: 4.99,
       date: new Date("2024-03-01"),
       isSale: true,
-      userId,
     };
 
     it("should create a new group with an item when no matching group exists", async () => {
@@ -450,7 +449,6 @@ describe("Item Repository integration tests", () => {
       await addItem(baseItem);
 
       const otherUserId = "different-user";
-
       await prisma.user.create({
         data: {
           id: otherUserId,
@@ -458,16 +456,11 @@ describe("Item Repository integration tests", () => {
           hashedPassword: "test-password-hash",
         },
       });
-
       const otherUserItem = {
         ...baseItem,
-        userId: otherUserId,
       };
 
-      const otherUserSession = {
-        user: { id: otherUserId },
-      };
-      (verifySession as jest.Mock).mockResolvedValue({ otherUserSession });
+      (verifySession as jest.Mock).mockResolvedValue({ userId: otherUserId });
 
       await addItem(otherUserItem);
 

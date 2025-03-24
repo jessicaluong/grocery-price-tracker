@@ -37,7 +37,6 @@ describe("Item Repository", () => {
       price: 5.99,
       date: new Date("2025-03-01"),
       isSale: false,
-      userId: "test-user-id",
     };
 
     it("should add item to existing group", async () => {
@@ -85,7 +84,7 @@ describe("Item Repository", () => {
           count: item.count,
           amount: item.amount,
           unit: item.unit,
-          userId: item.userId,
+          userId,
         },
       });
       expect(prismaMock.item.create).toHaveBeenCalledWith({
@@ -125,7 +124,7 @@ describe("Item Repository", () => {
           count: item.count,
           amount: item.amount,
           unit: item.unit,
-          userId: item.userId,
+          userId,
           items: {
             create: {
               date: item.date,
@@ -175,7 +174,7 @@ describe("Item Repository", () => {
           count: item.count,
           amount: item.amount,
           unit: item.unit,
-          userId: item.userId,
+          userId,
           items: {
             create: {
               date: item.date,

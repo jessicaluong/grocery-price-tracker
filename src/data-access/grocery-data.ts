@@ -137,7 +137,7 @@ export async function getPriceHistoryByGroupId(id: string) {
   }
 }
 
-export async function addItem(item: TItemSchema & { userId: string }) {
+export async function addItem(item: TItemSchema) {
   const session = await verifySession();
   if (!session) return null;
 
@@ -151,7 +151,7 @@ export async function addItem(item: TItemSchema & { userId: string }) {
       count: item.count,
       amount: item.amount,
       unit: item.unit,
-      userId: item.userId,
+      userId: session.userId,
     },
   });
 
@@ -173,7 +173,7 @@ export async function addItem(item: TItemSchema & { userId: string }) {
         count: item.count,
         amount: item.amount,
         unit: item.unit,
-        userId: item.userId,
+        userId: session.userId,
         items: {
           create: {
             date: item.date,

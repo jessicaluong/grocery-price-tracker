@@ -436,7 +436,6 @@ describe("Grocery server actions", () => {
         expect(addItem).toHaveBeenCalledWith({
           ...testData,
           brand: normalizedBrand,
-          userId: "test-user-id",
         });
       });
     });
@@ -460,7 +459,6 @@ describe("Grocery server actions", () => {
         expect(result).toEqual({ success: true });
         expect(addItem).toHaveBeenCalledWith({
           ...testData,
-          userId: "test-user-id",
         });
         expect(revalidatePath).toHaveBeenCalledWith("/groceries");
       });
@@ -486,7 +484,6 @@ describe("Grocery server actions", () => {
             name: "Test Name",
             brand: "Test Brand",
             store: "Test Store",
-            userId: "test-user-id",
           })
         );
       });
@@ -509,7 +506,6 @@ describe("Grocery server actions", () => {
         expect(result).toEqual({ success: true });
         expect(addItem).toHaveBeenCalledWith({
           ...testData,
-          userId: "test-user-id",
         });
       });
 
@@ -532,7 +528,6 @@ describe("Grocery server actions", () => {
         expect(addItem).toHaveBeenCalledWith({
           ...testData,
           price: 5.0,
-          userId: "test-user-id",
         });
       });
 
@@ -555,7 +550,6 @@ describe("Grocery server actions", () => {
         expect(addItem).toHaveBeenCalledWith({
           ...testData,
           price: 0,
-          userId: "test-user-id",
         });
       });
 
@@ -579,7 +573,6 @@ describe("Grocery server actions", () => {
           ...testData,
           count: 1,
           isSale: false,
-          userId: "test-user-id",
         });
       });
     });

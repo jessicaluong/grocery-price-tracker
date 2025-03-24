@@ -33,18 +33,7 @@ export async function addItemAction(values: unknown) {
 
   try {
     const data = validatedFields.data;
-    await addItem({
-      name: data.name,
-      brand: data.brand,
-      store: data.store,
-      count: data.count,
-      amount: data.amount,
-      unit: data.unit as Unit,
-      price: data.price,
-      date: data.date,
-      isSale: data.isSale,
-      userId,
-    });
+    await addItem(data);
     revalidatePath("/groceries");
     return { success: true };
   } catch (error) {
