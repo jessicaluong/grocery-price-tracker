@@ -50,7 +50,7 @@ export default function GroceryItemCard({
               </div>
             </div>
             <div className="flex">
-              <p className="font-light truncate">{item.store}</p>
+              <p className="truncate">{item.store}</p>
             </div>
           </div>
           <div className="shrink-0 text-right">
