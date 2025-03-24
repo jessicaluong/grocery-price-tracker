@@ -23,7 +23,7 @@ export default function AddItemDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="rounded-3xl">
+        <Button className="rounded-3xl">
           <PlusCircledIcon className="mr-2" /> Add item
         </Button>
       </DialogTrigger>

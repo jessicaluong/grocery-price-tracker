@@ -24,7 +24,7 @@ export default function UserButton() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="icon" variant="secondary">
+        <Button size="icon" variant="brand-secondary">
           {firstLetter}
         </Button>
       </DropdownMenuTrigger>

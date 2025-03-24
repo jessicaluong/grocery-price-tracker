@@ -36,7 +36,7 @@ export default async function GroceryList({
   if (initialItems.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4">
-        <ShoppingCart className="h-16 w-16 text-muted-foreground mb-4" />
+        <ShoppingCart className="h-16 w-16 text-brand-secondary mb-4" />
         <h3 className="text-xl font-semibold mb-2">
           Your grocery list is empty
         </h3>

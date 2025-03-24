@@ -9,7 +9,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm flex flex-col gap-6">
         <div className="flex flex-col items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-md">
-            <ShoppingCart className="size-6" />
+            <ShoppingCart className="size-6 text-brand" />
           </div>
           <h1 className="text-xl font-bold">
             Welcome to Grocery Price Tracker

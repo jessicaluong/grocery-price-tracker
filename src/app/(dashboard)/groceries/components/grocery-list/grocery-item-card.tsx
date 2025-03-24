@@ -60,7 +60,7 @@ export default function GroceryItemCard({
                   {item.isSale && <SaleIndicator />}
                   {currencyFormat(item.price)}
                 </p>
-                <p className="text-sm text-muted-foreground tracking-tighter h-7">
+                <p className="text-sm text-brand tracking-tighter h-7">
                   {comparePriceFormat(
                     item.count,
                     item.price,
