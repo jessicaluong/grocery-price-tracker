@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogContent,
@@ -5,14 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ItemWithView } from "@/types/grocery";
+import { ItemWithView, PricePoint } from "@/types/grocery";
 import { currencyFormat } from "@/lib/utils";
 import { ItemQuantity } from "../item-quantity";
 import GroceryGroupTable from "./grocery-group-table/grocery-group-table";
 import { columns } from "./grocery-group-table/grocery-group-table-column";
 import GroceryGroupDropdown from "./grocery-group-dropdown";
+import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
-type GroceryItemDialogProps = {
+type GroceryGroupDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   itemWithView: ItemWithView;
@@ -22,9 +26,36 @@ export default function GroceryGroupDialog({
   open,
   onOpenChange,
   itemWithView: { view, item, groupMap },
-}: GroceryItemDialogProps) {
+}: GroceryGroupDialogProps) {
+  const { toast } = useToast();
+
   const groupId = view === "LIST" ? item.groupId : item.id;
-  const group = groupMap.get(groupId);
+  const groupInfo = groupMap.get(groupId);
+
+  const { data, isLoading, error } = useQuery<PricePoint[]>({
+    queryKey: ["priceHistory", groupId],
+    queryFn: async () => {
+      try {
+        const response = await fetch(`/api/price-history/${groupId}`);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          toast({
+            variant: "destructive",
+            description: errorData.error,
+          });
+        }
+
+        return response.json();
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          description: "An error occurred while fetching price history",
+        });
+      }
+    },
+    enabled: open && !!groupId,
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -41,16 +72,16 @@ export default function GroceryGroupDialog({
                 unit={item.unit}
                 className="shrink-0 ml-2 mr-2 text-sm"
               />
-              {group && (
+              {groupInfo && (
                 <GroceryGroupDropdown
                   group={{
                     id: groupId,
-                    name: group.name,
-                    brand: group.brand,
-                    store: group.store,
-                    count: group.count,
-                    amount: group.amount,
-                    unit: group.unit,
+                    name: groupInfo.name,
+                    brand: groupInfo.brand,
+                    store: groupInfo.store,
+                    count: groupInfo.count,
+                    amount: groupInfo.amount,
+                    unit: groupInfo.unit,
                   }}
                 />
               )}
@@ -60,11 +91,13 @@ export default function GroceryGroupDialog({
             </div>
             <div className="flex font-light max-w-[70%] sm:max-w-full">
               <span className="shrink-0">
-                {group &&
-                  (group.maxPrice === group.minPrice
-                    ? currencyFormat(group.minPrice)
-                    : `${currencyFormat(group.minPrice)}-${currencyFormat(
-                        group.maxPrice
+                {groupInfo &&
+                  groupInfo.minPrice &&
+                  groupInfo.maxPrice &&
+                  (groupInfo.maxPrice === groupInfo.minPrice
+                    ? currencyFormat(groupInfo.minPrice)
+                    : `${currencyFormat(groupInfo.minPrice)}-${currencyFormat(
+                        groupInfo.maxPrice
                       )}`)}
               </span>
               <span className="text-sm mx-1 shrink-0"> @ </span>
@@ -74,9 +107,14 @@ export default function GroceryGroupDialog({
           <DialogDescription className="text-center"></DialogDescription>
         </DialogHeader>
         <div className="max-w-xs sm:max-w-lg">
-          {group && (
-            <GroceryGroupTable columns={columns} data={group?.pricePoints} />
+          {isLoading && (
+            <p className="text-center py-4">Loading price history...</p>
           )}
+          {data ? (
+            <GroceryGroupTable columns={columns} data={data} />
+          ) : !isLoading && !error ? (
+            <p className="text-center py-4">No price history available.</p>
+          ) : null}
         </div>
       </DialogContent>
     </Dialog>

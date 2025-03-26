@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { ItemWithView } from "@/types/grocery";
+import { ItemWithView, Unit } from "@/types/grocery";
 import GroceryGroupDialog from "./grocery-group-dialog/grocery-group-dialog";
 import { useState } from "react";
 import { ItemQuantity } from "./item-quantity";
@@ -14,6 +14,72 @@ import {
 import { SaleIndicator } from "./sale-indicator";
 
 type GroceryItemCardProps = ItemWithView;
+
+type ItemPriceProps = {
+  price: number;
+  isSale: boolean;
+  count: number;
+  amount: number;
+  unit: Unit;
+};
+
+function ItemPrice({ price, isSale, count, amount, unit }: ItemPriceProps) {
+  return (
+    <>
+      <p className="font-semibold tracking-tight flex items-center justify-end">
+        {isSale && <SaleIndicator />}
+        {currencyFormat(price)}
+      </p>
+      <p className="text-sm text-brand tracking-tighter h-7">
+        {comparePriceFormat(count, price, amount, unit)}
+      </p>
+    </>
+  );
+}
+
+type GroupPriceRangeProps = {
+  minPrice: number | null;
+  maxPrice: number | null;
+  count: number;
+  amount: number;
+  unit: Unit;
+};
+
+function GroupPriceRange({
+  minPrice,
+  maxPrice,
+  count,
+  amount,
+  unit,
+}: GroupPriceRangeProps) {
+  if (!maxPrice) {
+    return (
+      <>
+        <p className="font-semibold tracking-tight flex items-center justify-end">
+          &nbsp;
+        </p>
+        <p className="text-sm text-brand tracking-tighter h-7"></p>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <p className="font-semibold tracking-tight flex items-center justify-end">
+        {minPrice && minPrice !== maxPrice && `${currencyFormat(minPrice)}-`}
+        {currencyFormat(maxPrice)}
+      </p>
+      <p className="text-sm text-brand tracking-tighter h-7">
+        {minPrice &&
+          minPrice !== maxPrice &&
+          `${currencyFormat(
+            getConvertedPrice(count, minPrice, amount, unit)
+          )}-`}
+        {comparePriceFormat(count, maxPrice, amount, unit)}
+      </p>
+    </>
+  );
+}
 
 export default function GroceryItemCard({
   view,
@@ -55,52 +121,28 @@ export default function GroceryItemCard({
           </div>
           <div className="shrink-0 text-right">
             {view === "LIST" && (
-              <>
-                <p className="font-semibold tracking-tight flex items-center justify-end">
-                  {item.isSale && <SaleIndicator />}
-                  {currencyFormat(item.price)}
-                </p>
-                <p className="text-sm text-brand tracking-tighter h-7">
-                  {comparePriceFormat(
-                    item.count,
-                    item.price,
-                    item.amount,
-                    item.unit
-                  )}
-                </p>
-              </>
+              <ItemPrice
+                price={item.price}
+                isSale={item.isSale}
+                count={item.count}
+                amount={item.amount}
+                unit={item.unit}
+              ></ItemPrice>
             )}
             {view === "GROUP" && (
-              <>
-                <p className="font-semibold tracking-tight flex items-center justify-end">
-                  {item.minPrice !== item.maxPrice &&
-                    `${currencyFormat(item.minPrice)}-`}
-                  {currencyFormat(item.maxPrice)}
-                </p>
-                <p className="text-sm text-brand tracking-tighter h-7">
-                  {item.minPrice !== item.maxPrice &&
-                    `${currencyFormat(
-                      getConvertedPrice(
-                        item.count,
-                        item.minPrice,
-                        item.amount,
-                        item.unit
-                      )
-                    )}-`}
-                  {comparePriceFormat(
-                    item.count,
-                    item.maxPrice,
-                    item.amount,
-                    item.unit
-                  )}
-                </p>
-              </>
+              <GroupPriceRange
+                minPrice={item.minPrice}
+                maxPrice={item.maxPrice}
+                count={item.count}
+                amount={item.amount}
+                unit={item.unit}
+              ></GroupPriceRange>
             )}
             <p className="font-light tracking-tight">
               {view === "LIST" && formatDate(item.date)}
               {view === "GROUP" &&
-                `${item.priceHistory.length} ${
-                  item.priceHistory.length === 1 ? "item" : "items"
+                `${item.itemCount} ${
+                  Number(item.itemCount) === 1 ? "item" : "items"
                 }`}
             </p>
           </div>

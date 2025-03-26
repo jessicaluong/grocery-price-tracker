@@ -1,63 +1,46 @@
 import { z } from "zod";
 import { SORT_OPTIONS, VIEW_OPTIONS } from "../lib/constants";
-import {
-  Item as PrismaItem,
-  Group as PrismaGroup,
-  Unit as PrismaUnit,
-} from "@prisma/client";
+import { Group as PrismaGroup, Unit as PrismaUnit } from "@prisma/client";
 
 export type Unit = PrismaUnit;
 export const UnitEnum = PrismaUnit;
 export const UnitSchema = z.enum(Object.values(UnitEnum) as [Unit, ...Unit[]]);
 
-type DbItem = Omit<PrismaItem, "createdAt" | "updatedAt">;
 export type DbGroup = Omit<PrismaGroup, "createdAt" | "updatedAt" | "userId">;
 
-/**
- * Core Item type
- * Properties:
- * - id: string
- * - name: string
- * - brand: string | null
- * - store: string
- * - count: number
- * - amount: number
- * - unit: Unit
- * - date: Date
- * - price: number
- * - isSale: boolean
- * - groupId: string
- */
-export type GroceryItem = DbItem & Omit<DbGroup, "id">;
+export type GroceryItem = {
+  id: string;
+  name: string;
+  brand: string | null;
+  store: string;
+  count: number; // TODO: rename to bulkCount
+  amount: number;
+  unit: Unit;
+  date: Date;
+  price: number;
+  isSale: boolean;
+  groupId: string;
+};
 
-/**
- * Price point for historical price tracking
- * Properties:
- * - id: string
- * - date: Date
- * - price: number
- * - isSale: boolean
- */
-export type PricePoint = Pick<DbItem, "id" | "date" | "price" | "isSale">;
+export type PricePoint = {
+  id: string;
+  date: Date;
+  price: number;
+  isSale: boolean;
+};
 
-/**
- * Core Group type
- * Properties:
- * - id: string
- * - name: string
- * - brand: string | null
- * - store: string
- * - count: number
- * - amount: number
- * - unit: Unit
- * - maxPrice: number
- * - minPrice: number
- * - priceHistory: PricePoint[]
- */
-export type GroceryGroup = DbGroup & {
-  minPrice: number;
-  maxPrice: number;
-  priceHistory: PricePoint[];
+export type GroceryGroup = {
+  id: string;
+  name: string;
+  brand: string | null;
+  store: string;
+  count: number; // TODO: rename to bulkCount
+  amount: number;
+  unit: Unit;
+  itemCount: bigint | null;
+  maxPrice: number | null;
+  minPrice: number | null;
+  newestDate: Date | null;
 };
 
 export type GroupMap = Map<
@@ -69,9 +52,10 @@ export type GroupMap = Map<
     count: number;
     amount: number;
     unit: Unit;
-    minPrice: number;
-    maxPrice: number;
-    pricePoints: PricePoint[];
+    maxPrice: number | null;
+    minPrice: number | null;
+    newestDate: Date | null;
+    itemCount: number;
   }
 >;
 

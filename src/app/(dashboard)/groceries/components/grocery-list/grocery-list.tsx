@@ -4,7 +4,7 @@ import {
   SortParamValues,
   ViewParamValues,
 } from "@/types/grocery";
-import { getItems } from "@/data-access/grocery-data";
+import { getGroups, getItems } from "@/data-access/grocery-data";
 import { getFilteredItemsWithView } from "./grocery-list-utils";
 import { ShoppingCart } from "lucide-react";
 import AddItemDialog from "../grocery-action-dialogs/add-item/add-item-dialog";
@@ -24,9 +24,15 @@ export default async function GroceryList({
   const session = await verifySession();
   if (!session) return null;
 
-  const initialItems = await getItems();
+  const [initialGroups, initialItems] = await Promise.all([
+    getGroups(),
+    getItems(),
+  ]);
+  console.log(initialGroups);
+
   const { view, items, groupMap } = getFilteredItemsWithView(
     initialItems,
+    initialGroups,
     searchQuery,
     sortBy,
     viewMode

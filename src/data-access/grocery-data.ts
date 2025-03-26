@@ -3,47 +3,17 @@ import { TItemSchema, TPricePointSchema } from "@/zod-schemas/grocery-schemas";
 import { TGroupSchema } from "@/zod-schemas/grocery-schemas";
 import { verifySession } from "@/lib/auth";
 import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
+import { getGroupsWithPriceStats } from "@prisma/client/sql";
 
 export async function getGroups() {
   const session = await verifySession();
   if (!session) return [];
 
-  const groups = await prisma.group.findMany({
-    select: {
-      id: true,
-      name: true,
-      brand: true,
-      store: true,
-      count: true,
-      amount: true,
-      unit: true,
-      items: {
-        select: {
-          date: true,
-          price: true,
-          isSale: true,
-        },
-        orderBy: {
-          date: "desc",
-        },
-      },
-      _count: {
-        select: { items: true },
-      },
-    },
-  });
+  const groups = await prisma.$queryRawTyped(
+    getGroupsWithPriceStats(session.userId)
+  );
 
-  return groups.map((group) => ({
-    id: group.id,
-    name: group.name,
-    brand: group.brand,
-    store: group.store,
-    count: group.count,
-    amount: group.amount,
-    unit: group.unit,
-    numberOfItems: group._count.items,
-    priceHistory: group.items,
-  }));
+  return groups;
 }
 
 export async function getItems() {
@@ -95,42 +65,27 @@ export async function getItems() {
   }
 }
 
-export async function getPriceHistoryByGroupId(id: string) {
+export async function getPriceHistory(groupId: string) {
   const session = await verifySession();
   if (!session) return null;
 
-  const group = await prisma.group.findUnique({
-    where: { id: id },
-    select: { userId: true },
+  // authorization
+  const foundGroup = await prisma.group.findFirst({
+    where: { id: groupId, userId: session.userId },
   });
 
-  if (!group || group.userId !== session.userId) {
-    throw new Error("Unauthorized access to price history");
+  if (!foundGroup) {
+    throw new AuthorizationError();
   }
 
   try {
-    const items = await prisma.group.findUnique({
-      where: { id },
-      select: {
-        items: {
-          select: { id: true, date: true, price: true, isSale: true },
-          orderBy: { date: "asc" },
-        },
-      },
+    const result = await prisma.item.findMany({
+      where: { groupId },
+      select: { id: true, date: true, price: true, isSale: true },
+      orderBy: { date: "asc" },
     });
 
-    const priceHistory = items?.items ?? [];
-    return {
-      priceHistory,
-      minPrice:
-        priceHistory.length > 0
-          ? Math.min(...priceHistory.map((pricePoint) => pricePoint.price))
-          : 0,
-      maxPrice:
-        priceHistory.length > 0
-          ? Math.max(...priceHistory.map((pricePoint) => pricePoint.price))
-          : 0,
-    };
+    return result;
   } catch (error) {
     console.log("Failed to fetch price history");
     return null;
