@@ -2,7 +2,7 @@ import { z } from "zod";
 import { UnitSchema } from "../types/grocery";
 
 export const pricePointSchema = z.object({
-  date: z.date(),
+  date: z.coerce.date(),
   price: z.coerce
     .number({ invalid_type_error: "Price must be a number" })
     .nonnegative("Price cannot be negative")
