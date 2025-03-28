@@ -19,6 +19,14 @@ describe("AddItemForm", () => {
   const mockOnSuccess = jest.fn();
   const user = userEvent.setup();
 
+  const selectDate = async () => {
+    await user.click(screen.getByText("Pick a date"));
+    await user.click(screen.getByRole("gridcell", { name: "15" }));
+
+    // close date picker
+    await user.keyboard("{Escape}");
+  };
+
   describe("render", () => {
     it("renders the form correctly", () => {
       render(<AddItemForm onSuccess={mockOnSuccess} />);
@@ -171,6 +179,7 @@ describe("AddItemForm", () => {
       await user.type(screen.getByLabelText("Store"), "Walmart");
       await user.type(screen.getByLabelText("Amount"), "100");
       await user.type(screen.getByLabelText("Price"), "4.99");
+      await selectDate();
 
       await user.click(screen.getByRole("button", { name: "Submit" }));
 
@@ -196,6 +205,7 @@ describe("AddItemForm", () => {
       const countInput = screen.getByLabelText("Count");
       await user.clear(countInput);
       await user.type(screen.getByLabelText("Count"), "2");
+      await selectDate();
 
       await user.click(screen.getByRole("button", { name: "Submit" }));
 
@@ -230,6 +240,7 @@ describe("AddItemForm", () => {
       await user.type(screen.getByLabelText("Store"), "Walmart");
       await user.type(screen.getByLabelText("Amount"), "100");
       await user.type(screen.getByLabelText("Price"), "4.99");
+      await selectDate();
 
       await user.click(screen.getByRole("button", { name: "Submit" }));
 
@@ -258,6 +269,7 @@ describe("AddItemForm", () => {
       await user.type(screen.getByLabelText("Store"), "Walmart");
       await user.type(screen.getByLabelText("Amount"), "100");
       await user.type(screen.getByLabelText("Price"), "4.99");
+      await selectDate();
 
       await user.click(screen.getByRole("button", { name: "Submit" }));
 
@@ -283,6 +295,7 @@ describe("AddItemForm", () => {
       await user.type(screen.getByLabelText("Store"), "Walmart");
       await user.type(screen.getByLabelText("Amount"), "100");
       await user.type(screen.getByLabelText("Price"), "4.99");
+      await selectDate();
 
       await user.click(screen.getByRole("button", { name: "Submit" }));
 

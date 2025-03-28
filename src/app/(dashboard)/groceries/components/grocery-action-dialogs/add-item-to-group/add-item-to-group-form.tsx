@@ -28,7 +28,6 @@ export default function AddItemToGroupForm({
   const form = useForm<TPricePointSchema>({
     resolver: zodResolver(pricePointSchema),
     defaultValues: {
-      date: new Date(),
       isSale: false,
     },
   });

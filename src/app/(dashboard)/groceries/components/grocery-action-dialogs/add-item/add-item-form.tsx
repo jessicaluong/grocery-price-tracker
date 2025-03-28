@@ -29,7 +29,6 @@ export default function AddItemForm({ onSuccess }: AddItemFormProps) {
       store: "",
       count: 1,
       unit: UnitEnum.g,
-      date: new Date(),
       isSale: false,
     },
   });

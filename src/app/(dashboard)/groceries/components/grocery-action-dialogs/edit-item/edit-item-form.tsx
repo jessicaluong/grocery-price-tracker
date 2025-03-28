@@ -17,6 +17,7 @@ import FormInput from "../shared/item-form/item-form-input";
 import FormCheckbox from "../shared/item-form/item-form-checkbox";
 import { FormDatePicker } from "../shared/item-form/item-form-date-picker";
 import { useToast } from "@/hooks/use-toast";
+import { formatDate } from "@/lib/utils";
 
 type EditItemFormProps = {
   item: PricePoint;
@@ -28,7 +29,7 @@ export default function EditItemForm({ item, onSuccess }: EditItemFormProps) {
     resolver: zodResolver(pricePointSchema),
     defaultValues: {
       price: item.price,
-      date: item.date,
+      date: new Date(formatDate(item.date)),
       isSale: item.isSale,
     },
   });

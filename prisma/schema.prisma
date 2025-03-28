@@ -98,7 +98,7 @@ model Item {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  date      DateTime
+  date      DateTime @db.Date
   price     Float
   isSale    Boolean  @default(false)
   group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)

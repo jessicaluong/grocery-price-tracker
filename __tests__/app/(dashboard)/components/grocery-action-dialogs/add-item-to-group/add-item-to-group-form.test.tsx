@@ -33,6 +33,14 @@ describe("AddItemToGroupForm", () => {
     unit: "mL" as Unit,
   };
 
+  const selectDate = async () => {
+    await user.click(screen.getByText("Pick a date"));
+    await user.click(screen.getByRole("gridcell", { name: "15" }));
+
+    // close date picker
+    await user.keyboard("{Escape}");
+  };
+
   describe("render", () => {
     it("renders the form correctly", () => {
       render(<AddItemToGroupForm group={group} onSuccess={mockOnSuccess} />);
@@ -61,6 +69,7 @@ describe("AddItemToGroupForm", () => {
 
       // fill in required fields
       await user.type(screen.getByLabelText("Price"), "1.50");
+      await selectDate();
 
       await user.click(screen.getByRole("button", { name: "Submit" }));
 
@@ -77,21 +86,25 @@ describe("AddItemToGroupForm", () => {
       (addItemToGroupAction as jest.Mock).mockResolvedValue({ success: true });
 
       render(<AddItemToGroupForm group={group} onSuccess={mockOnSuccess} />);
-
       await user.type(screen.getByLabelText("Price"), "1.50");
       await user.click(screen.getByRole("checkbox"));
-
+      await selectDate();
       await user.click(screen.getByRole("button", { name: "Submit" }));
 
       await waitFor(() => {
-        expect(addItemToGroupAction).toHaveBeenCalledWith(
-          expect.objectContaining({
-            price: 1.5,
-            date: expect.any(Date),
-            isSale: true,
-          }),
-          "test-group-id"
-        );
+        expect(addItemToGroupAction).toHaveBeenCalled();
+
+        const formData = (addItemToGroupAction as jest.Mock).mock.calls[0][0];
+        const groupId = (addItemToGroupAction as jest.Mock).mock.calls[0][1];
+
+        expect(formData).toMatchObject({
+          price: 1.5,
+          isSale: true,
+        });
+
+        expect(formData.date.getDate()).toBe(15);
+
+        expect(groupId).toBe("test-group-id");
       });
     });
 
@@ -107,6 +120,7 @@ describe("AddItemToGroupForm", () => {
 
       // fill in required fields
       await user.type(screen.getByLabelText("Price"), "1.50");
+      await selectDate();
 
       await user.click(screen.getByRole("button", { name: "Submit" }));
 
@@ -132,6 +146,7 @@ describe("AddItemToGroupForm", () => {
 
       // fill in required fields
       await user.type(screen.getByLabelText("Price"), "1.50");
+      await selectDate();
 
       await user.click(screen.getByRole("button", { name: "Submit" }));
 
@@ -153,6 +168,7 @@ describe("AddItemToGroupForm", () => {
 
       // fill in required fields
       await user.type(screen.getByLabelText("Price"), "1.50");
+      await selectDate();
 
       await user.click(screen.getByRole("button", { name: "Submit" }));
 
