@@ -21,7 +21,12 @@ export function currencyFormat(value: number) {
   }).format(value);
 }
 
-export function formatDate(dateValue: string | Date): string {
+export function formatDate(
+  dateValue: string | Date,
+  monthFmt: "numeric" | "2-digit" | "long" | "short" | "narrow" = "short",
+  dayFmt: "numeric" | "2-digit" = "numeric",
+  yearFmt: "numeric" | "2-digit" = "numeric"
+): string {
   const date = new Date(dateValue as string | number | Date);
 
   const year = date.getUTCFullYear();
@@ -29,9 +34,9 @@ export function formatDate(dateValue: string | Date): string {
   const day = date.getUTCDate();
 
   const formatter = new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
+    month: monthFmt,
+    day: dayFmt,
+    year: yearFmt,
     timeZone: "UTC",
   });
 
