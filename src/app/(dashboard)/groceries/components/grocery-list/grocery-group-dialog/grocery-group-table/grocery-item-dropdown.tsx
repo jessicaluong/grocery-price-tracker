@@ -12,6 +12,8 @@ import { PricePoint } from "@/types/grocery";
 import EditItemDialogContent from "../../../grocery-action-dialogs/edit-item/edit-item-dialog-content";
 import { deleteItemAction } from "@/actions/grocery-actions";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGroceryGroupContext } from "@/hooks/use-grocery-group";
 
 type DropdownDialogProps = {
   rowData: PricePoint;
@@ -20,6 +22,8 @@ type DropdownDialogProps = {
 export default function GroceryItemDropdown({ rowData }: DropdownDialogProps) {
   const [openedDialog, setOpenedDialog] = useState<"copy" | "edit">();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { groupId } = useGroceryGroupContext();
 
   const handleClose = () => {
     setOpenedDialog(undefined);
@@ -34,6 +38,7 @@ export default function GroceryItemDropdown({ rowData }: DropdownDialogProps) {
           description: response.error,
         });
       } else if (response.success) {
+        queryClient.invalidateQueries({ queryKey: ["priceHistory", groupId] });
         toast({
           description: "Item deleted.",
         });

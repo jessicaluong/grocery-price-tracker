@@ -18,6 +18,8 @@ import FormCheckbox from "../shared/item-form/item-form-checkbox";
 import { FormDatePicker } from "../shared/item-form/item-form-date-picker";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGroceryGroupContext } from "@/hooks/use-grocery-group";
 
 type EditItemFormProps = {
   item: PricePoint;
@@ -37,6 +39,8 @@ export default function EditItemForm({ item, onSuccess }: EditItemFormProps) {
   const [serverErrors, setServerErrors] = useState<ServerErrors>(null);
   const { isSubmitting } = form.formState;
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { groupId } = useGroceryGroupContext();
 
   async function onSubmit(values: TPricePointSchema) {
     try {
@@ -44,6 +48,7 @@ export default function EditItemForm({ item, onSuccess }: EditItemFormProps) {
       if (response.errors) {
         setServerErrors(response.errors);
       } else if (response.success) {
+        queryClient.invalidateQueries({ queryKey: ["priceHistory", groupId] });
         toast({
           description: "Item edited.",
         });

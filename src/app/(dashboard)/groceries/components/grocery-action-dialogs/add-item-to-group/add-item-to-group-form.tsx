@@ -15,6 +15,8 @@ import { FormDatePicker } from "../../grocery-action-dialogs/shared/item-form/it
 import FormCheckbox from "../../grocery-action-dialogs/shared/item-form/item-form-checkbox";
 import { DialogFooter } from "@/components/ui/dialog";
 import FormButton from "@/components/form/form-button";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGroceryGroupContext } from "@/hooks/use-grocery-group";
 
 type AddItemToGroupFormProps = {
   group: DbGroup;
@@ -35,6 +37,8 @@ export default function AddItemToGroupForm({
   const [serverErrors, setServerErrors] = useState<ServerErrors>(null);
   const { isSubmitting } = form.formState;
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { groupId } = useGroceryGroupContext();
 
   async function onSubmit(values: TPricePointSchema) {
     try {
@@ -42,6 +46,7 @@ export default function AddItemToGroupForm({
       if (response.errors) {
         setServerErrors(response.errors);
       } else if (response.success) {
+        queryClient.invalidateQueries({ queryKey: ["priceHistory", groupId] });
         toast({
           description: "Item added.",
         });
