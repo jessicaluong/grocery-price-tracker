@@ -17,6 +17,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { FieldPath, FieldValues, UseFormReturn } from "react-hook-form";
+import { useState, useEffect } from "react";
 
 type FormDatePickerProps<TFieldValues extends FieldValues> = {
   form: UseFormReturn<TFieldValues>;
@@ -31,6 +32,15 @@ export function FormDatePicker<TFieldValues extends FieldValues>({
   label,
   description,
 }: FormDatePickerProps<TFieldValues>) {
+  const [defaultMonth, setDefaultMonth] = useState<Date | undefined>(undefined);
+
+  useEffect(() => {
+    const fieldValue = form.getValues(name) as Date | undefined;
+    if (fieldValue) {
+      setDefaultMonth(fieldValue);
+    }
+  }, [form, name]);
+
   return (
     <FormField
       control={form.control}
@@ -67,6 +77,8 @@ export function FormDatePicker<TFieldValues extends FieldValues>({
                     date > new Date() || date < new Date("1900-01-01")
                   }
                   initialFocus
+                  month={defaultMonth}
+                  defaultMonth={defaultMonth}
                 />
               </PopoverContent>
             </Popover>
