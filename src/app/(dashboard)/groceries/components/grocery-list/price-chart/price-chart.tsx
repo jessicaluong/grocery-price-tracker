@@ -11,12 +11,15 @@ import { PricePoint } from "@/types/grocery";
 import React from "react";
 import { currencyFormat, formatDate, formatMonthYear } from "@/lib/utils";
 import TooltipFormat from "../price-chart/tooltip-formatter";
+import TimeFrameSelector from "./time-frame-buttons";
+import DateNavigation from "./date-navigation";
 import CustomizedDot from "./customized-dot";
 import {
   aggregateDataByMonth,
   generateIntervals,
   getKey,
 } from "./price-chart-utils";
+import { usePriceChart } from "@/hooks/use-price-chart";
 
 type PriceChartProps = {
   data: PricePoint[];
@@ -34,6 +37,8 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function PriceChart({ data }: PriceChartProps) {
+  const { handleSetDateRange } = usePriceChart();
+
   const yAxisDomain = React.useMemo(() => {
     if (!data || data.length === 0) return [0, 10];
 
@@ -60,6 +65,7 @@ export function PriceChart({ data }: PriceChartProps) {
 
     const minDate = new Date(Math.min(...dates.map((d) => d.getTime())));
     const maxDate = new Date(Math.max(...dates.map((d) => d.getTime())));
+    handleSetDateRange({ start: minDate, end: maxDate });
 
     const { intervals, hasJanuary } = generateIntervals(minDate, maxDate);
 
@@ -101,6 +107,8 @@ export function PriceChart({ data }: PriceChartProps) {
 
   return (
     <>
+      <TimeFrameSelector />
+      <DateNavigation />
       <ChartContainer config={chartConfig}>
         <LineChart
           accessibilityLayer

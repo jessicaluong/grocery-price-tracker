@@ -45,6 +45,26 @@ export function formatDate(
   return formatter.format(utcDate);
 }
 
+export function formatMonthYear(
+  dateValue: string | Date,
+  monthFmt: "numeric" | "2-digit" | "long" | "short" | "narrow" = "long",
+  yearFmt: "numeric" | "2-digit" = "numeric"
+): string {
+  const date = new Date(dateValue as string | number | Date);
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth();
+
+  const options: Intl.DateTimeFormatOptions = {
+    month: monthFmt,
+    year: yearFmt,
+    timeZone: "UTC",
+  };
+
+  const formatter = new Intl.DateTimeFormat("en-US", options);
+  const utcDate = new Date(Date.UTC(year, month, 1)); // Always use the 1st of the month
+  return formatter.format(utcDate);
+}
+
 export function getConvertedPrice(
   count: number,
   price: number,
