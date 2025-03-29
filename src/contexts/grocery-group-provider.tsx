@@ -1,5 +1,3 @@
-import { PricePoint } from "@/types/grocery";
-import { UseQueryResult } from "@tanstack/react-query";
 import { createContext } from "react";
 
 type GroceryGroupContextType = {
