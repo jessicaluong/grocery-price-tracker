@@ -58,6 +58,7 @@ const config: Config = {
         sale: {
           DEFAULT: "hsl(var(--sale))",
         },
+        hybrid: { DEFAULT: "hsl(var(--chart-hybrid))" },
       },
       borderRadius: {
         lg: "var(--radius)",

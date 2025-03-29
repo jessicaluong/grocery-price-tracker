@@ -32,6 +32,7 @@
     --themed-secondary: 142 26% 73%; /* #aacbb7 */
     --themed-accent: 142 30% 65%; /* #8dbfa1 */
     --sale: 346, 67%, 51%; /* #d52050 */
+    --chart-hybrid: 244, 43%, 52.5%;
   }
   .dark {
     --background: 222.2 84% 4.9%;
@@ -62,6 +63,7 @@
     --themed-secondary: 142 23% 27%; /* #345542 */
     --themed-accent: 142 31% 35%; /* #407254 */
     --sale: 345, 71%, 52%; /* #df2a5a */
+    --chart-hybrid: 243.5, 45.5%, 49%;
   }
 }
 @layer base {

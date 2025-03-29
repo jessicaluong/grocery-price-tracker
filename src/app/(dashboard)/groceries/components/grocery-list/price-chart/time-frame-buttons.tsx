@@ -6,17 +6,39 @@ export default function TimeFrameSelector() {
   const { timeFrame, handleSetTimeFrame } = usePriceChart();
 
   return (
-    <div className="flex flex-wrap justify-center gap-2">
-      {TIME_FRAMES.map((frame) => (
-        <Button
-          key={frame.value}
-          size="sm"
-          variant={timeFrame === frame.value ? "default" : "outline"}
-          onClick={() => handleSetTimeFrame(frame.value)}
-        >
-          {frame.label}
-        </Button>
-      ))}
+    // <div className="flex justify-center">
+    //   {TIME_FRAMES.map((frame) => (
+    //     <Button
+    //       key={frame.value}
+    //       size="sm"
+    //       variant={timeFrame === frame.value ? "default" : "ghost"}
+    //       onClick={() => handleSetTimeFrame(frame.value)}
+    //       className="min-w-16 sm:min-w-20"
+    //     >
+    //       {frame.label}
+    //     </Button>
+    //   ))}
+    // </div>
+
+    <div className="flex justify-center">
+      <div className="flex border rounded-md">
+        {TIME_FRAMES.map((frame, index) => (
+          <div key={frame.value} className="flex items-center">
+            {index > 0 && (
+              <div className="h-6 w-px bg-border self-center"></div>
+            )}
+            <Button
+              key={frame.value}
+              size="sm"
+              variant={timeFrame === frame.value ? "default" : "ghost"}
+              onClick={() => handleSetTimeFrame(frame.value)}
+              className="min-w-16 sm:min-w-20"
+            >
+              {frame.label}
+            </Button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
