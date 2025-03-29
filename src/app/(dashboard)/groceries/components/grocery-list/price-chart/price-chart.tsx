@@ -34,6 +34,10 @@ const chartConfig = {
     label: "Sale",
     color: "hsl(var(--sale))",
   },
+  hybrid: {
+    label: "Sale",
+    color: "hsl(var(--chart-hybrid))",
+  },
 } satisfies ChartConfig;
 
 export function PriceChart({ data }: PriceChartProps) {
@@ -42,6 +46,7 @@ export function PriceChart({ data }: PriceChartProps) {
   const yAxisDomain = React.useMemo(() => {
     if (!data || data.length === 0) return [0, 10];
 
+    // TODO: evenly spaced yAxis
     const prices = data.map((item) => item.price);
     const min = Math.min(...prices);
     const max = Math.max(...prices);
@@ -113,7 +118,7 @@ export function PriceChart({ data }: PriceChartProps) {
         <LineChart
           accessibilityLayer
           data={chartData}
-          margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
+          margin={{ top: 8, right: 8, left: 0, bottom: 8 }}
         >
           <CartesianGrid vertical={false} />
           <XAxis
@@ -121,6 +126,10 @@ export function PriceChart({ data }: PriceChartProps) {
             tickLine={false}
             axisLine={false}
             tickMargin={8}
+            // tick={{ fontSize: 12 }}
+            // minTickGap={5}
+            interval={0}
+
             // tickFormatter={(timestamp) => {
             //   return new Date(timestamp).toLocaleDateString("en-US", {
             //     month: "short",
