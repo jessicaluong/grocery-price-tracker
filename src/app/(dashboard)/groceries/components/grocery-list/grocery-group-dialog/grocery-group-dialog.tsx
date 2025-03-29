@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ItemWithView, PricePoint } from "@/types/grocery";
-import { currencyFormat } from "@/lib/utils";
 import { ItemQuantity } from "../item-quantity";
 import GroceryGroupTable from "./grocery-group-table/grocery-group-table";
 import { columns } from "./grocery-group-table/grocery-group-table-column";
@@ -16,6 +15,7 @@ import GroceryGroupDropdown from "./grocery-group-dropdown";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import GroceryGroupProvider from "@/contexts/grocery-group-provider";
+import { PriceChart } from "../price-chart/price-chart";
 
 type GroceryGroupDialogProps = {
   open: boolean;
@@ -88,26 +88,21 @@ export default function GroceryGroupDialog({
                   />
                 )}
               </div>
-              <div className="flex max-w-[70%] sm:max-w-full">
-                {item.brand && <div className="h-7 truncate">{item.brand}</div>}
-              </div>
-              <div className="flex font-light max-w-[70%] sm:max-w-full">
-                <span className="shrink-0">
-                  {groupInfo &&
-                    groupInfo.minPrice &&
-                    groupInfo.maxPrice &&
-                    (groupInfo.maxPrice === groupInfo.minPrice
-                      ? currencyFormat(groupInfo.minPrice)
-                      : `${currencyFormat(groupInfo.minPrice)}-${currencyFormat(
-                          groupInfo.maxPrice
-                        )}`)}
-                </span>
-                <span className="text-sm mx-1 shrink-0"> @ </span>
-                <span className="truncate">{item.store}</span>
-              </div>
             </DialogTitle>
-            <DialogDescription className="text-center"></DialogDescription>
+            <DialogDescription className="text-left text-md text-primary">
+              {item.brand && (
+                <div className="truncate font-semibold">{item.brand}</div>
+              )}
+              <div className="truncate">{item.store}</div>
+            </DialogDescription>
           </DialogHeader>
+          {data && data.length > 0 ? (
+            <PriceChart data={data} />
+          ) : (
+            <span className="text-center text-muted-foreground pb-4">
+              No price history available
+            </span>
+          )}
           <div className="max-w-xs sm:max-w-lg">
             {isLoading && (
               <p className="text-center py-4">Loading price history...</p>
