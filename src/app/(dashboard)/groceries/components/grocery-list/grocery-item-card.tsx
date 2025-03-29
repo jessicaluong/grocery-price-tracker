@@ -30,7 +30,7 @@ function ItemPrice({ price, isSale, count, amount, unit }: ItemPriceProps) {
         {isSale && <SaleIndicator />}
         {currencyFormat(price)}
       </p>
-      <p className="text-sm text-brand tracking-tighter h-7">
+      <p className="text-sm text-themed tracking-tighter h-7">
         {comparePriceFormat(count, price, amount, unit)}
       </p>
     </>
@@ -58,7 +58,7 @@ function GroupPriceRange({
         <p className="font-semibold tracking-tight flex items-center justify-end">
           &nbsp;
         </p>
-        <p className="text-sm text-brand tracking-tighter h-7"></p>
+        <p className="text-sm text-themed tracking-tighter h-7"></p>
       </>
     );
   }
@@ -69,7 +69,7 @@ function GroupPriceRange({
         {minPrice && minPrice !== maxPrice && `${currencyFormat(minPrice)}-`}
         {currencyFormat(maxPrice)}
       </p>
-      <p className="text-sm text-brand tracking-tighter h-7">
+      <p className="text-sm text-themed tracking-tighter h-7">
         {minPrice &&
           minPrice !== maxPrice &&
           `${currencyFormat(

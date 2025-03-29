@@ -50,10 +50,13 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
-        brand: {
-          DEFAULT: "hsl(var(--brand-primary))",
-          secondary: "hsl(var(--brand-secondary))",
-          accent: "hsl(var(--brand-accent))",
+        themed: {
+          DEFAULT: "hsl(var(--themed-primary))",
+          secondary: "hsl(var(--themed-secondary))",
+          accent: "hsl(var(--themed-accent))",
+        },
+        sale: {
+          DEFAULT: "hsl(var(--sale))",
         },
       },
       borderRadius: {

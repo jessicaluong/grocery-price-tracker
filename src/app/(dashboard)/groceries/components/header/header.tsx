@@ -11,7 +11,7 @@ export default function Header() {
       <div className="flex flex-col gap-4">
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
-            <ShoppingBasket className="text-brand" />
+            <ShoppingBasket className="text-themed" />
             <span className="font-semibold text-xl">My Groceries</span>
           </div>
           <div className="flex gap-2">

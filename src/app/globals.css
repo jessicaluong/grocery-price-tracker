@@ -28,9 +28,10 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --brand-primary: 142 19% 54%; /* #72a184 */
-    --brand-secondary: 142 26% 73%; /* #aacbb7 */
-    --brand-accent: 142 30% 65%; /* #8dbfa1 */
+    --themed-primary: 142 19% 54%; /* #72a184 */
+    --themed-secondary: 142 26% 73%; /* #aacbb7 */
+    --themed-accent: 142 30% 65%; /* #8dbfa1 */
+    --sale: 346, 67%, 51%; /* #d52050 */
   }
   .dark {
     --background: 222.2 84% 4.9%;
@@ -57,9 +58,10 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --brand-primary: 142 20% 46%; /* #5e8d70 */
-    --brand-secondary: 142 23% 27%; /* #345542 */
-    --brand-accent: 142 31% 35%; /* #407254 */
+    --themed-primary: 142 20% 46%; /* #5e8d70 */
+    --themed-secondary: 142 23% 27%; /* #345542 */
+    --themed-accent: 142 31% 35%; /* #407254 */
+    --sale: 345, 71%, 52%; /* #df2a5a */
   }
 }
 @layer base {
