@@ -25,15 +25,11 @@ type PriceChartProps = {
 const chartConfig = {
   price: {
     label: "Price",
-    color: "hsl(var(--chart-2))",
+    color: "hsl(var(--themed-primary))",
   },
   sale: {
     label: "Sale",
     color: "hsl(var(--sale))",
-  },
-  hybrid: {
-    label: "Sale",
-    color: "hsl(var(--chart-4))", // TODO: select actual color for this
   },
 } satisfies ChartConfig;
 
@@ -52,7 +48,16 @@ export function PriceChart({ data }: PriceChartProps) {
   const chartData = React.useMemo(() => {
     if (!data || data.length === 0) return [];
 
+    // should already be sorted but defensive programming
+    // double check
+    // if sorted, min is first and max is last
     const dates = data.map((item) => new Date(formatDate(item.date)));
+    // const minDate = dates[0];
+    // const maxDate = dates.at(-1);
+    // if (maxDate) {
+    //   generateIntervals(minDate, maxDate);
+    // }
+
     const minDate = new Date(Math.min(...dates.map((d) => d.getTime())));
     const maxDate = new Date(Math.max(...dates.map((d) => d.getTime())));
 
@@ -82,7 +87,13 @@ export function PriceChart({ data }: PriceChartProps) {
               avgSalePrice: monthData.avgSalePrice,
               avgRegPrice: monthData.avgRegPrice,
             }
-          : { price: null, saleCount: null, count: null }),
+          : {
+              price: null,
+              saleCount: null,
+              count: null,
+              avgSalePrice: null,
+              avgRegPrice: null,
+            }),
       };
     });
     return res;
@@ -102,6 +113,13 @@ export function PriceChart({ data }: PriceChartProps) {
             tickLine={false}
             axisLine={false}
             tickMargin={8}
+            // tickFormatter={(timestamp) => {
+            //   return new Date(timestamp).toLocaleDateString("en-US", {
+            //     month: "short",
+            //     day: "numeric",
+            //     year: "2-digit",
+            //   });
+            // }}
           />
           <YAxis
             domain={yAxisDomain}
