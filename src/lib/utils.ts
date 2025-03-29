@@ -47,7 +47,7 @@ export function formatDate(
 
 export function formatMonthYear(
   dateValue: string | Date,
-  monthFmt: "numeric" | "2-digit" | "long" | "short" | "narrow" = "long",
+  monthFmt: "numeric" | "2-digit" | "long" | "short" | "narrow" = "short",
   yearFmt: "numeric" | "2-digit" = "numeric"
 ): string {
   const date = new Date(dateValue as string | number | Date);
