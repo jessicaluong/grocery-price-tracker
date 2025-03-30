@@ -18,6 +18,7 @@ import {
   aggregateDataByMonth,
   calculateDateRange,
   generateMonthlyIntervals,
+  getMaxOffset,
   getMonthKey,
 } from "./price-chart-utils";
 import { usePriceChart } from "@/hooks/use-price-chart";
@@ -47,6 +48,16 @@ export function PriceChart({ data }: PriceChartProps) {
     start: Date | null;
     end: Date | null;
   }>({ start: null, end: null });
+  const [offset, setOffset] = React.useState(0);
+  const [maxOffset, setMaxOffset] = React.useState(0);
+
+  const increaseOffset = () => {
+    setOffset((prev) => prev + 1);
+  };
+
+  const decreaseOffset = () => {
+    setOffset((prev) => prev - 1);
+  };
 
   const yAxisDomain = React.useMemo(() => {
     if (!data || data.length === 0) return [0, 10];
@@ -73,7 +84,14 @@ export function PriceChart({ data }: PriceChartProps) {
     const minDate = new Date(Math.min(...dates.map((d) => d.getTime())));
     const maxDate = new Date(Math.max(...dates.map((d) => d.getTime())));
 
-    const { start, end } = calculateDateRange(minDate, maxDate, timeFrame);
+    setMaxOffset(getMaxOffset(minDate, maxDate, timeFrame));
+
+    const { start, end } = calculateDateRange(
+      minDate,
+      maxDate,
+      timeFrame,
+      offset
+    );
     setDateRange({ start, end });
 
     switch (timeFrame) {
@@ -126,12 +144,18 @@ export function PriceChart({ data }: PriceChartProps) {
       case "1m": // 1-31 (daily averages)
         break;
     }
-  }, [data, timeFrame]);
+  }, [data, timeFrame, offset]);
 
   return (
     <>
       <TimeFrameSelector />
-      <DateNavigation dateRange={dateRange} />
+      <DateNavigation
+        dateRange={dateRange}
+        offset={offset}
+        increaseOffset={increaseOffset}
+        decreaseOffset={decreaseOffset}
+        maxOffset={maxOffset}
+      />
       <ChartContainer config={chartConfig}>
         <LineChart
           accessibilityLayer
