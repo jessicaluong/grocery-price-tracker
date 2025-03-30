@@ -8,7 +8,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { PricePoint } from "@/types/grocery";
-import React from "react";
+import React, { useEffect } from "react";
 import { currencyFormat, formatDate, formatMonthYear } from "@/lib/utils";
 import TooltipFormat from "../price-chart/tooltip-formatter";
 import TimeFrameSelector from "./time-frame-buttons";
@@ -16,8 +16,9 @@ import DateNavigation from "./date-navigation";
 import CustomizedDot from "./customized-dot";
 import {
   aggregateDataByMonth,
-  generateIntervals,
-  getKey,
+  calculateDateRange,
+  generateMonthlyIntervals,
+  getMonthKey,
 } from "./price-chart-utils";
 import { usePriceChart } from "@/hooks/use-price-chart";
 
@@ -41,7 +42,11 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function PriceChart({ data }: PriceChartProps) {
-  const { handleSetDateRange } = usePriceChart();
+  const { timeFrame } = usePriceChart();
+  const [dateRange, setDateRange] = React.useState<{
+    start: Date | null;
+    end: Date | null;
+  }>({ start: null, end: null });
 
   const yAxisDomain = React.useMemo(() => {
     if (!data || data.length === 0) return [0, 10];
@@ -57,9 +62,7 @@ export function PriceChart({ data }: PriceChartProps) {
 
   const chartData = React.useMemo(() => {
     if (!data || data.length === 0) return [];
-
     // should already be sorted but defensive programming
-    // double check
     // if sorted, min is first and max is last
     const dates = data.map((item) => new Date(formatDate(item.date)));
     // const minDate = dates[0];
@@ -67,53 +70,68 @@ export function PriceChart({ data }: PriceChartProps) {
     // if (maxDate) {
     //   generateIntervals(minDate, maxDate);
     // }
-
     const minDate = new Date(Math.min(...dates.map((d) => d.getTime())));
     const maxDate = new Date(Math.max(...dates.map((d) => d.getTime())));
-    handleSetDateRange({ start: minDate, end: maxDate });
 
-    const { intervals, hasJanuary } = generateIntervals(minDate, maxDate);
+    const { start, end } = calculateDateRange(minDate, maxDate, timeFrame);
+    setDateRange({ start, end });
 
-    const aggregateData = aggregateDataByMonth(data);
+    switch (timeFrame) {
+      case "all":
+      case "y": {
+        const { intervals, hasJanuary } = generateMonthlyIntervals(start, end);
+        const aggregateData = aggregateDataByMonth(data);
 
-    const res = intervals.map((interval: Date, index: number) => {
-      const xAxisLabel = hasJanuary
-        ? interval.getMonth() === 0
-          ? interval.getFullYear().toString()
-          : ""
-        : index === 0
-        ? interval.getFullYear().toString()
-        : "";
+        const processedData = intervals.map((interval: Date, index: number) => {
+          let xAxisLabel = "";
+          if (timeFrame === "all") {
+            xAxisLabel = hasJanuary
+              ? interval.getMonth() === 0
+                ? interval.getFullYear().toString()
+                : ""
+              : index === 0
+              ? interval.getFullYear().toString()
+              : "";
+          } else if (timeFrame === "y") {
+            xAxisLabel = interval
+              .toLocaleDateString("en-US", { month: "short" })
+              .charAt(0);
+          }
 
-      const monthData = aggregateData.get(getKey(interval));
-
-      return {
-        xAxisLabel,
-        date: formatMonthYear(interval),
-        ...(monthData
-          ? {
-              price: monthData.avgPrice,
-              saleCount: monthData.saleCount,
-              count: monthData.count,
-              avgSalePrice: monthData.avgSalePrice,
-              avgRegPrice: monthData.avgRegPrice,
-            }
-          : {
-              price: null,
-              saleCount: null,
-              count: null,
-              avgSalePrice: null,
-              avgRegPrice: null,
-            }),
-      };
-    });
-    return res;
-  }, [data]);
+          const monthData = aggregateData.get(getMonthKey(interval));
+          return {
+            xAxisLabel,
+            date: formatMonthYear(interval),
+            ...(monthData
+              ? {
+                  price: monthData.avgPrice,
+                  saleCount: monthData.saleCount,
+                  count: monthData.count,
+                  avgSalePrice: monthData.avgSalePrice,
+                  avgRegPrice: monthData.avgRegPrice,
+                }
+              : {
+                  price: null,
+                  saleCount: null,
+                  count: null,
+                  avgSalePrice: null,
+                  avgRegPrice: null,
+                }),
+          };
+        });
+        return processedData;
+      }
+      case "3m": // jan-mar, apr-jun, jul-sep, oct-dec (weekly averages)
+        break;
+      case "1m": // 1-31 (daily averages)
+        break;
+    }
+  }, [data, timeFrame]);
 
   return (
     <>
       <TimeFrameSelector />
-      <DateNavigation />
+      <DateNavigation dateRange={dateRange} />
       <ChartContainer config={chartConfig}>
         <LineChart
           accessibilityLayer

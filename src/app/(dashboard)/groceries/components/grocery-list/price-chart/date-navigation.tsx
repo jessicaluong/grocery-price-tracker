@@ -1,14 +1,39 @@
 import { Button } from "@/components/ui/button";
 import { usePriceChart } from "@/hooks/use-price-chart";
 import { formatMonthYear } from "@/lib/utils";
+import { DateRange, TimeFrame } from "@/types/price-chart";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export default function DateNavigation() {
-  const { timeFrame, dateRange } = usePriceChart();
+type DateNavigationProps = {
+  dateRange: DateRange;
+};
 
-  const startDate = dateRange.start ? formatMonthYear(dateRange.start) : "";
-  const endDate = dateRange.end ? formatMonthYear(dateRange.end) : "";
+function getDisplayDateRange(
+  timeFrame: TimeFrame,
+  start: Date | null,
+  end: Date | null
+) {
+  switch (timeFrame) {
+    case "all": {
+      const startDate = start ? formatMonthYear(start) : "";
+      const endDate = end ? formatMonthYear(end) : "";
+      return startDate !== endDate ? `${startDate} - ${endDate}` : endDate;
+    }
+    case "y": {
+      const year = start
+        ? start.toLocaleDateString("en-US", {
+            year: "numeric",
+          })
+        : "";
+      return year;
+    }
+    default:
+      return "";
+  }
+}
 
+export default function DateNavigation({ dateRange }: DateNavigationProps) {
+  const { timeFrame } = usePriceChart();
   return (
     <div className="flex items-center justify-center gap-3">
       <Button
@@ -22,8 +47,7 @@ export default function DateNavigation() {
         <ChevronLeft className="h-4 w-4" />
       </Button>
       <span className="text-sm font-medium">
-        {startDate !== endDate && `${startDate} - `}
-        {endDate}
+        {getDisplayDateRange(timeFrame, dateRange.start, dateRange.end)}
       </span>
       <Button
         variant="ghost"
