@@ -15,9 +15,12 @@ import TimeFrameSelector from "./time-frame-buttons";
 import DateNavigation from "./date-navigation";
 import CustomizedDot from "./customized-dot";
 import {
+  aggregateDataByDay,
   aggregateDataByMonth,
   calculateDateRange,
+  generateDailyIntervals,
   generateMonthlyIntervals,
+  getDayKey,
   getMaxOffset,
   getMonthKey,
 } from "./price-chart-utils";
@@ -117,6 +120,7 @@ export function PriceChart({ data }: PriceChartProps) {
           }
 
           const monthData = aggregateData.get(getMonthKey(interval));
+
           return {
             xAxisLabel,
             date: formatMonthYear(interval),
@@ -141,8 +145,36 @@ export function PriceChart({ data }: PriceChartProps) {
       }
       case "3m": // jan-mar, apr-jun, jul-sep, oct-dec (weekly averages)
         break;
-      case "1m": // 1-31 (daily averages)
-        break;
+      case "1m": {
+        const { intervals } = generateDailyIntervals(start);
+        const aggregateData = aggregateDataByDay(data);
+
+        const processedData = intervals.map((interval: Date) => {
+          let xAxisLabel = interval.getDate();
+
+          const dayData = aggregateData.get(getDayKey(interval));
+          return {
+            xAxisLabel,
+            date: formatMonthYear(interval),
+            ...(dayData
+              ? {
+                  price: dayData.avgPrice,
+                  saleCount: dayData.saleCount,
+                  count: dayData.count,
+                  avgSalePrice: dayData.avgSalePrice,
+                  avgRegPrice: dayData.avgRegPrice,
+                }
+              : {
+                  price: null,
+                  saleCount: null,
+                  count: null,
+                  avgSalePrice: null,
+                  avgRegPrice: null,
+                }),
+          };
+        });
+        return processedData;
+      }
     }
   }, [data, timeFrame, offset]);
 
@@ -168,17 +200,7 @@ export function PriceChart({ data }: PriceChartProps) {
             tickLine={false}
             axisLine={false}
             tickMargin={8}
-            // tick={{ fontSize: 12 }}
-            // minTickGap={5}
-            interval={0}
-
-            // tickFormatter={(timestamp) => {
-            //   return new Date(timestamp).toLocaleDateString("en-US", {
-            //     month: "short",
-            //     day: "numeric",
-            //     year: "2-digit",
-            //   });
-            // }}
+            interval={timeFrame === "1m" ? 3 : timeFrame === "3m" ? 1 : 0}
           />
           <YAxis
             domain={yAxisDomain}

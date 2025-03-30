@@ -3,7 +3,6 @@ import { usePriceChart } from "@/hooks/use-price-chart";
 import { formatMonthYear } from "@/lib/utils";
 import { DateRange, TimeFrame } from "@/types/price-chart";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { getMaxOffset } from "./price-chart-utils";
 
 type DateNavigationProps = {
   dateRange: DateRange;
@@ -31,6 +30,10 @@ function getDisplayDateRange(
           })
         : "";
       return year;
+    }
+    case "1m": {
+      const month = start ? formatMonthYear(start) : "";
+      return month;
     }
     default:
       return "";

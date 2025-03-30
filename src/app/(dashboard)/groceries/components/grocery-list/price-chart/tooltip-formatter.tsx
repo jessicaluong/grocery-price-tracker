@@ -1,4 +1,5 @@
 import { Progress } from "@/components/ui/progress";
+import { usePriceChart } from "@/hooks/use-price-chart";
 import { currencyFormat } from "@/lib/utils";
 
 type TooltipFormatProps = {
@@ -18,6 +19,21 @@ export default function TooltipFormat({
   avgSalePrice,
   avgRegPrice,
 }: TooltipFormatProps) {
+  const { timeFrame } = usePriceChart();
+
+  if (timeFrame === "1m" && count === 1) {
+    return (
+      <div className="flex flex-col gap-1 w-full">
+        <div className="font-medium">{date}</div>
+        <div className="flex flex-col"></div>
+        <div className="flex justify-between items-center">
+          <span className="mr-2">Price:</span>
+          <span className="font-mono font-medium">{currencyFormat(price)}</span>
+        </div>
+        {saleCount === 1 && <div className="text-sale">Sale</div>}
+      </div>
+    );
+  }
   const percentSale = (saleCount / count) * 100;
   const regCount = count - saleCount;
 
