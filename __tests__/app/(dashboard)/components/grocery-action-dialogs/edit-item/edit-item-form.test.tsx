@@ -1,9 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Unit } from "@/types/grocery";
 import { useToast } from "@/hooks/use-toast";
 import EditItemForm from "@/app/(dashboard)/groceries/components/grocery-action-dialogs/edit-item/edit-item-form";
 import { editItemAction } from "@/actions/grocery-actions";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGroceryGroupContext } from "@/hooks/use-grocery-group";
 
 jest.mock("@/hooks/use-toast", () => ({
   useToast: jest.fn(() => ({
@@ -15,6 +16,14 @@ jest.mock("@/actions/grocery-actions", () => ({
   editItemAction: jest.fn(),
 }));
 
+jest.mock("@tanstack/react-query", () => ({
+  useQueryClient: jest.fn(),
+}));
+
+jest.mock("@/hooks/use-grocery-group", () => ({
+  useGroceryGroupContext: jest.fn(),
+}));
+
 describe("EditItemForm", () => {
   /**
    * This component uses the same validation as AddItemForm (tested in add-item-form.test.tsx)
@@ -22,6 +31,8 @@ describe("EditItemForm", () => {
    */
 
   const mockOnSuccess = jest.fn();
+  const mockInvalidateQueries = jest.fn();
+  const mockGroupId = "test-group-id";
   const user = userEvent.setup();
   const item = {
     id: "test-item-id",
@@ -29,6 +40,15 @@ describe("EditItemForm", () => {
     date: new Date("2025-03-15T12:00:00"),
     isSale: true,
   };
+
+  beforeEach(() => {
+    (useQueryClient as jest.Mock).mockReturnValue({
+      invalidateQueries: mockInvalidateQueries,
+    });
+    (useGroceryGroupContext as jest.Mock).mockReturnValue({
+      groupId: mockGroupId,
+    });
+  });
 
   describe("render", () => {
     it("renders the form correctly", () => {
@@ -53,7 +73,7 @@ describe("EditItemForm", () => {
   });
 
   describe("successful submission", () => {
-    it("calls editItemAction, toast, and onSuccess when form submission is successful", async () => {
+    it("calls editItemAction, invalidates queries, shows toast, and calls onSuccess when form submission is successful", async () => {
       const mockToast = jest.fn();
       (useToast as jest.Mock).mockReturnValue({ toast: mockToast });
       (editItemAction as jest.Mock).mockResolvedValue({ success: true });
@@ -64,6 +84,9 @@ describe("EditItemForm", () => {
 
       await waitFor(() => {
         expect(editItemAction).toHaveBeenCalled();
+        expect(mockInvalidateQueries).toHaveBeenCalledWith({
+          queryKey: ["priceHistory", mockGroupId],
+        });
         expect(mockToast).toHaveBeenCalledWith({
           description: "Item edited.",
         });
@@ -155,6 +178,23 @@ describe("EditItemForm", () => {
             content.includes("An error occurred while editing item")
           )
         ).toBeInTheDocument();
+      });
+    });
+
+    it("should not invalidate queries when submission fails", async () => {
+      (editItemAction as jest.Mock).mockResolvedValue({
+        errors: { form: "Server error" },
+      });
+
+      render(<EditItemForm item={item} onSuccess={mockOnSuccess} />);
+
+      // fill in required fields
+      await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+      await waitFor(() => {
+        expect(editItemAction).toHaveBeenCalled();
+        expect(mockInvalidateQueries).not.toHaveBeenCalled();
+        expect(mockOnSuccess).not.toHaveBeenCalled();
       });
     });
   });

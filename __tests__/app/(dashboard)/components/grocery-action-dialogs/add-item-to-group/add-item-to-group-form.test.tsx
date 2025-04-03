@@ -4,6 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { addItemToGroupAction } from "@/actions/grocery-actions";
 import { Unit } from "@/types/grocery";
 import AddItemToGroupForm from "@/app/(dashboard)/groceries/components/grocery-action-dialogs/add-item-to-group/add-item-to-group-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGroceryGroupContext } from "@/hooks/use-grocery-group";
 
 jest.mock("@/hooks/use-toast", () => ({
   useToast: jest.fn(() => ({
@@ -15,6 +17,14 @@ jest.mock("@/actions/grocery-actions", () => ({
   addItemToGroupAction: jest.fn(),
 }));
 
+jest.mock("@tanstack/react-query", () => ({
+  useQueryClient: jest.fn(),
+}));
+
+jest.mock("@/hooks/use-grocery-group", () => ({
+  useGroceryGroupContext: jest.fn(),
+}));
+
 describe("AddItemToGroupForm", () => {
   /**
    * This component uses the same validation as AddItemForm (tested in add-item-form.test.tsx)
@@ -22,6 +32,8 @@ describe("AddItemToGroupForm", () => {
    */
 
   const mockOnSuccess = jest.fn();
+  const mockInvalidateQueries = jest.fn();
+  const mockGroupId = "test-group-id";
   const user = userEvent.setup();
   const group = {
     id: "test-group-id",
@@ -35,11 +47,20 @@ describe("AddItemToGroupForm", () => {
 
   const selectDate = async () => {
     await user.click(screen.getByText("Pick a date"));
-    await user.click(screen.getByRole("gridcell", { name: "15" }));
+    await user.click(screen.getAllByRole("gridcell", { name: "1" })[0]);
 
     // close date picker
     await user.keyboard("{Escape}");
   };
+
+  beforeEach(() => {
+    (useQueryClient as jest.Mock).mockReturnValue({
+      invalidateQueries: mockInvalidateQueries,
+    });
+    (useGroceryGroupContext as jest.Mock).mockReturnValue({
+      groupId: mockGroupId,
+    });
+  });
 
   describe("render", () => {
     it("renders the form correctly", () => {
@@ -60,7 +81,7 @@ describe("AddItemToGroupForm", () => {
   });
 
   describe("successful submission", () => {
-    it("calls addItemToGroupAction, toast, and onSuccess when form submission is successful", async () => {
+    it("calls addItemToGroupAction, invalidates queries, shows toast, and calls onSuccess when form submission is successful", async () => {
       const mockToast = jest.fn();
       (useToast as jest.Mock).mockReturnValue({ toast: mockToast });
       (addItemToGroupAction as jest.Mock).mockResolvedValue({ success: true });
@@ -75,6 +96,9 @@ describe("AddItemToGroupForm", () => {
 
       await waitFor(() => {
         expect(addItemToGroupAction).toHaveBeenCalled();
+        expect(mockInvalidateQueries).toHaveBeenCalledWith({
+          queryKey: ["priceHistory", mockGroupId],
+        });
         expect(mockToast).toHaveBeenCalledWith({
           description: "Item added.",
         });
@@ -102,7 +126,7 @@ describe("AddItemToGroupForm", () => {
           isSale: true,
         });
 
-        expect(formData.date.getDate()).toBe(15);
+        expect(formData.date.getDate()).toBe(1);
 
         expect(groupId).toBe("test-group-id");
       });
@@ -178,6 +202,26 @@ describe("AddItemToGroupForm", () => {
             content.includes("An error occurred while adding item")
           )
         ).toBeInTheDocument();
+      });
+    });
+
+    it("should not invalidate queries when submission fails", async () => {
+      (addItemToGroupAction as jest.Mock).mockResolvedValue({
+        errors: { form: "Server error" },
+      });
+
+      render(<AddItemToGroupForm group={group} onSuccess={mockOnSuccess} />);
+
+      // fill in required fields
+      await user.type(screen.getByLabelText("Price"), "1.50");
+      await selectDate();
+
+      await user.click(screen.getByRole("button", { name: "Submit" }));
+
+      await waitFor(() => {
+        expect(addItemToGroupAction).toHaveBeenCalled();
+        expect(mockInvalidateQueries).not.toHaveBeenCalled();
+        expect(mockOnSuccess).not.toHaveBeenCalled();
       });
     });
   });

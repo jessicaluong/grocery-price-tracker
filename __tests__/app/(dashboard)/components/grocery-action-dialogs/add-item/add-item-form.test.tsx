@@ -21,7 +21,7 @@ describe("AddItemForm", () => {
 
   const selectDate = async () => {
     await user.click(screen.getByText("Pick a date"));
-    await user.click(screen.getByRole("gridcell", { name: "15" }));
+    await user.click(screen.getAllByRole("gridcell", { name: "1" })[0]);
 
     // close date picker
     await user.keyboard("{Escape}");
