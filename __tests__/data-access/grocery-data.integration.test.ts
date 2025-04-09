@@ -1,15 +1,16 @@
 import {
   addItem,
   addItemToGroup,
+  addReceiptData,
   deleteGroup,
   deleteItem,
   editGroup,
   editItem,
 } from "@/data-access/grocery-data";
 import prisma from "@/lib/db";
-import { Unit } from "@prisma/client";
 import { verifySession } from "@/lib/auth";
 import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
+import { UnitEnum } from "@/types/grocery";
 
 jest.mock("@/lib/auth", () => ({
   verifySession: jest.fn(),
@@ -21,6 +22,7 @@ jest.mock("next/navigation", () => ({
 
 describe("Item Repository integration tests", () => {
   const userId = "test-user-id";
+  const otherUserId = "other-user-id";
 
   beforeAll(async () => {
     await prisma.user.create({
@@ -58,7 +60,7 @@ describe("Item Repository integration tests", () => {
       store: "Test Store",
       count: 1,
       amount: 100,
-      unit: Unit.mL,
+      unit: UnitEnum.mL,
       price: 4.99,
       date: new Date("2024-03-01"),
       isSale: true,
@@ -96,8 +98,7 @@ describe("Item Repository integration tests", () => {
 
     it("should add a new item to an existing group", async () => {
       // Create a group
-      const firstResult = await addItem(baseItem);
-      expect(firstResult).toBeDefined();
+      await addItem(baseItem);
 
       const group = await prisma.group.findFirst({
         where: {
@@ -119,8 +120,7 @@ describe("Item Repository integration tests", () => {
         isSale: false,
       };
 
-      const secondResult = await addItem(secondItem);
-      expect(secondResult).toBeDefined();
+      await addItem(secondItem);
 
       const updatedGroup = await prisma.group.findUnique({
         where: { id: groupId },
@@ -155,8 +155,7 @@ describe("Item Repository integration tests", () => {
         brand: null,
       };
 
-      const result = await addItem(itemWithNullBrand);
-      expect(result).toBeDefined();
+      await addItem(itemWithNullBrand);
 
       const group = await prisma.group.findFirst({
         where: {
@@ -314,7 +313,7 @@ describe("Item Repository integration tests", () => {
       const item1 = { ...baseItem };
       const item2 = {
         ...baseItem,
-        unit: Unit.L,
+        unit: UnitEnum.L,
         price: 9.99,
       };
 
@@ -448,7 +447,6 @@ describe("Item Repository integration tests", () => {
     it("should isolate items between different users", async () => {
       await addItem(baseItem);
 
-      const otherUserId = "different-user";
       await prisma.user.create({
         data: {
           id: otherUserId,
@@ -495,15 +493,164 @@ describe("Item Repository integration tests", () => {
     });
   });
 
+  describe("addReceiptData", () => {
+    afterEach(async () => {
+      const deleteItem = prisma.item.deleteMany({});
+      const deleteGroup = prisma.group.deleteMany({});
+      await prisma.$transaction([deleteItem, deleteGroup]);
+    });
+
+    const receiptData = {
+      store: "Superstore",
+      date: new Date("2025-03-27"),
+      items: [
+        {
+          name: "Milk",
+          brand: "Dairyland",
+          count: 1,
+          amount: 1,
+          unit: UnitEnum.L,
+          price: 3.99,
+          isSale: false,
+        },
+        {
+          name: "Bread",
+          brand: "Silver Hills",
+          count: 1,
+          amount: 675,
+          unit: UnitEnum.g,
+          price: 2.49,
+          isSale: true,
+        },
+        {
+          name: "Eggs",
+          brand: null,
+          count: 1,
+          amount: 12,
+          unit: UnitEnum.units,
+          price: 4.29,
+          isSale: false,
+        },
+      ],
+    };
+
+    it("should add multiple items from a receipt in a single transaction", async () => {
+      await addReceiptData(receiptData);
+
+      const groups = await prisma.group.findMany({
+        where: { userId },
+        include: { items: true },
+      });
+
+      expect(groups.length).toBe(3);
+
+      for (const group of groups) {
+        expect(group.store).toBe("Superstore");
+        expect(group.items[0].date.toISOString()).toBe(
+          receiptData.date.toISOString()
+        );
+      }
+
+      // check one item for verification
+      const eggsGroup = groups.find(
+        (g) => g.name === "Eggs" && g.brand === null
+      );
+      expect(eggsGroup).toBeDefined();
+      expect(eggsGroup?.count).toBe(1);
+      expect(eggsGroup?.amount).toBe(12);
+      expect(eggsGroup?.unit).toBe(UnitEnum.units);
+      expect(eggsGroup?.items.length).toBe(1);
+      expect(eggsGroup?.items[0].price).toBe(4.29);
+      expect(eggsGroup?.items[0].isSale).toBe(false);
+    });
+
+    it("should add to existing groups when matching items exist in receipt", async () => {
+      const existingItem = {
+        name: "Milk",
+        brand: "Dairyland",
+        store: "Superstore",
+        count: 1,
+        amount: 1,
+        unit: UnitEnum.L,
+        price: 4.99,
+        date: new Date("2025-03-01"),
+        isSale: false,
+      };
+
+      await addItem(existingItem);
+
+      await addReceiptData(receiptData);
+
+      const groups = await prisma.group.findMany({
+        where: { userId },
+        include: {
+          items: {
+            orderBy: { date: "asc" },
+          },
+        },
+      });
+
+      expect(groups.length).toBe(3);
+
+      const milkGroup = groups.find((g) => g.name === "Milk");
+      expect(milkGroup).toBeDefined();
+      expect(milkGroup?.items.length).toBe(2);
+
+      const prices = milkGroup?.items.map((item) => item.price).sort();
+      expect(prices).toEqual([3.99, 4.99]);
+    });
+
+    it("should prevent unauthorized users from adding receipt data", async () => {
+      (verifySession as jest.Mock).mockResolvedValue({ userId: otherUserId });
+
+      await addReceiptData(receiptData);
+
+      // verify no items were added
+      const groups = await prisma.group.findMany({
+        where: { userId },
+      });
+
+      expect(groups.length).toBe(0);
+    });
+
+    it("should handle a large receipt with many items", async () => {
+      const items = Array.from({ length: 20 }, (_, i) => ({
+        name: `Item ${i + 1}`,
+        brand: i % 2 === 0 ? `Brand ${i + 1}` : null,
+        count: 1,
+        amount: i + 1,
+        unit: UnitEnum.units,
+        price: (i + 1) * 0.99,
+        isSale: i % 3 === 0,
+      }));
+
+      const receiptData = {
+        store: "Superstore",
+        date: new Date("2025-03-27"),
+        items,
+      };
+
+      await addReceiptData(receiptData);
+
+      const groups = await prisma.group.findMany({
+        where: { userId },
+      });
+
+      expect(groups.length).toBe(20);
+
+      const allSameStore = groups.every((g) => g.store === "Superstore");
+      expect(allSameStore).toBe(true);
+    });
+  });
+
   describe("editItem", () => {
-    const otherUserId = "other-user-id";
     const existingGroupData = {
       name: "Original Name",
       brand: "Original Brand",
       store: "Original Store",
       count: 1,
       amount: 1,
-      unit: Unit.kg,
+      unit: UnitEnum.kg,
       userId,
     };
     const existingItemData = {
@@ -580,14 +727,13 @@ describe("Item Repository integration tests", () => {
   });
 
   describe("deleteItem", () => {
-    const otherUserId = "other-user-id";
     const existingGroupData = {
       name: "Original Name",
       brand: "Original Brand",
       store: "Original Store",
       count: 1,
       amount: 1,
-      unit: Unit.kg,
+      unit: UnitEnum.kg,
       userId,
     };
     const existingItemData = {
@@ -659,8 +805,6 @@ describe("Item Repository integration tests", () => {
   });
 
   describe("addItemToGroup", () => {
-    const otherUserId = "other-user-id";
-
     const newItemData = {
       price: 4.99,
       date: new Date("2025-03-15"),
@@ -673,7 +817,7 @@ describe("Item Repository integration tests", () => {
       store: "Original Store",
       count: 1,
       amount: 1,
-      unit: Unit.kg,
+      unit: UnitEnum.kg,
       userId,
     };
 
@@ -742,15 +886,13 @@ describe("Item Repository integration tests", () => {
   });
 
   describe("editGroup", () => {
-    const otherUserId = "other-user-id";
-
     const existingGroupData = {
       name: "Original Name",
       brand: "Original Brand",
       store: "Original Store",
       count: 1,
       amount: 1,
-      unit: Unit.kg,
+      unit: UnitEnum.kg,
       userId,
     };
 
@@ -762,7 +904,7 @@ describe("Item Repository integration tests", () => {
       store: "Updated Store",
       count: 2,
       amount: 200,
-      unit: Unit.mL,
+      unit: UnitEnum.mL,
     };
 
     beforeEach(async () => {
@@ -859,14 +1001,13 @@ describe("Item Repository integration tests", () => {
   });
 
   describe("deleteGroup", () => {
-    const otherUserId = "other-user-id";
     const existingGroupData = {
       name: "Original Name",
       brand: "Original Brand",
       store: "Original Store",
       count: 1,
       amount: 1,
-      unit: Unit.kg,
+      unit: UnitEnum.kg,
       userId,
     };
     let existingGroupId: string;

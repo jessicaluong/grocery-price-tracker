@@ -7,7 +7,7 @@ import {
 import { getGroups, getItems } from "@/data-access/grocery-data";
 import { getFilteredItemsWithView } from "./grocery-list-utils";
 import { ShoppingCart } from "lucide-react";
-import AddItemDialog from "../grocery-action-dialogs/add-item/add-item-dialog";
+import AddItemDialog from "../header/add-dialog/add-dialog";
 import { verifySession } from "@/lib/auth";
 
 type GroceryListProps = {

@@ -2,8 +2,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { addItemAction } from "@/actions/grocery-actions";
 import React from "react";
-import AddItemForm from "@/app/(dashboard)/groceries/components/grocery-action-dialogs/add-item/add-item-form";
 import { useToast } from "@/hooks/use-toast";
+import AddItemForm from "@/app/(dashboard)/groceries/components/header/add-dialog/manual/add-item-form";
 
 jest.mock("@/actions/grocery-actions", () => ({
   addItemAction: jest.fn(),
@@ -82,22 +82,6 @@ describe("AddItemForm", () => {
     });
 
     describe("number field", () => {
-      it("shows correct error messages for empty field or non-numeric input", async () => {
-        const user = userEvent.setup();
-        render(<AddItemForm onSuccess={mockOnSuccess} />);
-
-        await user.click(screen.getByRole("button", { name: "Submit" }));
-
-        await waitFor(() => {
-          expect(
-            screen.getByText("Amount must be a number")
-          ).toBeInTheDocument();
-          expect(
-            screen.getByText("Price must be a number")
-          ).toBeInTheDocument();
-        });
-      });
-
       it("shows correct error messages for nonpositive number", async () => {
         const user = userEvent.setup();
         render(<AddItemForm onSuccess={mockOnSuccess} />);

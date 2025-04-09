@@ -1,6 +1,7 @@
 import {
   addItemAction,
   addItemToGroupAction,
+  addReceiptDataAction,
   deleteGroupAction,
   deleteItemAction,
   editGroupAction,
@@ -9,13 +10,14 @@ import {
 import {
   addItem,
   addItemToGroup,
+  addReceiptData,
   deleteGroup,
   deleteItem,
   editGroup,
   editItem,
 } from "@/data-access/grocery-data";
 import { verifySession } from "@/lib/auth";
-import { Unit } from "@/types/grocery";
+import { Unit, UnitEnum } from "@/types/grocery";
 import { revalidatePath } from "next/cache";
 
 jest.mock("@/lib/auth", () => ({
@@ -29,6 +31,7 @@ jest.mock("@/data-access/grocery-data", () => ({
   editGroup: jest.fn(),
   deleteGroup: jest.fn(),
   addItemToGroup: jest.fn(),
+  addReceiptData: jest.fn(),
 }));
 
 jest.mock("next/cache", () => ({
@@ -413,7 +416,7 @@ describe("Grocery server actions", () => {
       });
     });
 
-    describe("brand normalization", () => {
+    describe("field normalization", () => {
       it("should handle empty brand as null", async () => {
         const emptyBrand = "";
         const normalizedBrand = null;
@@ -436,6 +439,81 @@ describe("Grocery server actions", () => {
         expect(addItem).toHaveBeenCalledWith({
           ...testData,
           brand: normalizedBrand,
+        });
+      });
+
+      it("should handle empty count as 1", async () => {
+        const emptyCount = undefined;
+        const normalizedCount = 1;
+
+        const testData = {
+          name: "Test Item",
+          brand: "Test Brand",
+          store: "Test Store",
+          count: emptyCount,
+          amount: 100,
+          unit: "mL",
+          price: 4.99,
+          date: new Date(),
+          isSale: false,
+        };
+
+        const result = await addItemAction(testData);
+
+        expect(result).toEqual({ success: true });
+        expect(addItem).toHaveBeenCalledWith({
+          ...testData,
+          count: normalizedCount,
+        });
+      });
+
+      it("should handle empty amount as 1", async () => {
+        const emptyAmount = undefined;
+        const normalizedAmount = 1;
+
+        const testData = {
+          name: "Test Item",
+          brand: "Test Brand",
+          store: "Test Store",
+          count: 1,
+          amount: emptyAmount,
+          unit: "mL",
+          price: 4.99,
+          date: new Date(),
+          isSale: false,
+        };
+
+        const result = await addItemAction(testData);
+
+        expect(result).toEqual({ success: true });
+        expect(addItem).toHaveBeenCalledWith({
+          ...testData,
+          amount: normalizedAmount,
+        });
+      });
+
+      it("should handle empty unit as Units", async () => {
+        const emptyUnits = undefined;
+        const normalizedUnits = UnitEnum.units;
+
+        const testData = {
+          name: "Test Item",
+          brand: "Test Brand",
+          store: "Test Store",
+          count: 1,
+          amount: 100,
+          unit: emptyUnits,
+          price: 4.99,
+          date: new Date(),
+          isSale: false,
+        };
+
+        const result = await addItemAction(testData);
+
+        expect(result).toEqual({ success: true });
+        expect(addItem).toHaveBeenCalledWith({
+          ...testData,
+          unit: normalizedUnits,
         });
       });
     });
@@ -824,6 +902,83 @@ describe("Grocery server actions", () => {
 
         expect(result).toHaveProperty("error");
         expect(result.error).toBe("Failed to delete group");
+      });
+    });
+  });
+
+  describe("addReceiptDataAction", () => {
+    /**
+     * This server action uses the same validation as addItemAction
+     * These tests focus only on addReceiptDataAction-specific behavior
+     */
+
+    const validReceiptData = {
+      store: "Superstore",
+      date: new Date("2025-03-01"),
+      items: [
+        {
+          name: "Oats",
+          brand: "Quaker",
+          count: 1,
+          amount: 1,
+          unit: UnitEnum.kg,
+          price: 5.99,
+          isSale: false,
+        },
+        {
+          name: "Yogurt",
+          brand: "Danone",
+          count: 1,
+          amount: 2,
+          unit: UnitEnum.kg,
+          price: 8.99,
+          isSale: false,
+        },
+        {
+          name: "Milk",
+          brand: "Dairyland",
+          count: 2,
+          amount: 2,
+          unit: UnitEnum.L,
+          price: 11,
+          isSale: true,
+        },
+      ],
+    };
+
+    describe("authentication", () => {
+      it("should return an error if user is not authenticated", async () => {
+        (verifySession as jest.Mock).mockResolvedValue(null);
+
+        const result = await addReceiptDataAction(validReceiptData);
+
+        expect(verifySession).toHaveBeenCalledWith({ redirect: false });
+        expect(result).toHaveProperty("error");
+        expect(result.error).toBe("You must be logged in to add receipt items");
+        expect(addReceiptData).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("successful submission", () => {
+      it("should return success for valid receipt data", async () => {
+        const result = await addReceiptDataAction(validReceiptData);
+
+        expect(result).toEqual({ success: true });
+        expect(addReceiptData).toHaveBeenCalledWith(validReceiptData);
+        expect(revalidatePath).toHaveBeenCalledWith("/groceries");
+      });
+    });
+
+    describe("error handling", () => {
+      it("should handle repository errors gracefully", async () => {
+        (addReceiptData as jest.Mock).mockRejectedValue(
+          new Error("Database error")
+        );
+
+        const result = await addReceiptDataAction(validReceiptData);
+
+        expect(result).toHaveProperty("error");
+        expect(result.error).toBe("Failed to add receipt items");
       });
     });
   });

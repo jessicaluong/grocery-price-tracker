@@ -6,6 +6,7 @@ import {
   getParamFromDisplay,
   matchName,
   formatDate,
+  capitalizeWords,
 } from "@/lib/utils";
 
 describe("utils", () => {
@@ -297,6 +298,41 @@ describe("utils", () => {
     it("should handle case-sensitive display matching", () => {
       const display = getParamFromDisplay("sort", "LOWEST PRICE");
       expect(display).toBe("cheapest");
+    });
+  });
+
+  describe("capitalizeWords", () => {
+    it("should capitalize the first letter of each word", () => {
+      expect(capitalizeWords("orange juice")).toBe("Orange Juice");
+    });
+
+    it("should lowercase the rest of each word", () => {
+      expect(capitalizeWords("ORANGE JUICE")).toBe("Orange Juice");
+    });
+
+    it("should handle single word inputs", () => {
+      expect(capitalizeWords("orange")).toBe("Orange");
+    });
+
+    it("should handle mixed case inputs", () => {
+      expect(capitalizeWords("oRanGe jUICe")).toBe("Orange Juice");
+    });
+
+    it("should handle empty strings", () => {
+      expect(capitalizeWords("")).toBe("");
+    });
+
+    it("should handle strings with extra spaces", () => {
+      expect(capitalizeWords("  orange   juice  ")).toBe("  Orange   Juice  ");
+    });
+
+    it("should handle strings with special characters", () => {
+      expect(capitalizeWords("orange-juice")).toBe("Orange-Juice");
+      expect(capitalizeWords("orange_juice")).toBe("Orange_Juice");
+    });
+
+    it("should handle strings with numbers", () => {
+      expect(capitalizeWords("orange juice 2nd")).toBe("Orange Juice 2nd");
     });
   });
 });

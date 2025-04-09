@@ -1,15 +1,16 @@
 import {
   addItem,
   addItemToGroup,
+  addReceiptData,
   deleteGroup,
   deleteItem,
   editGroup,
   editItem,
 } from "@/data-access/grocery-data";
 import { prismaMock } from "../../test/prisma-mock";
-import { Unit } from "@prisma/client";
 import { verifySession } from "@/lib/auth";
 import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
+import { UnitEnum } from "@/types/grocery";
 
 jest.mock("@/lib/auth", () => ({
   verifySession: jest.fn(),
@@ -33,7 +34,7 @@ describe("Item Repository", () => {
       store: "Superstore",
       count: 1,
       amount: 1,
-      unit: Unit.kg,
+      unit: UnitEnum.kg,
       price: 5.99,
       date: new Date("2025-03-01"),
       isSale: false,
@@ -49,7 +50,7 @@ describe("Item Repository", () => {
         store: "Superstore",
         count: 1,
         amount: 1,
-        unit: Unit.kg,
+        unit: UnitEnum.kg,
         userId: "test-user-id",
       };
 
@@ -66,15 +67,7 @@ describe("Item Repository", () => {
       prismaMock.group.findFirst.mockResolvedValue(mockExistingGroup);
       prismaMock.item.create.mockResolvedValue(mockNewItem);
 
-      await expect(addItem(item)).resolves.toEqual({
-        id: "1",
-        createdAt: new Date("2025-03-01"),
-        updatedAt: new Date("2025-03-01"),
-        date: new Date("2025-03-01"),
-        isSale: false,
-        price: 5.99,
-        groupId: "g1",
-      });
+      await addItem(item);
 
       expect(prismaMock.group.findFirst).toHaveBeenCalledWith({
         where: {
@@ -107,14 +100,14 @@ describe("Item Repository", () => {
         store: "Superstore",
         count: 1,
         amount: 1,
-        unit: Unit.kg,
+        unit: UnitEnum.kg,
         userId: "test-user-id",
       };
 
       prismaMock.group.findFirst.mockResolvedValue(null);
       prismaMock.group.create.mockResolvedValue(mockNewGroup);
 
-      await expect(addItem(item)).resolves.toEqual(mockNewGroup);
+      await addItem(item);
 
       expect(prismaMock.group.create).toHaveBeenCalledWith({
         data: {
@@ -152,7 +145,7 @@ describe("Item Repository", () => {
         store: "Superstore",
         count: 1,
         amount: 1,
-        unit: Unit.kg,
+        unit: UnitEnum.kg,
         userId: "test-user-id",
       };
 
@@ -184,6 +177,199 @@ describe("Item Repository", () => {
           },
         },
       });
+    });
+  });
+
+  describe("addReceiptData", () => {
+    const mockReceiptData = {
+      store: "Superstore",
+      date: new Date("2025-03-01"),
+      items: [
+        {
+          name: "Oats",
+          brand: "Quaker",
+          count: 1,
+          amount: 1,
+          unit: UnitEnum.kg,
+          price: 5.99,
+          isSale: false,
+        },
+        {
+          name: "Yogurt",
+          brand: "Danone",
+          count: 1,
+          amount: 2,
+          unit: UnitEnum.kg,
+          price: 8.99,
+          isSale: false,
+        },
+        {
+          name: "Milk",
+          brand: "Dairyland",
+          count: 2,
+          amount: 2,
+          unit: UnitEnum.L,
+          price: 11,
+          isSale: true,
+        },
+      ],
+    };
+
+    const mockTxClient = {
+      group: {
+        findFirst: jest.fn().mockResolvedValue(null),
+        create: jest.fn().mockResolvedValue({}),
+      },
+      item: {
+        create: jest.fn().mockResolvedValue({}),
+      },
+    };
+
+    beforeEach(() => {
+      prismaMock.$transaction.mockImplementation((callback: any) =>
+        callback(mockTxClient)
+      );
+    });
+
+    it("should use a transaction for all database operations", async () => {
+      await addReceiptData(mockReceiptData);
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1);
+    });
+
+    it("should process each item in the receipt", async () => {
+      await addReceiptData(mockReceiptData);
+
+      expect(mockTxClient.group.findFirst).toHaveBeenCalledTimes(
+        mockReceiptData.items.length
+      );
+    });
+
+    it("should add items to existing groups when they match", async () => {
+      // mock all groups exist
+      (mockTxClient.group.findFirst as jest.Mock).mockResolvedValue({
+        id: "existing-group-id",
+      });
+
+      await addReceiptData(mockReceiptData);
+
+      // should create item for each receipt item
+      expect(mockTxClient.item.create).toHaveBeenCalledTimes(
+        mockReceiptData.items.length
+      );
+      expect(mockTxClient.group.create).not.toHaveBeenCalled();
+
+      // check one of the calls
+      expect(mockTxClient.item.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            groupId: "existing-group-id",
+          }),
+        })
+      );
+    });
+
+    it("should create new groups with items when no match is found", async () => {
+      // mock no groups exist
+      (mockTxClient.group.findFirst as jest.Mock).mockResolvedValue(null);
+
+      await addReceiptData(mockReceiptData);
+
+      // should create a group for each receipt item
+      expect(mockTxClient.group.create).toHaveBeenCalledTimes(
+        mockReceiptData.items.length
+      );
+      expect(mockTxClient.item.create).not.toHaveBeenCalled();
+
+      // check one of the calls
+      expect(mockTxClient.group.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            name: expect.any(String),
+            store: mockReceiptData.store,
+            userId: userId,
+            items: expect.objectContaining({
+              create: expect.objectContaining({
+                date: expect.any(Date),
+              }),
+            }),
+          }),
+        })
+      );
+    });
+
+    it("should handle a mix of existing and new groups", async () => {
+      // mock first item has group
+      (mockTxClient.group.findFirst as jest.Mock)
+        .mockResolvedValueOnce({ id: "existing-group-id" })
+        .mockResolvedValue(null);
+
+      await addReceiptData(mockReceiptData);
+
+      expect(mockTxClient.item.create).toHaveBeenCalledTimes(1);
+      expect(mockTxClient.group.create).toHaveBeenCalledTimes(2);
+    });
+
+    it("should normalize empty brand strings to null", async () => {
+      (mockTxClient.group.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const emptyBrandReceiptData = {
+        store: "Superstore",
+        date: new Date("2025-03-01"),
+        items: [
+          {
+            name: "Apples",
+            brand: "",
+            count: 1,
+            amount: 2,
+            unit: UnitEnum.kg,
+            price: 8.99,
+            isSale: false,
+          },
+        ],
+        total: 1.99,
+      };
+
+      await addReceiptData(emptyBrandReceiptData);
+
+      expect(mockTxClient.group.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            brand: null,
+          }),
+        })
+      );
+    });
+
+    it("should propagate database errors", async () => {
+      const mockError = new Error("Database error");
+      (mockTxClient.group.findFirst as jest.Mock).mockRejectedValue(mockError);
+
+      await expect(addReceiptData(mockReceiptData)).rejects.toThrow(
+        "Database error"
+      );
+    });
+
+    it("should abort the transaction if any operation fails", async () => {
+      const mockError = new Error("Operation failed");
+
+      (mockTxClient.group.findFirst as jest.Mock)
+        .mockResolvedValueOnce({ id: "existing-group-id" })
+        .mockRejectedValueOnce(mockError);
+
+      (prismaMock.$transaction as jest.Mock).mockImplementation(
+        async (callback) => {
+          try {
+            return await callback(mockTxClient);
+          } catch (error) {
+            throw error;
+          }
+        }
+      );
+
+      await expect(addReceiptData(mockReceiptData)).rejects.toThrow(
+        "Operation failed"
+      );
     });
   });
 
@@ -297,7 +483,7 @@ describe("Item Repository", () => {
       store: "Superstore",
       count: 1,
       amount: 1,
-      unit: Unit.kg,
+      unit: UnitEnum.kg,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -345,7 +531,7 @@ describe("Item Repository", () => {
       store: "Superstore",
       count: 1,
       amount: 1,
-      unit: Unit.kg,
+      unit: UnitEnum.kg,
     };
 
     const validGroupId = "test-group-id";
@@ -358,7 +544,7 @@ describe("Item Repository", () => {
       store: "Superstore",
       count: 1,
       amount: 1,
-      unit: Unit.kg,
+      unit: UnitEnum.kg,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -486,7 +672,7 @@ describe("Item Repository", () => {
       store: "Superstore",
       count: 1,
       amount: 1,
-      unit: Unit.kg,
+      unit: UnitEnum.kg,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

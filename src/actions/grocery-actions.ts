@@ -3,6 +3,7 @@
 import {
   addItem,
   addItemToGroup,
+  addReceiptData,
   deleteGroup,
   deleteItem,
   editGroup,
@@ -14,14 +15,13 @@ import { revalidatePath } from "next/cache";
 import { groupSchema } from "@/zod-schemas/grocery-schemas";
 import { verifySession } from "@/lib/auth";
 import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
+import { receiptSchema } from "@/zod-schemas/receipt-schemas";
 
 export async function addItemAction(values: unknown) {
   const session = await verifySession({ redirect: false });
   if (!session) {
     return { errors: { form: "You must be logged in to add an item" } };
   }
-
-  const userId = session.userId;
 
   const validatedFields = itemSchema.safeParse(values);
 
@@ -155,5 +155,28 @@ export async function deleteGroupAction(groupId: string) {
     return { success: true };
   } catch (error) {
     return { error: "Failed to delete group" };
+  }
+}
+
+export async function addReceiptDataAction(receiptData: unknown) {
+  const session = await verifySession({ redirect: false });
+  if (!session) {
+    return { error: "You must be logged in to add receipt items" };
+  }
+
+  const validatedFields = receiptSchema.safeParse(receiptData);
+  if (!validatedFields.success) {
+    return {
+      error: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const data = validatedFields.data;
+    await addReceiptData(data);
+    revalidatePath("/groceries");
+    return { success: true };
+  } catch (error) {
+    return { error: "Failed to add receipt items" };
   }
 }

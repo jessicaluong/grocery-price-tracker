@@ -132,3 +132,26 @@ export function getParamFromDisplay(type: "sort" | "view", display: string) {
     entry?.param || (type === "sort" ? DEFAULT_SORT.param : DEFAULT_VIEW.param)
   );
 }
+
+export function capitalizeWords(words: string) {
+  const delimiters = [" ", "-", "_"];
+
+  let result = "";
+  let capitalizeNext = true;
+
+  for (let i = 0; i < words.length; i++) {
+    const char = words[i];
+
+    if (delimiters.includes(char)) {
+      result += char;
+      capitalizeNext = true;
+    } else if (capitalizeNext) {
+      result += char.toUpperCase();
+      capitalizeNext = false;
+    } else {
+      result += char.toLowerCase();
+    }
+  }
+
+  return result;
+}

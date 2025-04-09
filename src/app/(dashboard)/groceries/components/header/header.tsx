@@ -1,6 +1,6 @@
 import { SearchBar } from "./search-bar";
 import SortAndViewControls from "./sort-and-view-controls";
-import AddItemDialog from "../grocery-action-dialogs/add-item/add-item-dialog";
+import AddItemDialog from "./add-dialog/add-dialog";
 import UserButton from "./user-button";
 import { ThemeToggle } from "./theme-toggle";
 import { ShoppingBasket } from "lucide-react";

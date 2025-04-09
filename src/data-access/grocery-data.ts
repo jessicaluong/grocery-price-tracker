@@ -4,6 +4,8 @@ import { TGroupSchema } from "@/zod-schemas/grocery-schemas";
 import { verifySession } from "@/lib/auth";
 import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
 import { getGroupsWithPriceStats } from "@prisma/client/sql";
+import { ReceiptData } from "@/types/receipt";
+import { PrismaClient } from "@prisma/client";
 
 export async function getGroups() {
   const session = await verifySession();
@@ -92,13 +94,19 @@ export async function getPriceHistory(groupId: string) {
   }
 }
 
-export async function addItem(item: TItemSchema) {
-  const session = await verifySession();
-  if (!session) return null;
+type PrismaClientOrTransaction = Omit<
+  PrismaClient,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+>;
 
+async function _addItemImplementation(
+  item: TItemSchema,
+  userId: string,
+  db: PrismaClientOrTransaction = prisma
+) {
   const normalizedBrand = item.brand === "" ? null : item.brand;
 
-  const existingGroup = await prisma.group.findFirst({
+  const existingGroup = await db.group.findFirst({
     where: {
       name: item.name,
       brand: normalizedBrand,
@@ -106,12 +114,12 @@ export async function addItem(item: TItemSchema) {
       count: item.count,
       amount: item.amount,
       unit: item.unit,
-      userId: session.userId,
+      userId,
     },
   });
 
   if (existingGroup) {
-    return await prisma.item.create({
+    await db.item.create({
       data: {
         date: item.date,
         price: item.price,
@@ -120,7 +128,7 @@ export async function addItem(item: TItemSchema) {
       },
     });
   } else {
-    return await prisma.group.create({
+    await db.group.create({
       data: {
         name: item.name,
         brand: normalizedBrand,
@@ -128,7 +136,7 @@ export async function addItem(item: TItemSchema) {
         count: item.count,
         amount: item.amount,
         unit: item.unit,
-        userId: session.userId,
+        userId,
         items: {
           create: {
             date: item.date,
@@ -139,6 +147,36 @@ export async function addItem(item: TItemSchema) {
       },
     });
   }
+}
+
+export async function addItem(item: TItemSchema) {
+  const session = await verifySession();
+  if (!session) return null;
+
+  return _addItemImplementation(item, session.userId);
+}
+
+export async function addReceiptData(data: ReceiptData) {
+  const session = await verifySession();
+  if (!session) return null;
+
+  return await prisma.$transaction(async (tx) => {
+    for (const item of data.items) {
+      const itemData = {
+        store: data.store,
+        date: data.date,
+        name: item.name,
+        brand: item.brand,
+        count: item.count,
+        amount: item.amount,
+        unit: item.unit,
+        price: item.price,
+        isSale: item.isSale,
+      };
+
+      await _addItemImplementation(itemData, session.userId, tx);
+    }
+  });
 }
 
 export async function editItem(itemData: TPricePointSchema, itemId: string) {
