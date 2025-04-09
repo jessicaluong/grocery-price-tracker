@@ -200,7 +200,21 @@ export function PriceChart({ data }: PriceChartProps) {
             tickLine={false}
             axisLine={false}
             tickMargin={8}
+<<<<<<< HEAD
             interval={timeFrame === "1m" ? 3 : timeFrame === "3m" ? 1 : 0}
+=======
+            // tick={{ fontSize: 12 }}
+            // minTickGap={5}
+            interval={0}
+
+            // tickFormatter={(timestamp) => {
+            //   return new Date(timestamp).toLocaleDateString("en-US", {
+            //     month: "short",
+            //     day: "numeric",
+            //     year: "2-digit",
+            //   });
+            // }}
+>>>>>>> 64b496633abeaec5e2b3e85c7072867218ca6237
           />
           <YAxis
             domain={yAxisDomain}
