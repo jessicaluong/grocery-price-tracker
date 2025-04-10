@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ItemWithView, PricePoint } from "@/types/grocery";
-import { currencyFormat } from "@/lib/utils";
 import { ItemQuantity } from "../item-quantity";
 import GroceryGroupTable from "./grocery-group-table/grocery-group-table";
 import { columns } from "./grocery-group-table/grocery-group-table-column";
@@ -67,106 +66,56 @@ export default function GroceryGroupDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <GroceryGroupProvider groupId={groupId}>
         <DialogContent className="max-w-sm sm:max-w-lg gap-2">
-          <DialogHeader>
-            <DialogTitle>
-              <div className="flex">
-                <span className="truncate font-semibold max-w-[35%] sm:max-w-[60%]">
-                  {item.name}
-                </span>
-                <ItemQuantity
-                  count={item.count}
-                  amount={item.amount}
-                  unit={item.unit}
-                  className="shrink-0 ml-2 mr-2 text-sm"
+          <DialogHeader className="max-w-xs sm:max-w-md">
+            <DialogTitle className="flex">
+              <span className="truncate font-semibold">{item.name}</span>
+              <ItemQuantity
+                count={item.count}
+                amount={item.amount}
+                unit={item.unit}
+                className="shrink-0 ml-2 mr-2 text-sm"
+              />
+              {groupInfo && (
+                <GroceryGroupDropdown
+                  group={{
+                    id: groupId,
+                    name: groupInfo.name,
+                    brand: groupInfo.brand,
+                    store: groupInfo.store,
+                    count: groupInfo.count,
+                    amount: groupInfo.amount,
+                    unit: groupInfo.unit,
+                  }}
                 />
-                {groupInfo && (
-                  <GroceryGroupDropdown
-                    group={{
-                      id: groupId,
-                      name: groupInfo.name,
-                      brand: groupInfo.brand,
-                      store: groupInfo.store,
-                      count: groupInfo.count,
-                      amount: groupInfo.amount,
-                      unit: groupInfo.unit,
-                    }}
-                  />
-                )}
-              </div>
-              {/* <div className="flex font-light max-w-[70%] sm:max-w-full">
-              <span className="shrink-0">
-                {groupInfo &&
-                  groupInfo.minPrice &&
-                  groupInfo.maxPrice &&
-                  (groupInfo.maxPrice === groupInfo.minPrice
-                    ? currencyFormat(groupInfo.minPrice)
-                    : `${currencyFormat(groupInfo.minPrice)}-${currencyFormat(
-                        groupInfo.maxPrice
-                      )}`)}
-              </span>
-              <span className="text-sm mx-1 shrink-0"> @ </span>
-              <span className="truncate">{item.store}</span>
-            </div> */}
-            </DialogTitle>
-            <DialogDescription className="text-left text-md text-primary">
-              {item.brand && (
-                <div className="truncate font-semibold">{item.brand}</div>
               )}
-              <div className="truncate">{item.store}</div>
+            </DialogTitle>
+            <DialogDescription className="flex flex-col text-left text-md text-primary">
+              {item.brand && (
+                <span className="truncate font-semibold">{item.brand}</span>
+              )}
+              <span className="truncate">{item.store}</span>
             </DialogDescription>
           </DialogHeader>
-          {/* <div className="grid grid-cols-3 gap-4 mb-6 text-center font-light">
-        <div className="bg-green-50 p-2 rounded-md">
-          <p className="text-xs text-green-700">Lowest</p>
-          <p className="font-semibold">{currencyFormat(1)}</p>
-        </div>
-        <div className="bg-blue-50 p-2 rounded-md">
-          <p className="text-xs text-blue-700">Average</p>
-          <p className="font-semibold">{currencyFormat(2)}</p>
-        </div>
-        <div className="bg-red-50 p-2 rounded-md">
-          <p className="text-xs text-red-700">Highest</p>
-          <p className="font-semibold">{currencyFormat(3)}</p>
-        </div>
-      </div> */}
-          {data && data.length > 0 ? (
-            <PriceChartProvider>
-              <PriceChart data={data} />
-            </PriceChartProvider>
+
+          {isLoading ? (
+            <span className="text-center text-muted-foreground py-4">
+              Loading price history...
+            </span>
+          ) : data && data.length > 0 ? (
+            <>
+              <PriceChartProvider>
+                <PriceChart data={data} />
+                {/* <PriceChart3a data={data} /> */}
+                {/* <PriceChart3 data={data} /> */}
+              </PriceChartProvider>
+              <GroceryGroupTable columns={columns} data={data} />
+            </>
           ) : (
-            // <PriceChart3 data={data} />
-            <span className="text-center text-muted-foreground pb-4">
+            <span className="text-center text-muted-foreground py-4">
               No price history available
             </span>
           )}
-          {/* 
-          {data && data.length > 0 ? (
-            <PriceChart3a data={data} />
-          ) : (
-            <span className="text-center text-muted-foreground pb-4">
-              No price history available
-            </span>
-          )} */}
-
-          {/* {data && data.length > 0 ? (
-          <PriceChart3 data={data} />
-        ) : (
-          <span className="text-center text-muted-foreground pb-4">
-            No price history available
-          </span>
-        )} */}
           {/* <PriceChartDemo></PriceChartDemo> */}
-
-          {/* <div className="max-w-xs sm:max-w-lg">
-            {isLoading && (
-              <p className="text-center py-4">Loading price history...</p>
-            )}
-            {data ? (
-              <GroceryGroupTable columns={columns} data={data} />
-            ) : !isLoading && !error ? (
-              <p className="text-center py-4">No price history available.</p>
-            ) : null}
-          </div> */}
         </DialogContent>
       </GroceryGroupProvider>
     </Dialog>
