@@ -18,7 +18,7 @@ export default function Header() {
             <UserButton />
           </div>
         </div>
-        <div className="flex flex-col gap-2 md:flex-row md:justify-between">
+        <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <SearchBar />
           <SortAndViewControls />
         </div>

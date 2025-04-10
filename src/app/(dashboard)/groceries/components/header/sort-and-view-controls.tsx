@@ -12,7 +12,7 @@ export default function SortAndViewControls() {
   const viewDisplay = getDisplayValue("view", "view", "list");
 
   return (
-    <div className="flex justify-between sm:gap-2">
+    <div className="flex gap-4">
       <SortAndViewSelect<SortDisplayValues>
         label="Sort"
         options={Object.values(SORT_OPTIONS).map((option) => option.display)}
