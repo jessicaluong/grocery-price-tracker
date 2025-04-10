@@ -7,7 +7,6 @@ A full-stack Next.js application being developed to help shoppers track grocery 
 ## Table of Contents
 
 - [Project Overview](#preview)
-
 - [Technologies Used](#tech)
 - [Database Design](#db)
 - [Data Access](#data)
@@ -15,18 +14,31 @@ A full-stack Next.js application being developed to help shoppers track grocery 
 - [Testing Strategy](#test)
 - [Current Development Status](#status)
 
-<div id="preview"></div>
+<div id="features"></div>
 
-## Project Overview
+## Features
 
-This application aims to help users determine if grocery prices represent good value by providing historical prices for an item. 
+### Comprehensive Price Tracking
 
-  <img width="450" alt="price-table" src="https://github.com/user-attachments/assets/0dbfe3af-2c6b-4d41-a6f8-6c2699f86191" />  
+- Interactive price history charts for data visualization using Recharts
+- Automatic calculation of normalized price comparisons (\$/100g, \$/100mL)
+- Support for multiple measurement units (weight, volume, count)
+- Sale price flagging for spotting deals and discounts
 
-The application allows users to:
-- Track prices across different stores, brands, and product sizes
-- Compare unit pricing for better value assessment
-- Search for and sort products
+### Smart Receipt Scanner
+
+- ML-powered receipt processing using Azure Document Intelligence
+- Automatic extraction of merchant, date, and line items
+- Interactive UI for reviewing and editing extracted items
+- Bulk import of multiple grocery items in a single operation
+
+View demo on <a href="https://youtu.be/Bprjsu2sJTI">YouTube</a>
+
+### Powerful Data Management
+
+- Advanced search with multi-term filtering across product names and brands
+- Flexible view options (list individual items or group by product)
+- Customizable sorting by price or date
 
 <div id="tech"></div>
 
@@ -72,7 +84,12 @@ The application allows users to:
 - **User**: Account information and authentication
 - Supporting tables for authentication
 
-<img width="1141" alt="db" src="https://github.com/user-attachments/assets/6e7835dd-719f-4435-b752-cec0485a01bb" />
+[comment]: # "TODO: Add simple db diagram"
+
+<details> 
+  <summary>Full diagram: </summary>
+  <img width="1141" alt="db" src="https://github.com/user-attachments/assets/6e7835dd-719f-4435-b752-cec0485a01bb" />
+</details>
 
 The database is designed with:
 
@@ -103,14 +120,15 @@ Security is implemented at multiple levels:
 - **JWT-based authentication** with NextAuth.js
 - **Multiple providers** including credentials and OAuth (Google)  
   <img width="400" alt="login" src="https://github.com/user-attachments/assets/4305e9ba-9537-46b1-a6b0-0b3f47b6704e" />
-- **Authentication and authorization** checks on data access functions
-- **Middleware protection** for secured routes
 - **Password hashing** using bcrypt
+- **Middleware** for optimistic checks, pre-filtering unauthorized users
+- **Data Access Layer (DAL)** for centralizing data requests, and authentication and authorization logic
 
 **Data & Request Validation**
+
 - **Input validation** using Zod schema validation
 - **CSRF protection** through Next.js server actions
-- **XSS prevention** through React's built-in escaping 
+- **XSS prevention** through React's built-in escaping
 
 <div id="test"></div>
 
@@ -129,7 +147,7 @@ The application is under active development.
 ### Completed
 
 - Core data model and database schema
-- User authentication 
+- User authentication
 - Item management (adding items)
 - Search and sorting capabilities
 
@@ -137,8 +155,3 @@ The application is under active development.
 
 - Item management (editing and deleting items)
 - Authentication through credentials (add email verification, rate limiting, password reset)
-
-### Possible Future Enhancements
-
-- Receipt scanning with computer vision
-- Product image integration via public APIs
