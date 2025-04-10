@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut, useSession } from "next-auth/react";
+import { ThemeToggle } from "./theme-toggle";
 
 export default function UserButton() {
   const { data: session } = useSession();
@@ -30,6 +31,10 @@ export default function UserButton() {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>
+          <ThemeToggle />
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/login" })}>
           Log out

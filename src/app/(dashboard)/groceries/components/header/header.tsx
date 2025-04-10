@@ -2,7 +2,6 @@ import { SearchBar } from "./search-bar";
 import SortAndViewControls from "./sort-and-view-controls";
 import AddItemDialog from "./add-dialog/add-dialog";
 import UserButton from "./user-button";
-import { ThemeToggle } from "./theme-toggle";
 import { ShoppingBasket } from "lucide-react";
 
 export default function Header() {
@@ -16,7 +15,6 @@ export default function Header() {
           </div>
           <div className="flex gap-2">
             <AddItemDialog />
-            <ThemeToggle />
             <UserButton />
           </div>
         </div>
