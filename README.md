@@ -127,18 +127,18 @@ Security is implemented at multiple levels:
 
 **Authentication & Authorization**
 
-- **JWT-based authentication** with NextAuth.js
-- **Multiple providers** including credentials and OAuth (Google)  
+- **JWT-based sessions**: Secure authentication managed by NextAuth.js
+- **Multi-provider Support** Email/password (with bcrypt) and OAuth (Google)
   <img width="400" alt="login" src="https://github.com/user-attachments/assets/4305e9ba-9537-46b1-a6b0-0b3f47b6704e" />
-- **Password hashing** using bcrypt
 - **Middleware** for optimistic checks, pre-filtering unauthorized users
 - **Data Access Layer (DAL)** for centralizing data requests, and authentication and authorization logic
 
-**Data & Request Validation**
+**Input Handling & Validation**
 
-- **Input validation** using Zod schema validation
-- **CSRF protection** through Next.js server actions
-- **XSS prevention** through React's built-in escaping
+- **Schema Validation**: Type-safe request validation with Zod
+- **Server Actions**: Inherent CSRF protection via Next.js architecture
+- **Content Security**: React's automatic output encoding for XSS prevention
+- **Error Boundaries**: Controlled error exposure preventing information leakage
 
 <div id="test"></div>
 
@@ -158,10 +158,16 @@ The application is under active development.
 
 - Core data model and database schema
 - User authentication
-- Item management (adding items)
+- Complete item management (add, edit, delete)
+- Group management for related items
 - Search and sorting capabilities
+- Historical price tracking with visualization in interactive price chart
+- Receipt scanning with Azure Document Intelligence for adding multiple items
 
 ### In Progress
 
-- Item management (editing and deleting items)
-- Authentication through credentials (add email verification, rate limiting, password reset)
+- Enhanced authentication (email verification, rate limiting)
+- Password reset functionality
+- Price chart enhancements (implementing 3-month view)
+- Database-level filtering optimization for pagination
+- Rate-limiting for third-party API requests
