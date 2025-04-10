@@ -6,7 +6,7 @@ A full-stack Next.js application being developed to help shoppers track grocery 
 
 ## Table of Contents
 
-- [Project Overview](#preview)
+- [Features](#features)
 - [Technologies Used](#tech)
 - [Database Design](#db)
 - [Data Access](#data)
@@ -25,20 +25,29 @@ A full-stack Next.js application being developed to help shoppers track grocery 
 - Support for multiple measurement units (weight, volume, count)
 - Sale price flagging for spotting deals and discounts
 
+https://github.com/user-attachments/assets/087fab49-9df2-4f6c-87d3-4ad6f9f62568
+
+[comment]: # "![price-chart-demo](https://github.com/user-attachments/assets/12bc90d6-cc3d-44bd-8c7e-bc5992a75bc4)"
+
 ### Smart Receipt Scanner
 
 - ML-powered receipt processing using Azure Document Intelligence
 - Automatic extraction of merchant, date, and line items
 - Interactive UI for reviewing and editing extracted items
 - Bulk import of multiple grocery items in a single operation
+- View demo on <a href="https://youtu.be/Bprjsu2sJTI">YouTube</a>
 
-View demo on <a href="https://youtu.be/Bprjsu2sJTI">YouTube</a>
+<img width="1220" alt="receipt-scanner" src="https://github.com/user-attachments/assets/41bce44d-7b73-4e59-889f-43614f7ca489" />
 
 ### Powerful Data Management
 
 - Advanced search with multi-term filtering across product names and brands
 - Flexible view options (list individual items or group by product)
 - Customizable sorting by price or date
+
+https://github.com/user-attachments/assets/15f69913-d63d-40c1-bd75-08e65bc1a01b
+
+[comment]: # "![search-and-sort-demo](https://github.com/user-attachments/assets/869c667e-7b8c-42fa-a94b-0e4fda9dff86)"
 
 <div id="tech"></div>
 
@@ -84,10 +93,10 @@ View demo on <a href="https://youtu.be/Bprjsu2sJTI">YouTube</a>
 - **User**: Account information and authentication
 - Supporting tables for authentication
 
-[comment]: # "TODO: Add simple db diagram"
+![db_simple](https://github.com/user-attachments/assets/7cba52d8-09f8-4c34-a0ec-0d4a2366df58)
 
 <details> 
-  <summary>Full diagram: </summary>
+  <summary>View full diagram with supporting tables for authentication </summary>
   <img width="1141" alt="db" src="https://github.com/user-attachments/assets/6e7835dd-719f-4435-b752-cec0485a01bb" />
 </details>
 
@@ -101,13 +110,14 @@ The database is designed with:
 
 ## Data Access
 
-The application uses Next.js for data fetching and mutations:
+The application leverages Next.js 14's modern data access patterns:
 
-- **Server Components**: For server-rendered data fetching directly from the database
-- **Server Actions**: For form submissions and data mutations
-- **NextAuth Routes**: For authentication flows
-
-[comment]: # "- **Route Handler**: Limited API endpoints for client-side data fetching e.g., price history"
+- **Server Components**: Fetch data directly from the database for efficient server-rendered content
+- **Server Actions**: Handle form submissions and data mutations securely on the server, preventing direct client access to the database
+- **Route Handler**: Limited API endpoints for client-side data fetching (e.g., price history)
+- **React Query**: Manage client-side data fetching, caching, and synchronization for dynamic UI updates
+- **NextAuth Integration**: Secure authentication with protected routes and session validation
+- **External API Integration**: Access Azure Document Intelligence for receipt scanning via secure server actions
 
 <div id="security"></div>
 
