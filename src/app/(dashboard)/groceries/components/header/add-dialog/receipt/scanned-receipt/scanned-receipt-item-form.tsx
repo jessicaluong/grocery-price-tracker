@@ -13,13 +13,13 @@ import { Button } from "@/components/ui/button";
 import ReceiptFormInput from "./receipt-form-input";
 import ReceiptFormCheckbox from "./receipt-form-checkbox";
 import { ReceiptFormSelect } from "./receipt-form-select";
-import { UnitEnum } from "@/types/grocery";
+import { Unit, UnitEnum } from "@/types/grocery";
 
 type ScannedReceiptItemFormProps = {
   index: number;
   item: ReceiptItem;
   onCloseEdit: () => void;
-  onSuccess: (index: number, updatedItem: Partial<ReceiptItem>) => void;
+  onSuccess: (index: number, updatedItem: ReceiptItem) => void;
 };
 
 export function ScannedReceiptItemForm({
@@ -28,6 +28,10 @@ export function ScannedReceiptItemForm({
   onCloseEdit,
   onSuccess,
 }: ScannedReceiptItemFormProps) {
+  const isValidUnit = (unit: string | null): unit is Unit => {
+    return unit !== null && Object.values(UnitEnum).includes(unit as Unit);
+  };
+
   const form = useForm<TReceiptItemSchema>({
     resolver: zodResolver(receiptItemSchema),
     defaultValues: {
@@ -36,7 +40,7 @@ export function ScannedReceiptItemForm({
       count: item.count ? item.count : undefined,
       amount: item.amount ? item.amount : undefined,
       price: item.price ? item.price : undefined,
-      unit: item.unit ? item.unit : UnitEnum.units,
+      unit: isValidUnit(item.unit) ? item.unit : UnitEnum.units,
       isSale: item.isSale,
     },
   });

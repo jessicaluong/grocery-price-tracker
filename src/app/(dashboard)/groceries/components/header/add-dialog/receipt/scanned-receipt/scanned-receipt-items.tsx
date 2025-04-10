@@ -8,7 +8,7 @@ import { ScannedReceiptItemForm } from "./scanned-receipt-item-form";
 
 type ScannedReceiptItemsProps = {
   receiptData: ReceiptData;
-  handleSubmitItem: (index: number, updatedItem: Partial<ReceiptItem>) => void;
+  handleSubmitItem: (index: number, updatedItem: ReceiptItem) => void;
   handleDeleteItem: (index: number) => void;
   onEditClick: (index: number) => void;
   onCancelEdit: () => void;

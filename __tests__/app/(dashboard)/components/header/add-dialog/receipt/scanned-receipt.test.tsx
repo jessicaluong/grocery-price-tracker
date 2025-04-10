@@ -24,8 +24,8 @@ describe("ScannedReceipt", () => {
     items: [
       {
         name: "Oats",
-        brand: "Quaker",
-        count: 1,
+        brand: null,
+        count: null,
         amount: 1,
         unit: UnitEnum.kg,
         price: 5.99,
@@ -33,8 +33,8 @@ describe("ScannedReceipt", () => {
       },
       {
         name: "Yogurt",
-        brand: "Danone",
-        count: 1,
+        brand: null,
+        count: null,
         amount: 2,
         unit: UnitEnum.kg,
         price: 8.99,
@@ -42,8 +42,8 @@ describe("ScannedReceipt", () => {
       },
       {
         name: "Milk",
-        brand: "Dairyland",
-        count: 2,
+        brand: null,
+        count: null,
         amount: 2,
         unit: UnitEnum.L,
         price: 11,
@@ -130,6 +130,88 @@ describe("ScannedReceipt", () => {
         })
       );
     });
+  });
+
+  it("converts empty count, amount and unit to default values in handleSubmit", async () => {
+    const emptyValuesData = {
+      store: "Superstore",
+      date: new Date("2025-03-01"),
+      items: [
+        {
+          name: "Oats",
+          brand: null,
+          count: null,
+          amount: null,
+          unit: null,
+          price: 5.99,
+          isSale: false,
+        },
+      ],
+    };
+
+    render(<ScannedReceipt data={emptyValuesData} onSuccess={mockOnSuccess} />);
+
+    await user.click(screen.getByRole("button", { name: "Add 1 item" }));
+
+    await waitFor(() => {
+      expect(addReceiptDataAction).toHaveBeenCalledWith({
+        store: "Superstore",
+        date: new Date("2025-03-01"),
+        items: [
+          {
+            name: "Oats",
+            brand: null,
+            count: 1,
+            amount: 1,
+            unit: UnitEnum.units,
+            price: 5.99,
+            isSale: false,
+          },
+        ],
+      });
+    });
+    expect(mockOnSuccess).toHaveBeenCalled();
+  });
+
+  it("converts invalid unit to Units in handleSubmit", async () => {
+    const emptyValuesData = {
+      store: "Superstore",
+      date: new Date("2025-03-01"),
+      items: [
+        {
+          name: "Oats",
+          brand: null,
+          count: 1,
+          amount: 1,
+          unit: "invalid",
+          price: 5.99,
+          isSale: false,
+        },
+      ],
+    };
+
+    render(<ScannedReceipt data={emptyValuesData} onSuccess={mockOnSuccess} />);
+
+    await user.click(screen.getByRole("button", { name: "Add 1 item" }));
+
+    await waitFor(() => {
+      expect(addReceiptDataAction).toHaveBeenCalledWith({
+        store: "Superstore",
+        date: new Date("2025-03-01"),
+        items: [
+          {
+            name: "Oats",
+            brand: null,
+            count: 1,
+            amount: 1,
+            unit: UnitEnum.units,
+            price: 5.99,
+            isSale: false,
+          },
+        ],
+      });
+    });
+    expect(mockOnSuccess).toHaveBeenCalled();
   });
 
   it("shows error toast when server action fails", async () => {

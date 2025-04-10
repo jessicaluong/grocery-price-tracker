@@ -4,8 +4,8 @@ import { TGroupSchema } from "@/zod-schemas/grocery-schemas";
 import { verifySession } from "@/lib/auth";
 import { AuthorizationError, DuplicateGroupError } from "@/lib/customErrors";
 import { getGroupsWithPriceStats } from "@prisma/client/sql";
-import { ReceiptData } from "@/types/receipt";
 import { PrismaClient } from "@prisma/client";
+import { TReceiptSchema } from "@/zod-schemas/receipt-schemas";
 
 export async function getGroups() {
   const session = await verifySession();
@@ -156,7 +156,7 @@ export async function addItem(item: TItemSchema) {
   return _addItemImplementation(item, session.userId);
 }
 
-export async function addReceiptData(data: ReceiptData) {
+export async function addReceiptData(data: TReceiptSchema) {
   const session = await verifySession();
   if (!session) return null;
 

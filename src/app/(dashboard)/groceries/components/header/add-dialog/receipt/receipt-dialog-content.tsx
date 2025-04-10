@@ -20,7 +20,7 @@ export default function ReceiptScannerDialogContent({
 }: ReceiptScannerDialogContentProps) {
   const [scanResult, setScanResult] = useState<ReceiptData | null>(null);
 
-  const handleSetScanResult = (results: ReceiptData) => {
+  const handleSetScanResult = (results: ReceiptData | null) => {
     setScanResult(results);
   };
 

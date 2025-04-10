@@ -36,3 +36,4 @@ export const receiptSchema = z.object({
 
 export type TReceiptHeaderSchema = z.infer<typeof receiptHeaderSchema>;
 export type TReceiptItemSchema = z.infer<typeof receiptItemSchema>;
+export type TReceiptSchema = z.infer<typeof receiptSchema>;

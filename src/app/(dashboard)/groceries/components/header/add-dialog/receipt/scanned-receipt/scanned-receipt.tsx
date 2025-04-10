@@ -8,7 +8,7 @@ import { receiptSchema } from "@/zod-schemas/receipt-schemas";
 import { useToast } from "@/hooks/use-toast";
 import FormButton from "@/components/form/form-button";
 import { addReceiptDataAction } from "@/actions/grocery-actions";
-import { UnitEnum } from "@/types/grocery";
+import { Unit, UnitEnum } from "@/types/grocery";
 
 type ScannedReceiptProps = {
   data: ReceiptData;
@@ -19,7 +19,7 @@ export default function ScannedReceipt({
   data,
   onSuccess,
 }: ScannedReceiptProps) {
-  const [receiptData, setReceiptData] = useState({
+  const [receiptData, setReceiptData] = useState<ReceiptData>({
     store: data.store,
     date: data.date,
     items: [...data.items],
@@ -87,6 +87,10 @@ export default function ScannedReceipt({
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  const isValidUnit = (unit: string | null): unit is Unit => {
+    return unit !== null && Object.values(UnitEnum).includes(unit as Unit);
+  };
+
   const handleSubmit = async () => {
     setIsLoading(true);
     setHasHeaderErrors(false);
@@ -96,10 +100,9 @@ export default function ScannedReceipt({
       ...receiptData,
       items: receiptData.items.map((item) => ({
         ...item,
-        brand: item.brand ?? "",
         count: item.count ?? 1,
         amount: item.amount ?? 1,
-        unit: item.unit ?? UnitEnum.units,
+        unit: isValidUnit(item.unit) ? item.unit : UnitEnum.units,
       })),
     };
 
