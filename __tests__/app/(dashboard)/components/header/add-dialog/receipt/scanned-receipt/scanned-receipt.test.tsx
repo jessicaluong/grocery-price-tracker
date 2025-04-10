@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ReceiptData } from "@/types/receipt";
 import { useToast } from "@/hooks/use-toast";
 import { addReceiptDataAction } from "@/actions/grocery-actions";
 import { UnitEnum } from "@/types/grocery";

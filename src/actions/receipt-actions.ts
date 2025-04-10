@@ -10,6 +10,29 @@ import {
 } from "@azure-rest/ai-document-intelligence";
 import { AzureKeyCredential } from "@azure/core-auth";
 
+export function processSaleItemName(name: string | null) {
+  if (!name) {
+    return { normalizedName: null, isSale: false };
+  }
+
+  const salePattern = /(\(sale\)|\[sale\]|\bsale\b)/i;
+  const saleMatch = name.match(salePattern);
+
+  if (saleMatch) {
+    let cleanedName = name.replace(saleMatch[0], "").trim();
+    cleanedName = cleanedName.replace(/\s+/g, " ").trim();
+    return {
+      normalizedName: capitalizeWords(cleanedName),
+      isSale: true,
+    };
+  } else {
+    return {
+      normalizedName: capitalizeWords(name),
+      isSale: false,
+    };
+  }
+}
+
 export async function scanReceiptAction(formData: FormData) {
   const session = await verifySession({ redirect: false });
   if (!session) {
@@ -64,7 +87,8 @@ export async function scanReceiptAction(formData: FormData) {
   const fields = result.fields ?? {};
   const store = fields.MerchantName.valueString ?? null;
   const receiptItems = fields.Items;
-  const date = fields.TransactionDate.valueString ?? null;
+  const dateString = fields.TransactionDate?.valueString ?? null;
+  const date = dateString ? new Date(dateString) : null;
   const items = [];
 
   for (const { valueObject: receiptItem } of (receiptItems &&
@@ -76,28 +100,17 @@ export async function scanReceiptAction(formData: FormData) {
     const amount = receiptItem.Quantity?.valueNumber ?? null;
     const unit = receiptItem.QuantityUnit?.valueString ?? null;
 
-    let isSale = false;
-    let saleText = null;
-    let normalizedName;
+    const { normalizedName, isSale } = processSaleItemName(name);
 
-    if (name) {
-      const salePattern = /(\(sale\)|\[sale\]|\bsale\b)/i;
-      const saleMatch = name.match(salePattern);
-
-      if (saleMatch) {
-        isSale = true;
-        saleText = saleMatch[0];
-
-        let cleanedName = name.replace(saleMatch[0], "").trim();
-        cleanedName = cleanedName.replace(/\s+/g, " ").trim();
-
-        normalizedName = capitalizeWords(cleanedName);
-      } else {
-        normalizedName = capitalizeWords(name);
-      }
-    }
-
-    items.push({ name: normalizedName, price, amount, unit, isSale });
+    items.push({
+      name: normalizedName,
+      price,
+      amount,
+      unit,
+      isSale,
+      brand: null,
+      count: null,
+    });
   }
 
   return {

@@ -6,9 +6,10 @@ import { Upload } from "lucide-react";
 import FormButton from "@/components/form/form-button";
 import { scanReceiptAction } from "@/actions/receipt-actions";
 import { useToast } from "@/hooks/use-toast";
+import { ReceiptData } from "@/types/receipt";
 
 type UploadFormProps = {
-  onScanResult: (results: any) => void;
+  onScanResult: (results: ReceiptData | null) => void;
 };
 
 export default function UploadForm({ onScanResult }: UploadFormProps) {
@@ -27,7 +28,10 @@ export default function UploadForm({ onScanResult }: UploadFormProps) {
     e.preventDefault();
 
     if (!file) {
-      console.error("No file selected");
+      toast({
+        variant: "destructive",
+        description: "No file selected",
+      });
       return;
     }
 
@@ -43,14 +47,17 @@ export default function UploadForm({ onScanResult }: UploadFormProps) {
           variant: "destructive",
           description: response.error,
         });
-      } else if (response.success) {
+      } else if (response.success && response.data) {
         onScanResult(response.data);
+      } else {
+        toast({
+          description: "Unable to extract items from receipt",
+        });
       }
     } catch (error) {
       toast({
         description: "Unable to process receipt",
       });
-      console.log(error);
     } finally {
       setIsLoading(false);
     }
@@ -96,6 +103,7 @@ export default function UploadForm({ onScanResult }: UploadFormProps) {
           accept="image/*"
           className="hidden"
           onChange={handleFileChange}
+          data-testid="file-input"
         />
       </div>
       <FormButton
