@@ -78,7 +78,11 @@ export default function ScannedReceiptItems({
                 <LabeledValue label="Unit" value={item.unit} />
                 <div className="flex gap-1">
                   <LabeledValue label="Price" value={item.price} required />
-                  {item.isSale && <SaleIndicator />}
+                  {item.isSale && (
+                    <div>
+                      <SaleIndicator />
+                    </div>
+                  )}
                 </div>
               </div>
             </>
