@@ -2,11 +2,12 @@
 
 A full-stack Next.js application being developed to help shoppers track grocery prices over time.
 
-<img width="1212" alt="app-2" src="https://github.com/user-attachments/assets/125cd889-3fab-4c8c-9701-221d75573aec" />
+<img width="1212" alt="app-3" src="https://github.com/user-attachments/assets/07207b93-23e0-4110-8cee-03be8ea14c68" />
 
 ## Table of Contents
 
 - [Project Overview](#preview)
+
 - [Technologies Used](#tech)
 - [Database Design](#db)
 - [Data Access](#data)
