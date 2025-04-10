@@ -1,8 +1,8 @@
 import { PricePoint } from "@/types/grocery";
 import { currencyFormat, formatDate } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
-import { SaleIndicator } from "../../sale-indicator";
 import GroceryItemDropdown from "./grocery-item-dropdown";
+import { SaleIndicator } from "@/components/sale-indicator";
 
 export const columns: ColumnDef<PricePoint>[] = [
   {

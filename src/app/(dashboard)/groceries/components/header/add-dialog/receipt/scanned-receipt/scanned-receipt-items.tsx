@@ -5,6 +5,7 @@ import { ReceiptData, ReceiptItem } from "@/types/receipt";
 import { SquarePenIcon, TrashIcon } from "lucide-react";
 import LabeledValue from "./labeled-value";
 import { ScannedReceiptItemForm } from "./scanned-receipt-item-form";
+import { SaleIndicator } from "@/components/sale-indicator";
 
 type ScannedReceiptItemsProps = {
   receiptData: ReceiptData;
@@ -77,13 +78,7 @@ export default function ScannedReceiptItems({
                 <LabeledValue label="Unit" value={item.unit} />
                 <div className="flex gap-1">
                   <LabeledValue label="Price" value={item.price} required />
-                  <div>
-                    {item.isSale && (
-                      <span className="text-xs font-semibold rounded-lg px-1 bg-sale text-white">
-                        Sale
-                      </span>
-                    )}
-                  </div>
+                  {item.isSale && <SaleIndicator />}
                 </div>
               </div>
             </>

@@ -11,7 +11,7 @@ import {
   formatDate,
   getConvertedPrice,
 } from "@/lib/utils";
-import { SaleIndicator } from "./sale-indicator";
+import { SaleIndicator } from "@/components/sale-indicator";
 
 type GroceryItemCardProps = ItemWithView;
 
@@ -26,7 +26,7 @@ type ItemPriceProps = {
 function ItemPrice({ price, isSale, count, amount, unit }: ItemPriceProps) {
   return (
     <>
-      <p className="font-semibold tracking-tight flex items-center justify-end">
+      <p className="font-semibold tracking-tight flex items-center justify-end gap-1">
         {isSale && <SaleIndicator />}
         {currencyFormat(price)}
       </p>
