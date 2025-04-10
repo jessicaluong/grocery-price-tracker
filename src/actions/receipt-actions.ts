@@ -1,7 +1,7 @@
 "use server";
 
 import { verifySession } from "@/lib/auth";
-import { capitalizeWords } from "@/lib/utils";
+import { processSaleItemName } from "@/lib/receipt-utils";
 import DocumentIntelligence from "@azure-rest/ai-document-intelligence";
 import {
   getLongRunningPoller,
@@ -9,29 +9,6 @@ import {
   AnalyzeResultOutput,
 } from "@azure-rest/ai-document-intelligence";
 import { AzureKeyCredential } from "@azure/core-auth";
-
-export function processSaleItemName(name: string | null) {
-  if (!name) {
-    return { normalizedName: null, isSale: false };
-  }
-
-  const salePattern = /(\(sale\)|\[sale\]|\bsale\b)/i;
-  const saleMatch = name.match(salePattern);
-
-  if (saleMatch) {
-    let cleanedName = name.replace(saleMatch[0], "").trim();
-    cleanedName = cleanedName.replace(/\s+/g, " ").trim();
-    return {
-      normalizedName: capitalizeWords(cleanedName),
-      isSale: true,
-    };
-  } else {
-    return {
-      normalizedName: capitalizeWords(name),
-      isSale: false,
-    };
-  }
-}
 
 export async function scanReceiptAction(formData: FormData) {
   const session = await verifySession({ redirect: false });
