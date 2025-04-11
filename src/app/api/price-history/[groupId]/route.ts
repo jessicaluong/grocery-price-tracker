@@ -3,7 +3,6 @@ import { verifySession } from "@/lib/auth";
 import { AuthorizationError } from "@/lib/customErrors";
 import { NextResponse } from "next/server";
 
-// TODO: add cache (Next.js side or Prisma side?)
 export async function GET(
   request: Request,
   { params }: { params: { groupId: string } }
@@ -26,7 +25,7 @@ export async function GET(
     }
 
     const priceHistory = await getPriceHistory(groupId);
-    return NextResponse.json(priceHistory);
+    return NextResponse.json(priceHistory || []); // empty array when no data
   } catch (error) {
     if (error instanceof AuthorizationError) {
       return NextResponse.json(
