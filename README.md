@@ -21,7 +21,7 @@ A full-stack Next.js application being developed to help shoppers track grocery 
 ### Comprehensive Price Tracking
 
 - Interactive price history charts for data visualization using Recharts
-- Automatic calculation of normalized price comparisons (\$/100g, \$/100mL)
+- Automatic calculation of normalized price comparisons (e.g., price per 100g, price per 100mL)
 - Support for multiple measurement units (weight, volume, count)
 - Sale price flagging for spotting deals and discounts
 
@@ -128,7 +128,7 @@ Security is implemented at multiple levels:
 **Authentication & Authorization**
 
 - **JWT-based sessions**: Secure authentication managed by NextAuth.js
-- **Multi-provider Support** Email/password (with bcrypt) and OAuth (Google)
+- **Multi-provider Support** Email/password (with bcrypt) and OAuth (Google)  
   <img width="400" alt="login" src="https://github.com/user-attachments/assets/4305e9ba-9537-46b1-a6b0-0b3f47b6704e" />
 - **Middleware** for optimistic checks, pre-filtering unauthorized users
 - **Data Access Layer (DAL)** for centralizing data requests, and authentication and authorization logic
