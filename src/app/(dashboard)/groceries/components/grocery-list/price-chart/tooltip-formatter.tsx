@@ -1,25 +1,25 @@
 import { Progress } from "@/components/ui/progress";
-import { usePriceChart } from "@/hooks/use-price-chart";
 import { currencyFormat } from "@/lib/utils";
+import { ChartDataPoint, TimeFrame } from "@/types/price-chart";
 
 type TooltipFormatProps = {
-  date: string;
-  price: number;
-  count: number;
-  saleCount: number;
-  avgSalePrice: number;
-  avgRegPrice: number;
+  data: ChartDataPoint;
+  timeFrame: TimeFrame;
 };
 
-export default function TooltipFormat({
-  date,
-  price,
-  count,
-  saleCount,
-  avgSalePrice,
-  avgRegPrice,
-}: TooltipFormatProps) {
-  const { timeFrame } = usePriceChart();
+export default function TooltipFormat({ data, timeFrame }: TooltipFormatProps) {
+  const { date, price, count, saleCount, avgSalePrice, avgRegPrice, dateEnd } =
+    data;
+
+  if (
+    price === null ||
+    saleCount === null ||
+    count === null ||
+    avgSalePrice === null ||
+    avgRegPrice === null
+  ) {
+    return null;
+  }
 
   if (timeFrame === "1m" && count === 1) {
     return (
@@ -34,12 +34,15 @@ export default function TooltipFormat({
       </div>
     );
   }
+
   const percentSale = (saleCount / count) * 100;
   const regCount = count - saleCount;
 
   return (
     <div className="flex flex-col gap-1 w-full">
-      <div className="font-medium">{date}</div>
+      <div className="font-medium">
+        {timeFrame === "3m" ? `${date} - ${dateEnd}` : date}
+      </div>
       <div className="flex justify-between items-center">
         <span className="mr-2">Average price:</span>{" "}
         <span className="font-mono font-medium">{currencyFormat(price)}</span>

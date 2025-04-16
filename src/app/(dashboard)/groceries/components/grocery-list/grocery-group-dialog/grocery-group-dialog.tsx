@@ -14,12 +14,8 @@ import { columns } from "./grocery-group-table/grocery-group-table-column";
 import GroceryGroupDropdown from "./grocery-group-dropdown";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import PriceChartDemo from "../price-chart/price-chart-2";
-import { PriceChart3 } from "../price-chart/price-chart-3";
-import { PriceChart3a } from "../price-chart/price-chart-3a";
 import GroceryGroupProvider from "@/contexts/grocery-group-provider";
 import { PriceChart } from "../price-chart/price-chart";
-import PriceChartProvider from "@/contexts/price-chart-provider";
 
 type GroceryGroupDialogProps = {
   open: boolean;
@@ -103,19 +99,14 @@ export default function GroceryGroupDialog({
             </span>
           ) : data && data.length > 0 ? (
             <>
-              <PriceChartProvider>
-                <PriceChart data={data} />
-                {/* <PriceChart3a data={data} /> */}
-                {/* <PriceChart3 data={data} /> */}
-              </PriceChartProvider>
+              <PriceChart data={data} />
               <GroceryGroupTable columns={columns} data={data} />
             </>
           ) : (
-            <span className="text-center text-muted-foreground py-4">
-              No price history available
-            </span>
+            <div className="flex items-center justify-center text-muted-foreground h-64">
+              No price history available.
+            </div>
           )}
-          {/* <PriceChartDemo></PriceChartDemo> */}
         </DialogContent>
       </GroceryGroupProvider>
     </Dialog>

@@ -1,8 +1,3 @@
-export type DateRange = {
-  start: Date | null;
-  end: Date | null;
-};
-
 export const TimeFrameValue = {
   ONE_MONTH: "1m",
   THREE_MONTHS: "3m",
@@ -18,3 +13,36 @@ export const TIME_FRAMES = [
   { value: TimeFrameValue.ONE_YEAR, label: "Y" },
   { value: TimeFrameValue.ALL_TIME, label: "All" },
 ];
+
+export type ChartDataPoint = {
+  date: string;
+  dateEnd?: string;
+  xAxisLabel: string | number;
+  price: number | null;
+  saleCount: number | null;
+  count: number | null;
+  avgSalePrice: number | null;
+  avgRegPrice: number | null;
+};
+
+export type AggregateEntry = {
+  date?: Date;
+  endDate?: Date;
+  totalPrice: number;
+  totalSalePrice: number;
+  totalRegPrice: number;
+  count: number;
+  saleCount: number;
+  regCount: number;
+};
+
+export type AggregationResult = {
+  date?: Date;
+  endDate?: Date;
+  avgPrice: number;
+  count: number;
+  saleCount: number;
+  regCount: number;
+  avgSalePrice: number;
+  avgRegPrice: number;
+};
