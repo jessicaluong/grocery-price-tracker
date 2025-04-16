@@ -20,10 +20,9 @@ A full-stack Next.js application being developed to help shoppers track grocery 
 
 ### Comprehensive Price Tracking
 
-- Interactive price history charts for data visualization using Recharts
+- Interactive price history charts for data visualization using Recharts with different time frames and date navigation
 - Automatic calculation of normalized price comparisons (e.g., price per 100g, price per 100mL)
-- Support for multiple measurement units (weight, volume, count)
-- Sale price flagging for spotting deals and discounts
+- Sale price flagging
 
 https://github.com/user-attachments/assets/087fab49-9df2-4f6c-87d3-4ad6f9f62568
 
@@ -157,17 +156,21 @@ The application is under active development.
 ### Completed
 
 - Core data model and database schema
-- User authentication
+- User authentication with OAuth Provider (Google)
 - Complete item management (add, edit, delete)
 - Group management for related items
 - Search and sorting capabilities
-- Historical price tracking with visualization in interactive price chart
+- Interactive price chart with different time frames and date navigation
 - Receipt scanning with Azure Document Intelligence for adding multiple items
 
 ### In Progress
 
-- Enhanced authentication (email verification, rate limiting)
-- Password reset functionality
-- Price chart enhancements (implementing 3-month view)
-- Database-level filtering optimization for pagination
+- Add another OAuth Provider and remove Credentials Provider to mitigate security risks associated with usernames/passwords
 - Rate-limiting for third-party API requests
+- Demo mode with limited functionality
+- Deploy on Vercel
+
+### Future Enhancements
+
+- Database-level filtering optimization for pagination
+- Make manually adding grocery items easier by pooling grocery items from all users (name, brand, quantity, amount only) and integrating third party API for auto-complete
