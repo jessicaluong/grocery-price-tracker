@@ -5,14 +5,14 @@ import { Form } from "@/components/ui/form";
 import { DbGroup, ServerErrors, UnitEnum } from "@/types/grocery";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import FormInput from "../../grocery-action-dialogs/shared/item-form/item-form-input";
-import { FormSelect } from "../../grocery-action-dialogs/shared/item-form/item-form-select";
 import { DialogFooter } from "@/components/ui/dialog";
 import FormButton from "@/components/form/form-button";
 import { useState } from "react";
 import { groupSchema, TGroupSchema } from "@/zod-schemas/grocery-schemas";
 import { editGroupAction } from "@/actions/grocery-actions";
 import { useToast } from "@/hooks/use-toast";
+import FormInput from "@/components/form/item-form/item-form-input";
+import { FormSelect } from "@/components/form/item-form/item-form-select";
 
 type EditGroupFormProps = {
   group: DbGroup;

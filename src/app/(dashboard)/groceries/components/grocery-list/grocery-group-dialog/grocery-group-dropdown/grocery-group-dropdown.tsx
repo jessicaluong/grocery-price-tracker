@@ -18,8 +18,8 @@ import { useState } from "react";
 import { DbGroup } from "@/types/grocery";
 import { useToast } from "@/hooks/use-toast";
 import { deleteGroupAction } from "@/actions/grocery-actions";
-import AddItemToGroupDialogContent from "../../grocery-action-dialogs/add-item-to-group/add-item-to-group-dialog-content";
-import EditGroupDialogContent from "../../grocery-action-dialogs/edit-group/edit-group-dialog-content";
+import AddItemToGroupDialogContent from "./add-item-to-group/add-item-to-group-dialog-content";
+import EditGroupDialogContent from "./edit-group/edit-group-dialog-content";
 
 type GroceryGroupDropdownProps = {
   group: DbGroup;

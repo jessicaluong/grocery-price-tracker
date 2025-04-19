@@ -1,5 +1,5 @@
 import { deleteGroupAction } from "@/actions/grocery-actions";
-import GroceryGroupDropdown from "@/app/(dashboard)/groceries/components/grocery-list/grocery-group-dialog/grocery-group-dropdown";
+import GroceryGroupDropdown from "@/app/(dashboard)/groceries/components/grocery-list/grocery-group-dialog/grocery-group-dropdown/grocery-group-dropdown";
 import { Unit } from "@/types/grocery";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import GroceryItemDropdown from "@/app/(dashboard)/groceries/components/grocery-list/grocery-group-dialog/grocery-group-table/grocery-item-dropdown";
 import { deleteItemAction } from "@/actions/grocery-actions";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGroceryGroupContext } from "@/hooks/use-grocery-group";
+import GroceryItemDropdown from "@/app/(dashboard)/groceries/components/grocery-list/grocery-group-dialog/grocery-group-table/grocery-item-dropdown/grocery-item-dropdown";
 
 jest.mock("@/actions/grocery-actions", () => ({
   deleteItemAction: jest.fn(),

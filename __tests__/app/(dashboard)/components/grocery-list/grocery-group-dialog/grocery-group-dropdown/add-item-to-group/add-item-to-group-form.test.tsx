@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { useToast } from "@/hooks/use-toast";
 import { addItemToGroupAction } from "@/actions/grocery-actions";
 import { Unit } from "@/types/grocery";
-import AddItemToGroupForm from "@/app/(dashboard)/groceries/components/grocery-action-dialogs/add-item-to-group/add-item-to-group-form";
+import AddItemToGroupForm from "@/app/(dashboard)/groceries/components/grocery-list/grocery-group-dialog/grocery-group-dropdown/add-item-to-group/add-item-to-group-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGroceryGroupContext } from "@/hooks/use-grocery-group";
 

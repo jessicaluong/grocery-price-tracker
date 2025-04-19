@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { editGroupAction } from "@/actions/grocery-actions";
 import { Unit } from "@/types/grocery";
 import { useToast } from "@/hooks/use-toast";
-import EditGroupForm from "@/app/(dashboard)/groceries/components/grocery-action-dialogs/edit-group/edit-group-form";
+import EditGroupForm from "@/app/(dashboard)/groceries/components/grocery-list/grocery-group-dialog/grocery-group-dropdown/edit-group/edit-group-form";
 
 jest.mock("@/actions/grocery-actions", () => ({
   editGroupAction: jest.fn(),

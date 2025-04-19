@@ -1,36 +1,39 @@
-import { addItemToGroupAction } from "@/actions/grocery-actions";
-import ErrorCallout from "@/components/form/error-callout";
-import { Form } from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
-import { DbGroup, ServerErrors } from "@/types/grocery";
+"use client";
+
+import { editItemAction } from "@/actions/grocery-actions";
+import { DialogFooter } from "@/components/ui/dialog";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { PricePoint, ServerErrors } from "@/types/grocery";
+import FormButton from "@/components/form/form-button";
 import {
   pricePointSchema,
   TPricePointSchema,
 } from "@/zod-schemas/grocery-schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import FormInput from "../../grocery-action-dialogs/shared/item-form/item-form-input";
-import { FormDatePicker } from "../../grocery-action-dialogs/shared/item-form/item-form-date-picker";
-import FormCheckbox from "../../grocery-action-dialogs/shared/item-form/item-form-checkbox";
-import { DialogFooter } from "@/components/ui/dialog";
-import FormButton from "@/components/form/form-button";
+import ErrorCallout from "@/components/form/error-callout";
+import { Form } from "@/components/ui/form";
+
+import { useToast } from "@/hooks/use-toast";
+import { formatDate } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGroceryGroupContext } from "@/hooks/use-grocery-group";
+import FormInput from "@/components/form/item-form/item-form-input";
+import FormCheckbox from "@/components/form/item-form/item-form-checkbox";
+import { FormDatePicker } from "@/components/form/item-form/item-form-date-picker";
 
-type AddItemToGroupFormProps = {
-  group: DbGroup;
+type EditItemFormProps = {
+  item: PricePoint;
   onSuccess: () => void;
 };
 
-export default function AddItemToGroupForm({
-  group,
-  onSuccess,
-}: AddItemToGroupFormProps) {
+export default function EditItemForm({ item, onSuccess }: EditItemFormProps) {
   const form = useForm<TPricePointSchema>({
     resolver: zodResolver(pricePointSchema),
     defaultValues: {
-      isSale: false,
+      price: item.price,
+      date: new Date(formatDate(item.date)),
+      isSale: item.isSale,
     },
   });
 
@@ -42,18 +45,18 @@ export default function AddItemToGroupForm({
 
   async function onSubmit(values: TPricePointSchema) {
     try {
-      const response = await addItemToGroupAction(values, group.id);
+      const response = await editItemAction(values, item.id);
       if (response.errors) {
         setServerErrors(response.errors);
       } else if (response.success) {
         queryClient.invalidateQueries({ queryKey: ["priceHistory", groupId] });
         toast({
-          description: "Item added.",
+          description: "Item edited.",
         });
         onSuccess();
       }
     } catch (error) {
-      setServerErrors({ form: "An error occurred while adding item" });
+      setServerErrors({ form: "An error occurred while editing item" });
     }
   }
 
@@ -61,14 +64,14 @@ export default function AddItemToGroupForm({
     <Form {...form}>
       <ErrorCallout errors={serverErrors} />
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-        <FormInput form={form} name="price" label="Price" type="number" />
+        <FormInput form={form} name="price" label="Price" />
         <FormCheckbox form={form} name="isSale" label="Sale Price?" />
         <FormDatePicker form={form} name="date" label="Date" />
         <DialogFooter>
           <FormButton
             isSubmitting={isSubmitting}
-            pendingText="Adding..."
-            defaultText="Submit"
+            pendingText="Saving..."
+            defaultText="Save changes"
           />
         </DialogFooter>
       </form>

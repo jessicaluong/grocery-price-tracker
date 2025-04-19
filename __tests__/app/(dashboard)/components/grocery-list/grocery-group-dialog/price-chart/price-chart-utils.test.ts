@@ -16,7 +16,7 @@ import {
   getStartOfWeek,
   getWeekKey,
   hasDataInRange,
-} from "@/app/(dashboard)/groceries/components/grocery-list/price-chart/price-chart-utils";
+} from "@/app/(dashboard)/groceries/components/grocery-list/grocery-group-dialog/price-chart/price-chart-utils";
 import { PricePoint } from "@/types/grocery";
 
 describe("PriceChartUtils", () => {

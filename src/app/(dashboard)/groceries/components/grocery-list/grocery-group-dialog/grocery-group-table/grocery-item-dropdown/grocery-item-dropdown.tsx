@@ -9,11 +9,11 @@ import {
 import { MoreHorizontalIcon, TrashIcon, SquarePenIcon } from "lucide-react";
 import { useState } from "react";
 import { PricePoint } from "@/types/grocery";
-import EditItemDialogContent from "../../../grocery-action-dialogs/edit-item/edit-item-dialog-content";
 import { deleteItemAction } from "@/actions/grocery-actions";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGroceryGroupContext } from "@/hooks/use-grocery-group";
+import EditItemDialogContent from "./edit-item/edit-item-dialog-content";
 
 type DropdownDialogProps = {
   rowData: PricePoint;

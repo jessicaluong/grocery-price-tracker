@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useToast } from "@/hooks/use-toast";
-import EditItemForm from "@/app/(dashboard)/groceries/components/grocery-action-dialogs/edit-item/edit-item-form";
 import { editItemAction } from "@/actions/grocery-actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGroceryGroupContext } from "@/hooks/use-grocery-group";
+import EditItemForm from "@/app/(dashboard)/groceries/components/grocery-list/grocery-group-dialog/grocery-group-table/grocery-item-dropdown/edit-item/edit-item-form";
 
 jest.mock("@/hooks/use-toast", () => ({
   useToast: jest.fn(() => ({

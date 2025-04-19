@@ -11,11 +11,11 @@ import { ItemWithView, PricePoint } from "@/types/grocery";
 import { ItemQuantity } from "../item-quantity";
 import GroceryGroupTable from "./grocery-group-table/grocery-group-table";
 import { columns } from "./grocery-group-table/grocery-group-table-column";
-import GroceryGroupDropdown from "./grocery-group-dropdown";
+import GroceryGroupDropdown from "./grocery-group-dropdown/grocery-group-dropdown";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import GroceryGroupProvider from "@/contexts/grocery-group-provider";
-import { PriceChart } from "../price-chart/price-chart";
+import { PriceChart } from "./price-chart/price-chart";
 
 type GroceryGroupDialogProps = {
   open: boolean;

@@ -4,25 +4,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import EditGroupForm from "./edit-group-form";
 import { DbGroup } from "@/types/grocery";
-import { ItemQuantity } from "../../grocery-list/item-quantity";
-import AddItemToGroupForm from "./add-item-to-group-form";
+import { ItemQuantity } from "../../../item-quantity";
 
-type AddItemToGroupDialogContentProps = {
+type EditGroupDialogProps = {
   group: DbGroup;
   handleClose: () => void;
 };
 
-export default function AddItemToGroupDialogContent({
+export default function EditGroupDialogContent({
   group,
   handleClose,
-}: AddItemToGroupDialogContentProps) {
+}: EditGroupDialogProps) {
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
-        <DialogTitle>Add item</DialogTitle>
+        <DialogTitle>Edit group</DialogTitle>
         <DialogDescription>
-          Add an item to{" "}
+          Make changes to{" "}
           <span className="font-bold">
             {group.brand} {group.name} (
             <ItemQuantity
@@ -35,7 +35,7 @@ export default function AddItemToGroupDialogContent({
           from <span className="font-bold">{group.store}</span>.
         </DialogDescription>
       </DialogHeader>
-      <AddItemToGroupForm group={group} onSuccess={handleClose} />
+      <EditGroupForm group={group} onSuccess={handleClose} />
     </DialogContent>
   );
 }
