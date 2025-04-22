@@ -18,31 +18,30 @@ A full-stack Next.js application being developed to help shoppers track grocery 
 
 ## Features
 
-### Comprehensive Price Tracking
+### Price Tracking and Comparison
 
-- Interactive price history charts for data visualization using Recharts with different time frames and date navigation
-- Automatic calculation of normalized price comparisons (e.g., price per 100g, price per 100mL)
+- Interactive price history chart with different time frames and date navigation
+- Calculates normalized prices for easy comparison (e.g., price per 100g, price per 100mL)
 - Sale price flagging
 
 https://github.com/user-attachments/assets/087fab49-9df2-4f6c-87d3-4ad6f9f62568
 
 [comment]: # "![price-chart-demo](https://github.com/user-attachments/assets/12bc90d6-cc3d-44bd-8c7e-bc5992a75bc4)"
 
-### Smart Receipt Scanner
+### Receipt Scanner
 
-- ML-powered receipt processing using Azure Document Intelligence
-- Automatic extraction of merchant, date, and line items
+- ML-powered receipt processing using Azure Document Intelligence to extract merchant, date, and line items
 - Interactive UI for reviewing and editing extracted items
-- Bulk import of multiple grocery items in a single operation
+- Add multiple grocery items to tracker at once
 - View demo on <a href="https://youtu.be/Bprjsu2sJTI">YouTube</a>
 
 <img width="1220" alt="receipt-scanner" src="https://github.com/user-attachments/assets/41bce44d-7b73-4e59-889f-43614f7ca489" />
 
-### Powerful Data Management
+### Data Management
 
-- Advanced search with multi-term filtering across product names and brands
-- Flexible view options (list individual items or group by product)
-- Customizable sorting by price or date
+- Search by product name and/or brand
+- View items individually or group by product
+- Sort by price or date
 
 https://github.com/user-attachments/assets/15f69913-d63d-40c1-bd75-08e65bc1a01b
 
@@ -52,31 +51,25 @@ https://github.com/user-attachments/assets/15f69913-d63d-40c1-bd75-08e65bc1a01b
 
 ## Technologies Used
 
-### Core
+![tech](https://skillicons.dev/icons?i=nextjs,ts,react,tailwind,prisma,postgres,jest)
 
-![Core tech](https://skillicons.dev/icons?i=nextjs,ts)
+### Core
 
 - **Next.js** for full-stack **React** development
 - **TypeScript** for type-safe code across the entire application
 
 ### Frontend
 
-![Frontend tech](https://skillicons.dev/icons?i=react,tailwind)
-
 - **Shadcn** component library
 - **Tailwind CSS** for styling and responsive design
 
 ### Backend
-
-![Backend tech](https://skillicons.dev/icons?i=prisma,postgres)
 
 - **PostgreSQL** for database
 - **Prisma ORM** for type-safe database queries
 - **NextAuth.js** for authentication
 
 ### Testing
-
-![Testing tech](https://skillicons.dev/icons?i=jest)
 
 - **Jest** for unit and integration testing
 - **Playwright** for end-to-end testing
@@ -90,14 +83,9 @@ https://github.com/user-attachments/assets/15f69913-d63d-40c1-bd75-08e65bc1a01b
 - **Group**: Product details (name, brand, store, etc.)
 - **Item**: Price points with timestamps
 - **User**: Account information and authentication
-- Supporting tables for authentication
+- Supporting tables for authentication (not shown)
 
 ![db_simple](https://github.com/user-attachments/assets/7cba52d8-09f8-4c34-a0ec-0d4a2366df58)
-
-<details> 
-  <summary>View full diagram with supporting tables for authentication </summary>
-  <img width="1141" alt="db" src="https://github.com/user-attachments/assets/6e7835dd-719f-4435-b752-cec0485a01bb" />
-</details>
 
 The database is designed with:
 
@@ -135,8 +123,6 @@ Security is implemented at multiple levels:
 **Input Handling & Validation**
 
 - **Schema Validation**: Type-safe request validation with Zod
-- **Server Actions**: Inherent CSRF protection via Next.js architecture
-- **Content Security**: React's automatic output encoding for XSS prevention
 - **Error Boundaries**: Controlled error exposure preventing information leakage
 
 <div id="test"></div>
