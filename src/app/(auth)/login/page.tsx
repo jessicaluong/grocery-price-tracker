@@ -1,4 +1,4 @@
-import { ShoppingCart } from "lucide-react";
+import { ShoppingBasket } from "lucide-react";
 import LoginForm from "./components/login-form";
 import GoogleLoginButton from "./components/google-login-button";
 import Link from "next/link";
@@ -8,9 +8,7 @@ export default function LoginPage() {
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
       <div className="w-full max-w-sm flex flex-col gap-6">
         <div className="flex flex-col items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md">
-            <ShoppingCart className="size-6 text-themed" />
-          </div>
+          <ShoppingBasket className="size-10 text-themed" />
           <h1 className="text-xl font-bold">
             Welcome to Grocery Price Tracker
           </h1>
