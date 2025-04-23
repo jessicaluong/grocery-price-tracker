@@ -97,7 +97,7 @@ The database is designed with:
 
 ## Data Access
 
-The application leverages Next.js 14's modern data access patterns:
+The application uses Next.js data access patterns:
 
 - **Server Components**: Fetch data directly from the database for efficient server-rendered content
 - **Server Actions**: Handle form submissions and data mutations securely on the server, preventing direct client access to the database
@@ -115,7 +115,7 @@ Security is implemented at multiple levels:
 **Authentication & Authorization**
 
 - **JWT-based sessions**: Secure authentication managed by NextAuth.js
-- **Multi-provider Support** Email/password (with bcrypt) and OAuth (Google)  
+- **OAuth-based authentication**: Sign in through Google accounts
   <img width="400" alt="login" src="https://github.com/user-attachments/assets/4305e9ba-9537-46b1-a6b0-0b3f47b6704e" />
 - **Middleware** for optimistic checks, pre-filtering unauthorized users
 - **Data Access Layer (DAL)** for centralizing data requests, and authentication and authorization logic
@@ -131,7 +131,7 @@ Security is implemented at multiple levels:
 
 - **Unit testing**: Jest for testing complex components (e.g., forms) and utility functions
 - **Integration testing**: Jest for verifying interactions with a real database (i.e., functions in data access layer)
-- **End-to-end testing**: Playwright for testing user flows (e.g., logging in, adding an item, editing an item)
+- **End-to-end testing**: Playwright for testing user flows (e.g., adding an item)
 
 <div id="status"></div>
 
@@ -143,15 +143,14 @@ The application is under active development.
 
 - Core data model and database schema
 - User authentication with OAuth Provider (Google)
-- Complete item management (add, edit, delete)
-- Group management for related items
+- Credentials Provider used for testing and development only
+- Complete item and group management (add, edit, delete)
 - Search and sorting capabilities
 - Interactive price chart with different time frames and date navigation
 - Receipt scanning with Azure Document Intelligence for adding multiple items
 
 ### In Progress
 
-- Add another OAuth Provider and remove Credentials Provider to mitigate security risks associated with usernames/passwords
 - Rate-limiting for third-party API requests
 - Demo mode with limited functionality
 - Deploy on Vercel

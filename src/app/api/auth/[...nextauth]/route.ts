@@ -6,46 +6,54 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import { NextAuthOptions } from "next-auth";
 
+const isDevOrTest =
+  process.env.NODE_ENV !== "production" ||
+  process.env.NEXTAUTH_ALLOW_CREDENTIALS === "true";
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_ID!,
       clientSecret: process.env.GOOGLE_SECRET!,
     }),
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
+    ...(isDevOrTest
+      ? [
+          CredentialsProvider({
+            name: "Credentials",
+            credentials: {
+              email: { label: "Email", type: "email" },
+              password: { label: "Password", type: "password" },
+            },
+            async authorize(credentials) {
+              if (!credentials?.email || !credentials?.password) {
+                return null;
+              }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
+              const user = await prisma.user.findUnique({
+                where: { email: credentials.email },
+              });
 
-        if (!user || !user?.hashedPassword) {
-          return null;
-        }
+              if (!user || !user?.hashedPassword) {
+                return null;
+              }
 
-        const passwordMatch = await bcrypt.compare(
-          credentials.password,
-          user.hashedPassword
-        );
+              const passwordMatch = await bcrypt.compare(
+                credentials.password,
+                user.hashedPassword
+              );
 
-        if (!passwordMatch) {
-          return null;
-        }
+              if (!passwordMatch) {
+                return null;
+              }
 
-        return {
-          id: user.id,
-          email: user.email,
-        };
-      },
-    }),
+              return {
+                id: user.id,
+                email: user.email,
+              };
+            },
+          }),
+        ]
+      : []),
   ],
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,

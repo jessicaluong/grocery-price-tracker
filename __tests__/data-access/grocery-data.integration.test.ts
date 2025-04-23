@@ -29,7 +29,6 @@ describe("Item Repository integration tests", () => {
       data: {
         id: userId,
         email: "test@example.com",
-        hashedPassword: "test-password-hash",
       },
     });
   });
