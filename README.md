@@ -114,11 +114,11 @@ Security is implemented at multiple levels:
 
 **Authentication & Authorization**
 
-- **JWT-based sessions**: Secure authentication managed by NextAuth.js
-- **OAuth-based authentication**: Sign in through Google accounts
-  <img width="400" alt="login" src="https://github.com/user-attachments/assets/4305e9ba-9537-46b1-a6b0-0b3f47b6704e" />
+![login2](https://github.com/user-attachments/assets/0df6b13d-e6ca-434c-8eac-7b903eab8576)
+
+- **Authentication**: Secure sign-in with Google (OAuth) and JWT-based sessions via NextAuth.js
 - **Middleware** for optimistic checks, pre-filtering unauthorized users
-- **Data Access Layer (DAL)** for centralizing data requests, and authentication and authorization logic
+- **Data Access Layer** for centralizing data requests, and authentication and authorization logic
 
 **Input Handling & Validation**
 
