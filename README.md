@@ -1,6 +1,6 @@
-# Grocery Price Tracker (In Development)
+# Grocery Price Tracker
 
-A full-stack Next.js application being developed to help shoppers track grocery prices over time.
+A full-stack Next.js application developed to help shoppers track grocery prices over time.
 
 <img width="1212" alt="app-3" src="https://github.com/user-attachments/assets/07207b93-23e0-4110-8cee-03be8ea14c68" />
 
@@ -125,6 +125,13 @@ Security is implemented at multiple levels:
 - **Schema Validation**: Type-safe request validation with Zod
 - **Error Boundaries**: Controlled error exposure preventing information leakage
 
+## External Services & Resource Management
+
+### Azure AI Document Intelligence
+
+- **Usage Quotas**: Implemented daily and monthly limits (5 scans per day per user, 450 scans per month for all users) to control usage of the external service
+- **Database Tracking**: Used a database model to track scan usage
+
 <div id="test"></div>
 
 ## Testing Strategy
@@ -148,12 +155,13 @@ The application is under active development.
 - Search and sorting capabilities
 - Interactive price chart with different time frames and date navigation
 - Receipt scanning with Azure Document Intelligence for adding multiple items
+- Rate limiting for Azure
 
 ### In Progress
 
-- Rate-limiting for third-party API requests
 - Demo mode with limited functionality
 - Deploy on Vercel
+- Finish E2E tests
 
 ### Future Enhancements
 
