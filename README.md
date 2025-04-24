@@ -11,6 +11,7 @@ A full-stack Next.js application developed to help shoppers track grocery prices
 - [Database Design](#db)
 - [Data Access](#data)
 - [Security](#security)
+- [External Services & Resource Management](#external)
 - [Testing Strategy](#test)
 - [Current Development Status](#status)
 
@@ -114,7 +115,7 @@ Security is implemented at multiple levels:
 
 **Authentication & Authorization**
 
-![login2](https://github.com/user-attachments/assets/0df6b13d-e6ca-434c-8eac-7b903eab8576)
+![auth3](https://github.com/user-attachments/assets/bb535088-b72d-4199-839e-25560ad8322d)
 
 - **Authentication**: Secure sign-in with Google (OAuth) and JWT-based sessions via NextAuth.js
 - **Middleware** for optimistic checks, pre-filtering unauthorized users
@@ -125,11 +126,15 @@ Security is implemented at multiple levels:
 - **Schema Validation**: Type-safe request validation with Zod
 - **Error Boundaries**: Controlled error exposure preventing information leakage
 
+<div id="external"></div>
+
 ## External Services & Resource Management
 
 ### Azure AI Document Intelligence
 
-- **Usage Quotas**: Implemented daily and monthly limits (5 scans per day per user, 450 scans per month for all users) to control usage of the external service
+![azure-limit](https://github.com/user-attachments/assets/98b900ce-9d2c-4de3-824b-23772dc1200f)
+
+- **Usage Quotas**: Implemented daily and monthly limits (5 scans per day per user, 450 scans per month for all users)
 - **Database Tracking**: Used a database model to track scan usage
 
 <div id="test"></div>
