@@ -35,7 +35,9 @@ export default function ScannedReceiptItems({
           key={index}
           data-testid={`item-${index}-container`}
           className={`border rounded p-2 pr-1 ${
-            itemsWithErrors.has(index) ? "border-red-500 bg-red-100" : ""
+            itemsWithErrors.has(index)
+              ? "border-red-500 bg-red-100 dark:bg-red-950"
+              : ""
           }`}
         >
           {editItemIndex === index ? (
