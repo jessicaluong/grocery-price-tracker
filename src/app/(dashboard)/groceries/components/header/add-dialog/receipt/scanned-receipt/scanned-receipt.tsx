@@ -165,46 +165,37 @@ export default function ScannedReceipt({
 
   return (
     <div className="flex flex-col gap-2 text-sm">
-      {receiptData.items.length > 0 ? (
-        <>
-          <ScannedReceiptHeader
-            receiptData={receiptData}
-            handleSubmitHeader={handleSubmitHeader}
-            onEditClick={handleEditHeader}
-            onCancelEdit={handleCancelEdit}
-            editMode={editMode}
-            disabled={editMode !== null && editMode !== "header"}
-            hasErrors={hasHeaderErrors}
-          />
-          <ScannedReceiptItems
-            receiptData={receiptData}
-            handleSubmitItem={handleSubmitItem}
-            handleDeleteItem={handleDeleteItem}
-            onEditClick={handleEditItem}
-            onCancelEdit={handleCancelEdit}
-            editItemIndex={editItemIndex}
-            disabled={editMode !== null && editMode !== "item"}
-            itemsWithErrors={itemsWithErrors}
-          />
-          <FormButton
-            isSubmitting={isLoading}
-            disabled={editMode !== null}
-            pendingText="Processing ..."
-            defaultText={`Add ${receiptData.items.length} ${
-              receiptData.items.length === 1 ? "item" : "items"
-            }`}
-            className="w-full"
-            onClick={handleSubmit}
-          />
-        </>
-      ) : (
-        <div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
-          <p>No items found on this receipt. </p>
-          <p className="text-sm mt-2">
-            Try scanning a different receipt or add items manually.
-          </p>
-        </div>
-      )}
+      <>
+        <ScannedReceiptHeader
+          receiptData={receiptData}
+          handleSubmitHeader={handleSubmitHeader}
+          onEditClick={handleEditHeader}
+          onCancelEdit={handleCancelEdit}
+          editMode={editMode}
+          disabled={editMode !== null && editMode !== "header"}
+          hasErrors={hasHeaderErrors}
+        />
+        <ScannedReceiptItems
+          receiptData={receiptData}
+          handleSubmitItem={handleSubmitItem}
+          handleDeleteItem={handleDeleteItem}
+          onEditClick={handleEditItem}
+          onCancelEdit={handleCancelEdit}
+          editItemIndex={editItemIndex}
+          disabled={editMode !== null && editMode !== "item"}
+          itemsWithErrors={itemsWithErrors}
+        />
+        <FormButton
+          isSubmitting={isLoading}
+          disabled={editMode !== null}
+          pendingText="Processing ..."
+          defaultText={`Add ${receiptData.items.length} ${
+            receiptData.items.length === 1 ? "item" : "items"
+          }`}
+          className="w-full"
+          onClick={handleSubmit}
+        />
+      </>
     </div>
   );
 }

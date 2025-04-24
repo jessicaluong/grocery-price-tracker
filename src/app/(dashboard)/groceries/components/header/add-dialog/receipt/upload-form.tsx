@@ -10,9 +10,13 @@ import { ReceiptData } from "@/types/receipt";
 
 type UploadFormProps = {
   onScanResult: (results: ReceiptData | null) => void;
+  hasScansRemaining: boolean;
 };
 
-export default function UploadForm({ onScanResult }: UploadFormProps) {
+export default function UploadForm({
+  onScanResult,
+  hasScansRemaining,
+}: UploadFormProps) {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -108,7 +112,7 @@ export default function UploadForm({ onScanResult }: UploadFormProps) {
       </div>
       <FormButton
         isSubmitting={isLoading}
-        disabled={!file}
+        disabled={!file || !hasScansRemaining}
         pendingText="Processing..."
         defaultText="Scan Receipt"
         className="w-full"

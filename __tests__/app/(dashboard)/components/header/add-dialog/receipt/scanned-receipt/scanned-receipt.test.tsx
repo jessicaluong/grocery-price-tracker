@@ -69,26 +69,6 @@ describe("ScannedReceipt", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows empty state when there are no items", () => {
-    const emptyReceiptData = {
-      ...mockReceiptData,
-      items: [],
-    };
-
-    render(
-      <ScannedReceipt data={emptyReceiptData} onSuccess={mockOnSuccess} />
-    );
-
-    expect(
-      screen.getByText("No items found on this receipt.")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "Try scanning a different receipt or add items manually."
-      )
-    ).toBeInTheDocument();
-  });
-
   it("shows error toast when form validation fails", async () => {
     const invalidReceiptData = {
       ...mockReceiptData,

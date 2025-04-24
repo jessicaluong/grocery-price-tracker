@@ -2,6 +2,7 @@
 
 import { verifySession } from "@/lib/auth";
 import { processSaleItemName } from "@/lib/receipt-utils";
+import { checkAndUpdateScanUsage } from "@/lib/scan-rate-limit";
 import DocumentIntelligence from "@azure-rest/ai-document-intelligence";
 import {
   getLongRunningPoller,
@@ -14,6 +15,11 @@ export async function scanReceiptAction(formData: FormData) {
   const session = await verifySession({ redirect: false });
   if (!session) {
     return { error: "You must be logged in to scan receipts" };
+  }
+
+  const scanUsageResult = await checkAndUpdateScanUsage(session.userId);
+  if (!scanUsageResult.success) {
+    return { error: scanUsageResult.message };
   }
 
   const file = formData.get("file") as File;

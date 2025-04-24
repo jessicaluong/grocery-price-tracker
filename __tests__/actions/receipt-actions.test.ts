@@ -6,9 +6,14 @@ import DocumentIntelligence, {
 import { scanReceiptAction } from "@/actions/receipt-actions";
 import { verifySession } from "@/lib/auth";
 import { AzureKeyCredential } from "@azure/core-auth";
+import { checkAndUpdateScanUsage } from "@/lib/scan-rate-limit";
 
 jest.mock("@/lib/auth", () => ({
   verifySession: jest.fn(),
+}));
+
+jest.mock("@/lib/scan-rate-limit", () => ({
+  checkAndUpdateScanUsage: jest.fn(),
 }));
 
 jest.mock("@azure-rest/ai-document-intelligence", () => {
@@ -34,6 +39,10 @@ describe("Receipt server actions", () => {
     (verifySession as jest.Mock).mockResolvedValue({
       userId: "test-user-id",
     });
+
+    (checkAndUpdateScanUsage as jest.Mock).mockResolvedValue({
+      success: true,
+    });
   });
 
   describe("authentication", () => {
@@ -54,6 +63,60 @@ describe("Receipt server actions", () => {
       expect(verifySession).toHaveBeenCalledWith({ redirect: false });
       expect(result).toEqual({
         error: "You must be logged in to scan receipts",
+      });
+      expect(DocumentIntelligence).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("rate limiting", () => {
+    it("should check scan usage before processing", async () => {
+      const formData = new FormData();
+      formData.append(
+        "file",
+        new File(["test"], "test.jpg", { type: "image/jpeg" })
+      );
+
+      await scanReceiptAction(formData);
+
+      expect(checkAndUpdateScanUsage).toHaveBeenCalledWith("test-user-id");
+    });
+
+    it("should return an error if daily scan limit is reached", async () => {
+      (checkAndUpdateScanUsage as jest.Mock).mockResolvedValue({
+        success: false,
+        message: "Daily scan limit reached",
+      });
+
+      const formData = new FormData();
+      formData.append(
+        "file",
+        new File(["test"], "test.jpg", { type: "image/jpeg" })
+      );
+
+      const result = await scanReceiptAction(formData);
+
+      expect(result).toEqual({
+        error: "Daily scan limit reached",
+      });
+      expect(DocumentIntelligence).not.toHaveBeenCalled();
+    });
+
+    it("should return an error if monthly scan limit is reached", async () => {
+      (checkAndUpdateScanUsage as jest.Mock).mockResolvedValue({
+        success: false,
+        message: "Monthly scan limit reached",
+      });
+
+      const formData = new FormData();
+      formData.append(
+        "file",
+        new File(["test"], "test.jpg", { type: "image/jpeg" })
+      );
+
+      const result = await scanReceiptAction(formData);
+
+      expect(result).toEqual({
+        error: "Monthly scan limit reached",
       });
       expect(DocumentIntelligence).not.toHaveBeenCalled();
     });

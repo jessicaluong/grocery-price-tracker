@@ -25,14 +25,18 @@ describe("UploadForm", () => {
   });
 
   it("renders the upload interface correctly", () => {
-    render(<UploadForm onScanResult={mockOnScanResult} />);
+    render(
+      <UploadForm onScanResult={mockOnScanResult} hasScansRemaining={true} />
+    );
 
     expect(screen.getByText("Browse Files")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Scan Receipt" })).toBeDisabled();
   });
 
   it("allows file selection and enables the scan button", async () => {
-    render(<UploadForm onScanResult={mockOnScanResult} />);
+    render(
+      <UploadForm onScanResult={mockOnScanResult} hasScansRemaining={true} />
+    );
 
     const file = new File(["dummy content"], "receipt.jpg", {
       type: "image/jpeg",
@@ -52,7 +56,9 @@ describe("UploadForm", () => {
   });
 
   it("allows changing the selected file", async () => {
-    render(<UploadForm onScanResult={mockOnScanResult} />);
+    render(
+      <UploadForm onScanResult={mockOnScanResult} hasScansRemaining={true} />
+    );
 
     // Upload first file
     const file1 = new File(["dummy content"], "receipt1.jpg", {
@@ -70,13 +76,31 @@ describe("UploadForm", () => {
     expect(screen.getByRole("button", { name: "Scan Receipt" })).toBeDisabled();
   });
 
+  it("disables scan button when no scans remaining", async () => {
+    render(
+      <UploadForm onScanResult={mockOnScanResult} hasScansRemaining={false} />
+    );
+
+    const file = new File(["dummy content"], "receipt.jpg", {
+      type: "image/jpeg",
+    });
+    const input = screen.getByTestId("file-input");
+
+    await user.upload(input, file);
+
+    // Even with file selected, button should be disabled when no scans remain
+    expect(screen.getByRole("button", { name: "Scan Receipt" })).toBeDisabled();
+  });
+
   it("calls scanReceiptAction when scan button is clicked", async () => {
     (scanReceiptAction as jest.Mock).mockResolvedValue({
       success: true,
       data: { store: "Test Store", date: "2023-01-01", items: [] },
     });
 
-    render(<UploadForm onScanResult={mockOnScanResult} />);
+    render(
+      <UploadForm onScanResult={mockOnScanResult} hasScansRemaining={true} />
+    );
 
     const file = new File(["dummy content"], "receipt.jpg", {
       type: "image/jpeg",
@@ -111,7 +135,9 @@ describe("UploadForm", () => {
 
     (scanReceiptAction as jest.Mock).mockReturnValue(actionPromise);
 
-    render(<UploadForm onScanResult={mockOnScanResult} />);
+    render(
+      <UploadForm onScanResult={mockOnScanResult} hasScansRemaining={true} />
+    );
 
     const file = new File(["dummy content"], "receipt.jpg", {
       type: "image/jpeg",
@@ -148,7 +174,9 @@ describe("UploadForm", () => {
       error: "Failed to scan receipt",
     });
 
-    render(<UploadForm onScanResult={mockOnScanResult} />);
+    render(
+      <UploadForm onScanResult={mockOnScanResult} hasScansRemaining={true} />
+    );
 
     const file = new File(["dummy content"], "receipt.jpg", {
       type: "image/jpeg",
@@ -178,7 +206,9 @@ describe("UploadForm", () => {
       data: null,
     });
 
-    render(<UploadForm onScanResult={mockOnScanResult} />);
+    render(
+      <UploadForm onScanResult={mockOnScanResult} hasScansRemaining={true} />
+    );
 
     const file = new File(["dummy content"], "receipt.jpg", {
       type: "image/jpeg",
@@ -200,7 +230,9 @@ describe("UploadForm", () => {
       new Error("Unexpected error")
     );
 
-    render(<UploadForm onScanResult={mockOnScanResult} />);
+    render(
+      <UploadForm onScanResult={mockOnScanResult} hasScansRemaining={true} />
+    );
 
     const file = new File(["dummy content"], "receipt.jpg", {
       type: "image/jpeg",
@@ -223,7 +255,9 @@ describe("UploadForm", () => {
   });
 
   it("resets scan results when a new file is selected", async () => {
-    render(<UploadForm onScanResult={mockOnScanResult} />);
+    render(
+      <UploadForm onScanResult={mockOnScanResult} hasScansRemaining={true} />
+    );
 
     const file = new File(["dummy content"], "receipt.jpg", {
       type: "image/jpeg",

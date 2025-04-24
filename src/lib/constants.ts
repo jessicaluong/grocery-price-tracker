@@ -20,3 +20,6 @@ export const VIEW_OPTIONS = {
 
 export const DEFAULT_SORT = SORT_OPTIONS.NEWEST;
 export const DEFAULT_VIEW = VIEW_OPTIONS.LIST;
+
+export const DAILY_SCAN_LIMIT = 5;
+export const MONTHLY_SCAN_LIMIT = 450;

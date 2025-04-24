@@ -1,15 +1,12 @@
 "use client";
 
-import {
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { DialogContent } from "@/components/ui/dialog";
 import { ReceiptData } from "@/types/receipt";
 import { useState } from "react";
-import UploadForm from "./upload-form";
-import ScannedReceipt from "./scanned-receipt/scanned-receipt";
+import { useQuery } from "@tanstack/react-query";
+import ReceiptDialogContentUploadForm from "./receipt-dialog-content-upload-form";
+import ReceiptDialogContentScannedReceipt from "./receipt-dialog-content-scanned-receipt";
+import { useToast } from "@/hooks/use-toast";
 
 type ReceiptScannerDialogContentProps = {
   onClose: () => void;
@@ -18,23 +15,27 @@ type ReceiptScannerDialogContentProps = {
 export default function ReceiptScannerDialogContent({
   onClose,
 }: ReceiptScannerDialogContentProps) {
+  const { toast } = useToast();
+
   const [scanResult, setScanResult] = useState<ReceiptData | null>(null);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["scanQuota"],
+    queryFn: async () => {
+      const response = await fetch("/api/scan-quota");
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast({
+          variant: "destructive",
+          description: errorData.error,
+        });
+      }
+      return response.json();
+    },
+  });
 
   const handleSetScanResult = (results: ReceiptData | null) => {
     setScanResult(results);
   };
-
-  const getDescriptionText = () => {
-    if (!scanResult) {
-      return "Upload an image of your receipt to add multiple items.";
-    } else if (scanResult.items.length > 0) {
-      return "Edit your scanned receipt before adding the items to your grocery tracker.";
-    } else {
-      return null; // No description for empty items
-    }
-  };
-
-  const descriptionText = getDescriptionText();
 
   return (
     <DialogContent
@@ -44,20 +45,18 @@ export default function ReceiptScannerDialogContent({
       }}
       onEscapeKeyDown={(e) => e.preventDefault()}
     >
-      <DialogHeader>
-        <DialogTitle>
-          {!scanResult ? "Upload Receipt " : "Receipt Details"}
-        </DialogTitle>
-        {descriptionText && (
-          <DialogDescription>{descriptionText}</DialogDescription>
-        )}
-      </DialogHeader>
-      {!scanResult ? (
-        <UploadForm onScanResult={handleSetScanResult} />
+      {scanResult ? (
+        <ReceiptDialogContentScannedReceipt
+          scanResult={scanResult}
+          onClose={onClose}
+        />
       ) : (
-        <>
-          <ScannedReceipt data={scanResult} onSuccess={onClose} />
-        </>
+        <ReceiptDialogContentUploadForm
+          handleSetScanResult={handleSetScanResult}
+          quotaData={data}
+          isQuotaLoading={isLoading}
+          quotaError={error}
+        />
       )}
     </DialogContent>
   );
