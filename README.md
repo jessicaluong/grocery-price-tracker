@@ -1,8 +1,8 @@
 # Grocery Price Tracker
 
-A full-stack Next.js application developed to help shoppers track grocery prices over time.
+A web application that helps shoppers track their local grocery prices and monitor price trends over time. 
 
-<img width="1212" alt="preview" src="https://github.com/user-attachments/assets/ba5b985c-0f8b-45d6-a127-e593195a5127" />
+![grocery-tracker](https://github.com/user-attachments/assets/3d54afdc-3e02-4649-ada0-13ee38711a7f)
 
 ## Table of Contents
 
@@ -38,7 +38,7 @@ https://github.com/user-attachments/assets/087fab49-9df2-4f6c-87d3-4ad6f9f62568
 
 <img width="1220" alt="receipt-scanner" src="https://github.com/user-attachments/assets/41bce44d-7b73-4e59-889f-43614f7ca489" />
 
-### Data Management
+### Sort and Filter Items
 
 - Search by product name and/or brand
 - View items individually or group by product
@@ -134,15 +134,15 @@ Security is implemented at multiple levels:
 
 ![azure-limit](https://github.com/user-attachments/assets/98b900ce-9d2c-4de3-824b-23772dc1200f)
 
-- **Usage Quotas**: Implemented daily and monthly limits (5 scans per day per user, 450 scans per month for all users)
+- **Usage Quotas**: Implemented daily (per user) and monthly (shared) limits 
 - **Database Tracking**: Used a database model to track scan usage
 
 <div id="test"></div>
 
 ## Testing Strategy
 
-- **Unit testing**: Jest for testing complex components (e.g., forms) and utility functions
-- **Integration testing**: Jest for verifying interactions with a real database (i.e., functions in data access layer)
+- **Unit testing**: Jest for testing components with logic and utility functions
+- **Integration testing**: Jest for verifying interactions with database 
 - **End-to-end testing**: Playwright for testing user flows (e.g., adding an item)
 
 <div id="status"></div>
